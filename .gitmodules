@@ -1,0 +1,3 @@
+[submodule "SHEEP"]
+	path = SHEEP
+	url = ../SHEEP.git
