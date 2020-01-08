@@ -5,6 +5,13 @@
     <mapping directory="$PROJECT_DIR$/SHEEP" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/SHEEP/backend/cmake-build-debug/applications/googletest-src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/HElib" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/SEAL" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/SEAL/native/tests/thirdparty/googletest" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/palisade-release" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/palisade-release/third-party/cereal" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/palisade-release/third-party/google-benchmark" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/palisade-release/third-party/google-test" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/palisade-release/third-party/gperftools" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/tfhe" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/tfhe/src/test/googletest" vcs="Git" />
   </component>
