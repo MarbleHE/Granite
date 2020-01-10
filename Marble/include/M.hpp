@@ -27,30 +27,30 @@ namespace Marble {
 
     M encrypt(SelectorType batched, long value, int bitSize, bool twos_complement);
 
-    M encrypt(SelectorType batched, vector<long> value, int bitSize = 32, bool twos_complement = true);
+    M encrypt(SelectorType batched, std::vector<long> value, int bitSize = 32, bool twos_complement = true);
 
-    M encrypt(SelectorType batched, vector<bool> value, int bitSize = 1, bool twos_complement = false);
+    M encrypt(SelectorType batched, std::vector<bool> value, int bitSize = 1, bool twos_complement = false);
 
-    M encrypt(SelectorType batched, vector<int> value, int bitSize = 32, bool twos_complement = true);
+    M encrypt(SelectorType batched, std::vector<int> value, int bitSize = 32, bool twos_complement = true);
 
     M encrypt(long value, int bitSize, bool twos_complement);
 
-    vector<M> encrypt(vector<long> value, int bitSize = 32, bool twos_complement = true);
+    std::vector<M> encrypt(std::vector<long> value, int bitSize = 32, bool twos_complement = true);
 
-    vector<M> encrypt(vector<bool> value, int bitSize = 1, bool twos_complement = false);
+    std::vector<M> encrypt(std::vector<bool> value, int bitSize = 1, bool twos_complement = false);
 
     M encode(SelectorType batched, long value, int bitSize = 32, bool twos_complement = true);
 
-    M encode(SelectorType batched, vector<long> value, int bitSize = 32, bool twos_complement = true);
+    M encode(SelectorType batched, std::vector<long> value, int bitSize = 32, bool twos_complement = true);
 
-    M encode(SelectorType batched, vector<int> value, int bitSize = 32, bool twos_complement = true);
+    M encode(SelectorType batched, std::vector<int> value, int bitSize = 32, bool twos_complement = true);
 
 
     // Output
 
-    void output(M value, string msg = "", int slot = -1);
+    void output(M value, std::string msg = "", int slot = -1);
 
-    class M{
+    class M {
     public:
         /// The method generating an AST from some function written with M classes.
         static Ast make_AST(std::function<void()> f);
@@ -89,7 +89,7 @@ namespace Marble {
         M &operator+=(const M &rhs);
 
         /// Addition
-        M &operator+=(const vector<long> &rhs);
+        M &operator+=(const std::vector<long> &rhs);
 
         /// Subtraction
         M &operator-=(const M &rhs);
@@ -98,7 +98,7 @@ namespace Marble {
         M &operator*=(const M &rhs);
 
         /// Multiplication
-        M &operator*=(vector<long> &rhs);
+        M &operator*=(std::vector<long> &rhs);
 
         /// Increment operator
         M &operator++();
@@ -155,7 +155,7 @@ namespace Marble {
         /// This is the (temporary) Ast used to build the finally returned Ast by make_AST
         static Ast ast;
 
-        vector<long> values;
+        std::vector<long> values;
         int bitSize = -1;
         bool twos_complement;
         bool plaintext;
@@ -164,7 +164,7 @@ namespace Marble {
         M(long value, int bitSize, bool twos_complement, bool plaintext);
 
         /// Different values in different slots
-        M(vector<long> values, int bitSize, bool twos_complement, bool plaintext);
+        M(std::vector<long> values, int bitSize, bool twos_complement, bool plaintext);
 
 
         friend M encrypt(SelectorType batched, long value, int bitSize, bool twos_complement);
@@ -172,17 +172,17 @@ namespace Marble {
         friend M encode(SelectorType batched, long value, int bitSize, bool twos_complement);
 
 
-        friend M encrypt(SelectorType batched, vector<long> value, int bitSize, bool twos_complement);
+        friend M encrypt(SelectorType batched, std::vector<long> value, int bitSize, bool twos_complement);
 
-        friend M encode(SelectorType batched, vector<long> value, int bitSize, bool twos_complement);
+        friend M encode(SelectorType batched, std::vector<long> value, int bitSize, bool twos_complement);
 
-        friend vector<M> encrypt(vector<long> values, int bitSize, bool twos_complement);
+        friend std::vector<M> encrypt(std::vector<long> values, int bitSize, bool twos_complement);
 
-        friend vector<M> encrypt(vector<bool> values, int bitSize, bool twos_complement);
+        friend std::vector<M> encrypt(std::vector<bool> values, int bitSize, bool twos_complement);
 
         friend M encrypt(long value, int bitSize, bool twos_complement);
 
-        friend void output(M value, string msg, int slot);
+        friend void output(M value, std::string msg, int slot);
 
         friend Ast make_AST(std::function<void()> f);
 
