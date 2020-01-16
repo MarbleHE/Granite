@@ -1,3 +1,6 @@
 [submodule "SHEEP"]
 	path = SHEEP
 	url = ../SHEEP.git
+[submodule "Marble/lib/ast"]
+	path = Marble/lib/ast
+	url = ../../pjattke/msc-thesis-code-AST.git
