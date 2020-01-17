@@ -47,8 +47,15 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
     include_directories("${gtest_SOURCE_DIR}/include")
 endif()
 ]]
+
 #Linking against libraries gtest, ast, wool, sheep
+set(SOURCE_FILES
+        src/BitHelpers.cpp
+        src/M.cpp
+)
+
 add_executable(testsM tests/testsM.cpp
+        ${SOURCE_FILES}
         )
 target_include_directories(testsM PUBLIC
         include

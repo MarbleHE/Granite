@@ -6,12 +6,17 @@ using namespace std;
 namespace Marble {
 
     // Initialize static members
+    int M::fid = 0;
+    Ast M::ast;
+    Function* M::current_f;
 
     Ast M::make_AST(std::function<void()> f) {
-        M::ast = Ast();
-        ast.add_function(f);
-        f();
-        return Ast();
+        M::ast = Ast(); // clear Ast
+        string f_name = "f_" + to_string(M::fid);
+        M::fid++;
+        M::current_f = dynamic_cast<Function*>(M::ast.setRootNode(new Function(f_name)));
+        f(); // execute function to parse by self-evaluation with the help of the operators defined by M
+        return M::ast;
     }
 
     M::M() {
@@ -108,6 +113,75 @@ namespace Marble {
         return <#initializer#>;
     }
 */
+
+
+    M encode(SelectorType batched, long value, int bitSize, bool twos_complement) {
+        assert(bitSize > 0);
+        return M(value, bitSize, twos_complement, true);
+
+    }
+
+    M encrypt(SelectorType batched, long value, int bitSize, bool twos_complement) {
+        assert(bitSize > 0);
+        return M(value, bitSize, twos_complement, false);
+    }
+
+    M encrypt(SelectorType batched, vector<int> values, int bitSize, bool twos_complement) {
+        vector<long> v(values.size());
+        for (int i = 0; i < values.size(); ++i) {
+            v[i] = values[i];
+        }
+        return encrypt(batched, v, bitSize, twos_complement);
+    }
+
+    M encode(SelectorType batched, vector<long> values, int bitSize, bool twos_complement) {
+        assert(bitSize > 0);
+        return M(values, bitSize, twos_complement, true);
+    }
+
+    M encode(SelectorType batched, vector<int> values, int bitSize, bool twos_complement) {
+        vector<long> v(values.size());
+        for (int i = 0; i < values.size(); ++i) {
+            v[i] = values[i];
+        }
+        return encode(batched, v, bitSize, twos_complement);
+    }
+
+    M encrypt(SelectorType batched, vector<long> values, int bitSize, bool twos_complement) {
+        assert(bitSize > 0);
+        return M(values, bitSize, twos_complement, false);
+    }
+
+    M encrypt(SelectorType batched, vector<bool> values, int bitSize, bool twos_complement) {
+        vector<long> v(values.size());
+        for (int i = 0; i < values.size(); ++i) {
+            v[i] = values[i];
+        }
+        return encrypt(SelectorType(), v, bitSize, twos_complement);
+    }
+
+    M encrypt(long value, int bitSize, bool twos_complement) {
+        return M(value, bitSize, twos_complement, false);
+    }
+
+
+    vector<M> encrypt(vector<long> values, int bitSize, bool twos_complement) {
+        vector<M> vs;
+        for (int i = 0; i < values.size(); ++i) {
+            M t = M(values[i], bitSize, twos_complement, false);
+            vs.emplace_back(t);
+        }
+        return vs;
+    }
+
+    vector<M> encrypt(vector<bool> values, int bitSize, bool twos_complement) {
+        vector<long> v(values.size());
+        for (int i = 0; i < values.size(); ++i) {
+            v[i] = values[i];
+        }
+        return encrypt(v, bitSize, twos_complement);
+    }
+
     M::M(long value, int bitSize, bool twos_complement, bool plaintext) {
         this->values = std::vector<long>(1, value);
         this->bitSize = bitSize;

@@ -3,11 +3,16 @@
 //
 #include <gtest/gtest.h>
 #include "Ast.h"
+#include "M.hpp"
 
-TEST(BasicTest, Eq){
+TEST(BasicTest, GoogleTestImport){
     ASSERT_EQ(1,1);
 }
 
-TEST(BasicAst, Eq){
+TEST(BasicAst, AstImport){
     ASSERT_NO_THROW(Ast());
+}
+
+TEST(BasicM, MImport){
+    ASSERT_NO_THROW(Marble::M());
 }

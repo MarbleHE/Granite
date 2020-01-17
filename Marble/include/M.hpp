@@ -9,6 +9,7 @@
 #include <functional>
 
 #include "Ast.h"
+#include "Function.h"
 
 namespace Marble {
     class M;
@@ -160,6 +161,12 @@ namespace Marble {
     private:
         /// This is the (temporary) Ast used to build the finally returned Ast by make_AST
         static Ast ast;
+
+        /// This is a counter to uniquely name every function.
+        static int fid;
+
+        /// This is the pointer to the function currently being parsed
+        static Function* current_f;
 
         std::vector<long> values;
         int bitSize = -1;
