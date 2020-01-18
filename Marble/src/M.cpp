@@ -7,6 +7,7 @@ namespace Marble {
 
     // Initialize static members
     int M::fid = 0;
+    int M::vid = 0;
     Ast M::ast;
     Function* M::current_f;
 
@@ -52,6 +53,14 @@ namespace Marble {
         plaintext = other.plaintext;
         values = other.values;
         twos_complement = other.twos_complement;
+        if(uid == 0){
+            M::current_f->addStatement(new VarDecl(toExpr(other)));
+        }
+        else
+        {
+            M::current_f->addStatement(new VarAssign(toExpr(other)));
+            uid++;
+        }
         return *this;
     }
 
@@ -60,6 +69,15 @@ namespace Marble {
         plaintext = other.plaintext;
         values = other.values;
         twos_complement = other.twos_complement;
+        if(uid == 0){
+            M::current_f->addStatement(new VarDecl(toExpr(other)));
+            varid = M::vid++;
+        }
+        else
+        {
+            M::current_f->addStatement(new VarAssign(toExpr(other)));
+            uid++;
+        }
         return *this;
     }
 
@@ -68,16 +86,35 @@ namespace Marble {
         this->bitSize = ceil_log2(i) + 1;
         this->twos_complement = (i < 0);
         this->plaintext = true;
+        this->varid = M::vid++;
         return *this;
     }
 
     M &M::operator=(bool b) {
         *this = encrypt(SelectorType(), b, 1, false);
+        if(uid == 0){
+            M::current_f->addStatement(new VarDecl(to_string(M::vid), b));
+            this->varid = M::vid++;
+        }
+        else
+        {
+            M::current_f->addStatement(new VarAssign(to_string(this.varid), b));
+            uid++;
+        }
         return *this;
     }
 
     M &M::operator=(int i) {
         *this = encrypt(SelectorType(), i, 32, true);
+        if(uid == 0){
+            M::current_f->addStatement(new VarDecl(to_string(M::vid), i));
+            this->varid = M::vid++;
+        }
+        else
+        {
+            M::current_f->addStatement(new VarAssign(to_string(this.varid), i));
+            uid++;
+        }
         return *this;
     }
 /*

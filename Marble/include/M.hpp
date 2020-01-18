@@ -165,6 +165,9 @@ namespace Marble {
         /// This is a counter to uniquely name every function.
         static int fid;
 
+        /// Unique ID for every variable.
+        static int vid;
+
         /// This is the pointer to the function currently being parsed
         static Function* current_f;
 
@@ -172,6 +175,12 @@ namespace Marble {
         int bitSize = -1;
         bool twos_complement;
         bool plaintext;
+
+        /// usage ID
+        int uid = 0;
+        
+        /// variable ID (name of Variable)
+        int varid;
 
         /// Single value, replicated across all slots
         M(long value, int bitSize, bool twos_complement, bool plaintext);
