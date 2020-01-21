@@ -1,8 +1,14 @@
 {
     "type": "Function",
-    "name": "f_0",
+    "name": "f",
     "params": [
     ],
-    "body": [
+    "body": [{
+        "type": "Return",
+        "value": {
+            "type": "Variable",
+            "identifier": "0"
+        }
+    }
     ]
   }

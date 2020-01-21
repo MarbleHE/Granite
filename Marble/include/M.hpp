@@ -8,8 +8,7 @@
 #include <string>
 #include <functional>
 
-#include "Ast.h"
-#include "Function.h"
+#include "AbstractExpr.h"
 
 namespace Marble {
     class M;
@@ -49,10 +48,13 @@ namespace Marble {
 
     // Output
 
-    void output(M value, std::string msg = "", int slot = -1);
+    void output(M value);
 
     class M {
     public:
+        /// a pointer to the AST responsible for its construction
+        AbstractExpr* expr;
+
         /// The method generating an AST from some function written with M classes.
         static Ast make_AST(std::function<void()> f);
 
@@ -64,6 +66,12 @@ namespace Marble {
         /// TODO: with which library will evaluation happen? Can we select?
         /// @return duration elapsed in milleseconds
         static double evaluate(std::function<void()> f);
+
+        /// Return statement imitation
+        static void output(M m);
+
+        /// Destructor;
+        ~M();
 
         /// Dummy contructor
         M();
@@ -160,35 +168,18 @@ namespace Marble {
         ///
     private:
         /// This is the (temporary) Ast used to build the finally returned Ast by make_AST
-        static Ast ast;
+        static Ast output_ast;
 
-        /// This is a counter to uniquely name every function.
-        static int fid;
-
-        /// Unique ID for every variable.
+        /// Global counter to uniquely name variables
         static int vid;
 
-        /// This is the pointer to the function currently being parsed
-        static Function* current_f;
-
-        std::vector<long> values;
-        int bitSize = -1;
-        bool twos_complement;
         bool plaintext;
 
-        /// usage ID
-        int uid = 0;
+        /// Direct init with AST
+        M(AbstractExpr& expr, bool plaintext);
+
         
-        /// variable ID (name of Variable)
-        int varid;
-
-        /// Single value, replicated across all slots
-        M(long value, int bitSize, bool twos_complement, bool plaintext);
-
-        /// Different values in different slots
-        M(std::vector<long> values, int bitSize, bool twos_complement, bool plaintext);
-
-
+/*
         friend M encrypt(SelectorType batched, long value, int bitSize, bool twos_complement);
 
         friend M encode(SelectorType batched, long value, int bitSize, bool twos_complement);
@@ -203,9 +194,7 @@ namespace Marble {
         friend std::vector<M> encrypt(std::vector<bool> values, int bitSize, bool twos_complement);
 
         friend M encrypt(long value, int bitSize, bool twos_complement);
-
-        friend void output(M value, std::string msg, int slot);
-
+*/
         friend Ast make_AST(std::function<void()> f);
 
         void enc_if_needed();

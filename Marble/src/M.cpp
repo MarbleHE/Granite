@@ -1,120 +1,81 @@
 #include "M.hpp"
 #include "BitHelpers.h"
+#include "Ast.h"
+#include "Variable.h"
+#include "LiteralInt.h"
+#include "LiteralBool.h"
+#include "Function.h"
+#include "Return.h"
 
 using namespace std;
 
 namespace Marble {
 
-    // Initialize static members
-    int M::fid = 0;
+    // Initialize static member
+    Ast M::output_ast;
     int M::vid = 0;
-    Ast M::ast;
-    Function* M::current_f;
 
     Ast M::make_AST(std::function<void()> f) {
-        M::ast = Ast(); // clear Ast
-        string f_name = "f_" + to_string(M::fid);
-        M::fid++;
-        M::current_f = dynamic_cast<Function*>(M::ast.setRootNode(new Function(f_name)));
-        f(); // execute function to parse by self-evaluation with the help of the operators defined by M
-        return M::ast;
+        M::output_ast = Ast(); // clear Ast
+        f(); // execute function to parse by self-evaluation with the help of the operators defined by M. The output(M m) function sets M::output_ast
+        return M::output_ast;
+    }
+
+    void M::output(M m){
+        M::output_ast = Ast();
+        Function* func = dynamic_cast<Function*>(M::output_ast.setRootNode(new Function("f")));
+        func->addStatement(new Return(m.expr));
     }
 
     M::M() {
-        this->values = std::vector<long>(1, 0);
-        this->bitSize = 1;
-        this->twos_complement = false;
         this->plaintext = true;
+        this->expr = new Variable(to_string(M::vid++));
     }
 
     M::M(const M &other) {
-        bitSize = other.bitSize;
         plaintext = other.plaintext;
-        values = other.values;
-        twos_complement = other.twos_complement;
+        expr = other.expr;
     }
 
     M::M(M &&other) {
-        bitSize = other.bitSize;
         plaintext = other.plaintext;
-        values = other.values;
-        twos_complement = other.twos_complement;
+        expr = other.expr;
     }
 
     M::M(long i) {
-        this->values = std::vector<long>(1, i);
-        this->bitSize = ceil_log2(i) + 1;
-        this->twos_complement = (i < 0);
         this->plaintext = true;
+        this->expr = new LiteralInt(i); //TODO: long to int conversion is not a good idea. change LiteralInt to support longs
     }
 
     M &M::operator=(const M &other) {
-        bitSize = other.bitSize;
         plaintext = other.plaintext;
-        values = other.values;
-        twos_complement = other.twos_complement;
-        if(uid == 0){
-            M::current_f->addStatement(new VarDecl(toExpr(other)));
-        }
-        else
-        {
-            M::current_f->addStatement(new VarAssign(toExpr(other)));
-            uid++;
-        }
+        expr = other.expr;
         return *this;
     }
 
     M &M::operator=(M &&other) {
-        bitSize = other.bitSize;
         plaintext = other.plaintext;
-        values = other.values;
-        twos_complement = other.twos_complement;
-        if(uid == 0){
-            M::current_f->addStatement(new VarDecl(toExpr(other)));
-            varid = M::vid++;
-        }
-        else
-        {
-            M::current_f->addStatement(new VarAssign(toExpr(other)));
-            uid++;
-        }
+        expr = other.expr;
         return *this;
     }
 
     M &M::operator=(long i) {
-        this->values = std::vector<long>(1, i);
-        this->bitSize = ceil_log2(i) + 1;
-        this->twos_complement = (i < 0);
         this->plaintext = true;
-        this->varid = M::vid++;
+        this->expr = new LiteralInt(i);
         return *this;
     }
 
     M &M::operator=(bool b) {
-        *this = encrypt(SelectorType(), b, 1, false);
-        if(uid == 0){
-            M::current_f->addStatement(new VarDecl(to_string(M::vid), b));
-            this->varid = M::vid++;
-        }
-        else
-        {
-            M::current_f->addStatement(new VarAssign(to_string(this.varid), b));
-            uid++;
-        }
+        //*this = encrypt(SelectorType(), b, 1, false);
+        this->plaintext = true;
+        this->expr = new LiteralBool(b);
         return *this;
     }
 
     M &M::operator=(int i) {
-        *this = encrypt(SelectorType(), i, 32, true);
-        if(uid == 0){
-            M::current_f->addStatement(new VarDecl(to_string(M::vid), i));
-            this->varid = M::vid++;
-        }
-        else
-        {
-            M::current_f->addStatement(new VarAssign(to_string(this.varid), i));
-            uid++;
-        }
+        //*this = encrypt(SelectorType(), i, 32, true);
+        this->plaintext = true;
+        this->expr = new LiteralInt(i);
         return *this;
     }
 /*
@@ -151,7 +112,7 @@ namespace Marble {
     }
 */
 
-
+/*
     M encode(SelectorType batched, long value, int bitSize, bool twos_complement) {
         assert(bitSize > 0);
         return M(value, bitSize, twos_complement, true);
@@ -218,19 +179,16 @@ namespace Marble {
         }
         return encrypt(v, bitSize, twos_complement);
     }
-
-    M::M(long value, int bitSize, bool twos_complement, bool plaintext) {
-        this->values = std::vector<long>(1, value);
-        this->bitSize = bitSize;
-        this->twos_complement = twos_complement;
+*/
+    M::M(AbstractExpr& expr, bool plaintext) {
+        this->expr = &expr;
         this->plaintext = plaintext;
     }
 
-    M::M(std::vector<long> values, int bitSize, bool twos_complement, bool plaintext) {
-        this->values = values;
-        this->bitSize = bitSize;
-        this->twos_complement = twos_complement;
-        this->plaintext = plaintext;
+    M::~M(){
+        if (!this->expr){
+            delete this->expr;
+        }
     }
 
     void M::enc_if_needed() {
