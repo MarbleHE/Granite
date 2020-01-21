@@ -13,7 +13,6 @@ namespace Marble {
 
     // Initialize static member
     Ast M::output_ast;
-    int M::vid = 0;
 
     Ast M::make_AST(std::function<void()> f) {
         M::output_ast = Ast(); // clear Ast
@@ -29,7 +28,7 @@ namespace Marble {
 
     M::M() {
         this->plaintext = true;
-        this->expr = new Variable(to_string(M::vid++));
+        this->expr = new Variable("_var_");
     }
 
     M::M(const M &other) {

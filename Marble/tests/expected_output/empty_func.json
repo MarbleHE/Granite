@@ -7,7 +7,7 @@
         "type": "Return",
         "value": {
             "type": "Variable",
-            "identifier": "0"
+            "identifier": "_var_"
         }
     }
     ]

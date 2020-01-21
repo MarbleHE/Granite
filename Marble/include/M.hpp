@@ -170,9 +170,6 @@ namespace Marble {
         /// This is the (temporary) Ast used to build the finally returned Ast by make_AST
         static Ast output_ast;
 
-        /// Global counter to uniquely name variables
-        static int vid;
-
         bool plaintext;
 
         /// Direct init with AST
