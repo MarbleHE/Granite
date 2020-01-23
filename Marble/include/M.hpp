@@ -99,12 +99,12 @@ namespace Marble {
 
         /// Encrypt int
         M &operator=(int i);
-/*
+
         /// Addition
         M &operator+=(const M &rhs);
 
         /// Addition
-        M &operator+=(const std::vector<long> &rhs);
+        M &operator+=(const long &rhs);
 
         /// Subtraction
         M &operator-=(const M &rhs);
@@ -113,7 +113,7 @@ namespace Marble {
         M &operator*=(const M &rhs);
 
         /// Multiplication
-        M &operator*=(std::vector<long> &rhs);
+        M &operator*=(long &rhs);
 
         /// Increment operator
         M &operator++();
@@ -164,7 +164,7 @@ namespace Marble {
 
         /// Multiplication
         friend M operator*(const M &lhs, const M &rhs);
-*/
+
         ///
     private:
         /// This is the (temporary) Ast used to build the finally returned Ast by make_AST

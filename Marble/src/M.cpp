@@ -6,6 +6,9 @@
 #include "LiteralBool.h"
 #include "Function.h"
 #include "Return.h"
+#include "BinaryExpr.h"
+#include "Operator.h"
+#include "UnaryExpr.h"
 
 using namespace std;
 
@@ -77,39 +80,57 @@ namespace Marble {
         this->expr = new LiteralInt(i);
         return *this;
     }
-/*
+
     M &M::operator+=(const M &rhs) {
-        return <#initializer#>;
+        auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::addition, rhs.expr);
+        this->expr = exp;
+        return *this;
     }
 
-    M &M::operator+=(const std::vector<long> &rhs) {
-        return <#initializer#>;
+    M &M::operator+=(const long &rhs) {
+        auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::addition, new LiteralInt(rhs));
+        this->expr = exp;
+        return *this;
     }
 
     M &M::operator-=(const M &rhs) {
-        return <#initializer#>;
+        auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::subtraction, rhs);
+        this->expr = exp;
+        return *this;
     }
+
+    //TODO: -= long &rhs missing?
 
     M &M::operator*=(const M &rhs) {
-        return <#initializer#>;
+        auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::multiplication, rhs);
+        this->expr = exp;
+        return *this;
     }
 
-    M &M::operator*=(std::vector<long> &rhs) {
-        return <#initializer#>;
+    M &M::operator*=(long &rhs) {
+        auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::multiplication, new LiteralInt(rhs));
+        this->expr = exp;
+        return *this;
     }
 
     M &M::operator++() {
-        return <#initializer#>;
+        auto exp = new UnaryExpr(OpSymb::UnaryOp::increment, this->expr);
+        this->expr = exp;
+        return *this;
     }
 
     M &M::operator--() {
-        return <#initializer#>;
+        auto exp = new UnaryExpr(OpSymb::UnaryOp::decrement, this->expr);
+        this->expr = exp;
+        return *this;
     }
 
     M &M::operator!() {
-        return <#initializer#>;
+        auto exp = new UnaryExpr(OpSymb::UnaryOp::negation, this->expr);
+        this->expr = exp;
+        return *this;
     }
-*/
+
 
 /*
     M encode(SelectorType batched, long value, int bitSize, bool twos_complement) {
