@@ -15,18 +15,20 @@ using namespace std;
 namespace Marble {
 
     // Initialize static member
-    Ast M::output_ast;
+    Ast M::output_ast = Ast();
+
 
     Ast M::make_AST(std::function<void()> f) {
         M::output_ast = Ast(); // clear Ast
         f(); // execute function to parse by self-evaluation with the help of the operators defined by M. The output(M m) function sets M::output_ast
-        return M::output_ast;
+        Ast t = M::output_ast;
+        return t;
     }
 
-    void M::output(M m){
+    void M::output(const M &m) {
         M::output_ast = Ast();
-        Function* func = dynamic_cast<Function*>(M::output_ast.setRootNode(new Function("f")));
-        func->addStatement(new Return(m.expr));
+        Function *func = dynamic_cast<Function *>(M::output_ast.setRootNode(new Function("f")));
+        func->addStatement(new Return((m.expr)));
     }
 
     M::M() {
@@ -46,7 +48,18 @@ namespace Marble {
 
     M::M(long i) {
         this->plaintext = true;
-        this->expr = new LiteralInt(i); //TODO: long to int conversion is not a good idea. change LiteralInt to support longs
+        this->expr = new LiteralInt(
+                i); //TODO: long to int conversion is not a good idea. change LiteralInt to support longs
+    }
+
+    M::M(int i) {
+        this->plaintext = true;
+        this->expr = new LiteralInt(i);
+    }
+
+    M::M(bool b) {
+        this->plaintext = true;
+        this->expr = new LiteralBool(b);
     }
 
     M &M::operator=(const M &other) {
@@ -66,6 +79,7 @@ namespace Marble {
         this->expr = new LiteralInt(i);
         return *this;
     }
+
 
     M &M::operator=(bool b) {
         //*this = encrypt(SelectorType(), b, 1, false);
@@ -93,8 +107,14 @@ namespace Marble {
         return *this;
     }
 
+    M &M::operator+=(const int &rhs) {
+        auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::addition, new LiteralInt(rhs));
+        this->expr = exp;
+        return *this;
+    }
+
     M &M::operator-=(const M &rhs) {
-        auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::subtraction, rhs);
+        auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::subtraction, rhs.expr);
         this->expr = exp;
         return *this;
     }
@@ -102,12 +122,18 @@ namespace Marble {
     //TODO: -= long &rhs missing?
 
     M &M::operator*=(const M &rhs) {
-        auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::multiplication, rhs);
+        auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::multiplication, rhs.expr);
         this->expr = exp;
         return *this;
     }
 
     M &M::operator*=(long &rhs) {
+        auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::multiplication, new LiteralInt(rhs));
+        this->expr = exp;
+        return *this;
+    }
+
+    M &M::operator*=(int &rhs) {
         auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::multiplication, new LiteralInt(rhs));
         this->expr = exp;
         return *this;
@@ -200,18 +226,17 @@ namespace Marble {
         return encrypt(v, bitSize, twos_complement);
     }
 */
-    M::M(AbstractExpr& expr, bool plaintext) {
+    M::M(AbstractExpr &expr, bool plaintext) {
         this->expr = &expr;
         this->plaintext = plaintext;
     }
 
-    M::~M(){
-        if (!this->expr){
-            delete this->expr;
-        }
+    M::~M() {
+        delete this->expr;
     }
 
     void M::enc_if_needed() {
 
     }
+
 }

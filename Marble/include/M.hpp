@@ -52,8 +52,10 @@ namespace Marble {
 
     class M {
     public:
-        /// a pointer to the AST responsible for its construction
-        AbstractExpr* expr;
+        M(int i);
+
+/// a pointer to the AST responsible for its construction
+        AbstractExpr *expr;
 
         /// The method generating an AST from some function written with M classes.
         static Ast make_AST(std::function<void()> f);
@@ -68,7 +70,7 @@ namespace Marble {
         static double evaluate(std::function<void()> f);
 
         /// Return statement imitation
-        static void output(M m);
+        static void output(const M &m);
 
         /// Destructor;
         ~M();
@@ -84,6 +86,9 @@ namespace Marble {
 
         /// Plaintext constructor
         M(long i);
+
+        /// Plaintext constructor
+        M(bool b);
 
         /// Copy assignment
         M &operator=(const M &other);
@@ -106,6 +111,9 @@ namespace Marble {
         /// Addition
         M &operator+=(const long &rhs);
 
+        /// Addition
+        M &operator+=(const int &rhs);
+
         /// Subtraction
         M &operator-=(const M &rhs);
 
@@ -114,6 +122,9 @@ namespace Marble {
 
         /// Multiplication
         M &operator*=(long &rhs);
+
+        /// Multiplication
+        M &operator*=(int &rhs);
 
         /// Increment operator
         M &operator++();
@@ -165,7 +176,6 @@ namespace Marble {
         /// Multiplication
         friend M operator*(const M &lhs, const M &rhs);
 
-        ///
     private:
         /// This is the (temporary) Ast used to build the finally returned Ast by make_AST
         static Ast output_ast;
@@ -173,9 +183,9 @@ namespace Marble {
         bool plaintext;
 
         /// Direct init with AST
-        M(AbstractExpr& expr, bool plaintext);
+        M(AbstractExpr &expr, bool plaintext);
 
-        
+
 /*
         friend M encrypt(SelectorType batched, long value, int bitSize, bool twos_complement);
 
