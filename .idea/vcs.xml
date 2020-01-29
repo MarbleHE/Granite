@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Marble/cmake-build-debug/googletest-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Marble/cmake-build-debug/lib/ast/googletest-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Marble/cmake-build-debug/lib/ast/nlohmann-json-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Marble/lib/ast" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Marble/lib/ast/cmake-build-debug/googletest-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Marble/lib/ast/cmake-build-debug/nlohmann-json-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP/backend/cmake-build-debug/applications/googletest-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/HElib" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/SEAL" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/SEAL/native/tests/thirdparty/googletest" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/palisade-release" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/palisade-release/third-party/cereal" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/palisade-release/third-party/google-benchmark" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/palisade-release/third-party/google-test" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/palisade-release/third-party/gperftools" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/tfhe" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/tfhe/src/test/googletest" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug/Marble/lib/ast/googletest-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug/Marble/lib/ast/nlohmann-json-src" vcs="Git" />
+  </component>
+</project>
