@@ -67,6 +67,18 @@ TEST(MTest, LiteralBoolExprTest) {
     EXPECT_EQ(b.expr->toString(), expected_json.dump());
 }
 
+TEST(MTest, ReturnLiteralIntTest){
+    M m = 42;
+    Ast ast = Ast();
+    Function *func = dynamic_cast<Function *>(ast.setRootNode(new Function("f")));
+    std::ifstream file(expected_output + "return_literal_int.json");
+    json expected_json = json::parse(file);
+
+    func->addStatement(new Return((m.expr)));
+
+    EXPECT_EQ(ast.getRootNode()->toString(), expected_json.dump());
+}
+
 void empty_func() {
     M::output(M());
 }
@@ -76,32 +88,34 @@ void empty_func2() {
     M::output(x);
 }
 
-void simple_func() {
+void literalInt_func() {
     M::output(M(42));
 }
 
+void literalInt_func2() {
+    M a = 42;
+    M::output(a);
+}
 
-class MTest : public ::testing::Test {
+
+class FTest : public ::testing::Test {
 protected:
     std::function<void()> f;
 };
 
-TEST(MTest, LiteralIntAST) {
-    std::function<void()> f = simple_func;
-    // TODO: change to relative path
+TEST_F(FTest, LiteralIntAST) {
+    f = empty_func;
     std::ifstream file(expected_output + "empty_func.json");
     json expected_j = json::parse(file);
 
     Ast ast = M::make_AST(f);
     auto rn = ast.getRootNode();
-    auto bdy = ((Function *) rn)->getBody();
-    for (auto x: bdy) std::cout << "VALLUE" << ((LiteralInt *) ((Return *) x)->getValue())->getValue();
-    //std::cout << rn->toString();
 
-    //EXPECT_EQ(expected_j.dump(), rn->toString());
+    EXPECT_EQ(expected_j.dump(), rn->toString());
+    //TODO: SIGSEGV at destruction? SIGBUS when ~M() is manually implemented?
 }
 
-TEST_F(MTest, EmptyFuncEquality) {
+TEST_F(FTest, EmptyFuncEquality) {
     f = empty_func;
     Ast ast = M::make_AST(f);
     Ast ast2 = M::make_AST(empty_func2);

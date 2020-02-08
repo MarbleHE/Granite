@@ -1,0 +1,14 @@
+{
+  "type": "Function",
+  "name": "f",
+  "params": [],
+  "body": [
+    {
+      "type": "Return",
+      "value": {
+        "type": "LiteralInt",
+        "value": 42
+      }
+    }
+  ]
+}
