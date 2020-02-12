@@ -15,19 +15,19 @@ using namespace std;
 namespace Marble {
 
     // Initialize static member
-    Ast M::output_ast = Ast();
+    Ast* M::output_ast = new Ast();
 
 
-    Ast M::make_AST(std::function<void()> f) {
-        M::output_ast = Ast(); // clear Ast
+    Ast* M::make_AST(std::function<void()> f) {
+        M::output_ast = new Ast(); // clear Ast
         f(); // execute function to parse by self-evaluation with the help of the operators defined by M. The output(M m) function sets M::output_ast
-        Ast t = M::output_ast;
-        return t;
+        //TODO: copy problem?
+        return M::output_ast;
     }
 
     void M::output(const M &m) {
-        M::output_ast = Ast();
-        Function *func = dynamic_cast<Function *>(M::output_ast.setRootNode(new Function("f")));
+        M::output_ast = new Ast();
+        Function *func = dynamic_cast<Function *>(M::output_ast->setRootNode(new Function("f")));
         func->addStatement(new Return((m.expr)));
     }
 
@@ -232,7 +232,6 @@ namespace Marble {
     }
 
     M::~M() {
-        delete this->expr;
     }
 
     void M::enc_if_needed() {

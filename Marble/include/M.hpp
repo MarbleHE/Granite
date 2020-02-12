@@ -58,7 +58,7 @@ namespace Marble {
         AbstractExpr *expr;
 
         /// The method generating an AST from some function written with M classes.
-        static Ast make_AST(std::function<void()> f);
+        static Ast* make_AST(std::function<void()> f);
 
         /// Method for multdepth analysis will probably be within Wool. (Wrapper for Wool)
         /// @return Maximum multiplicative depth of circuit composed from AST.
@@ -178,7 +178,7 @@ namespace Marble {
 
     private:
         /// This is the (temporary) Ast used to build the finally returned Ast by make_AST
-        static Ast output_ast;
+        static Ast *output_ast;
 
         bool plaintext;
 

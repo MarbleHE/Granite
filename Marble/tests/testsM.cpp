@@ -108,8 +108,8 @@ TEST_F(FTest, LiteralIntAST) {
     std::ifstream file(expected_output + "empty_func.json");
     json expected_j = json::parse(file);
 
-    Ast ast = M::make_AST(f);
-    auto rn = ast.getRootNode();
+    Ast* ast = M::make_AST(f);
+    auto rn = ast->getRootNode();
 
     EXPECT_EQ(expected_j.dump(), rn->toString());
     //TODO: SIGSEGV at destruction? SIGBUS when ~M() is manually implemented?
@@ -117,9 +117,9 @@ TEST_F(FTest, LiteralIntAST) {
 
 TEST_F(FTest, EmptyFuncEquality) {
     f = empty_func;
-    Ast ast = M::make_AST(f);
-    Ast ast2 = M::make_AST(empty_func2);
-    auto rn = ast.getRootNode();
-    auto rn2 = ast2.getRootNode();
+    Ast* ast = M::make_AST(f);
+    Ast* ast2 = M::make_AST(empty_func2);
+    auto rn = ast->getRootNode();
+    auto rn2 = ast2->getRootNode();
     EXPECT_EQ(rn->toString(), rn2->toString());
 }
