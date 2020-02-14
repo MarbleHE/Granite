@@ -8,7 +8,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 ####################################################################################
 ## Build master_thesis_code_lib library
 ####################################################################################
-set(BUILD_TYPE_AST LIBRARY)
 add_subdirectory(lib/ast)
 
 ####################################################################################
@@ -60,11 +59,12 @@ add_executable(testsM tests/testsM.cpp
 target_include_directories(testsM PUBLIC
         include
         lib/ast/include/ast
+        lib/ast/innclude/optimizer
         lib/ast/include/utilities
         lib/ast/include/visitor)
 target_link_libraries(testsM
         gtest_main
-        master_thesis_code_lib
+        ast_lib
         )
 
 #target_link_libraries(testsM sheep)

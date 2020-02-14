@@ -3,6 +3,5 @@ project(Granite)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_subdirectory(Marble)
-#add_subdirectory(SHEEP/backend)
 add_subdirectory(Wool)
+add_subdirectory(Marble)
