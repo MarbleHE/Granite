@@ -3,7 +3,7 @@ project(wool)
 
 set(CMAKE_CXX_STANDARD 17)
 
-#add_subdirectory(lib/SHEEP/backend)
+add_subdirectory(lib/SHEEP/backend)
 
 #add_executable
 #sources
