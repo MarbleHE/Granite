@@ -1,3 +1,6 @@
-[submodule "Marble/lib/ast"]
+[submodule "AST"]
 	path = Marble/lib/ast
-	url = ../../pjattke/msc-thesis-code-AST.git
+	url = https://github.com/MarbleHE/AST-Optimizer.git
+[submodule "SHEEP"]
+    path = Wool/lib/SHEEP
+    url = https://github.com/MarbleHE/SHEEP.git
