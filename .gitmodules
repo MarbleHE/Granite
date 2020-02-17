@@ -1,6 +1,8 @@
 [submodule "AST"]
 	path = Marble/lib/ast
 	url = https://github.com/MarbleHE/AST-Optimizer.git
+	update = rebase
 [submodule "SHEEP"]
     path = Wool/lib/SHEEP
     url = https://github.com/MarbleHE/SHEEP.git
+    update = rebase

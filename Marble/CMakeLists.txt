@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ####################################################################################
-## Build master_thesis_code_lib library
+## Build ast_lib library
 ####################################################################################
 add_subdirectory(lib/ast)
 
