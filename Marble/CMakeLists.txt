@@ -61,7 +61,9 @@ target_include_directories(testsM PUBLIC
         lib/ast/include/ast
         lib/ast/innclude/optimizer
         lib/ast/include/utilities
-        lib/ast/include/visitor)
+        lib/ast/include/visitor
+        ../Wool/include
+        )
 target_link_libraries(testsM
         gtest_main
         ast_lib

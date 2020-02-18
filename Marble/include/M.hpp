@@ -9,17 +9,23 @@
 #include <functional>
 
 #include "AbstractExpr.h"
+#include "Wool.hpp"
 
 namespace Marble {
     class M;
 
-    enum Library {Plaintext, HElib, LP, Palisade, SEALBFV, SEALCKKS, TFHEBool, TFHECommon, TFHEInteger};
+    /// Encrypt does not actually encrypt at runtime, but sets the variables with a constructor
+    M encrypt(long value, Wool::Library library);
 
-    // Enc and Dec
-    M encrypt(long value, Library library);
+    M encrypt(long value);
 
-    // Output
+    /// Evaluates the expression in m according to the selected library (Plaintext default) and returns its result.
+    long decrypt(M m);
 
+    /// Vector decrypt
+    std::vector<long> decrypt(std::vector<M> mv);
+
+    /// Output imitates the return statement in HE functions.
     void output(M value);
 
     class M {
@@ -46,7 +52,7 @@ namespace Marble {
         M();
 
         /// full constructor
-        M(long value, Library library, bool plaintext);
+        M(long value, Wool::Library library, bool plaintext);
 
         /// Copy constructor
         M(const M &other);
@@ -153,7 +159,7 @@ namespace Marble {
         bool isPlaintext();
 
         /// \return library to be used at evaluation time
-        Library getLib();
+        Wool::Library getLib();
 
         /// set Library to be used at evaluation time
         void setLib();
@@ -169,7 +175,7 @@ namespace Marble {
         AbstractExpr *expr;
 
         /// Library to use when evaluating
-        Library library;
+        Wool::Library library;
 
         /// true, if value is a plaintext
         bool plaintext;
@@ -178,13 +184,13 @@ namespace Marble {
         M(AbstractExpr &expr, bool plaintext);
 
         /// \return true, if the library is well suited for int
-        bool isWellSuited(Library library, int i);
+        bool isWellSuited(Wool::Library l, int i);
 
         /// \return true, if the library is well suited for long
-        bool isWellSuited(Library library, long l);
+        bool isWellSuited(Wool::Library l, long x);
 
         /// \return true, if the library is well suited for bool
-        bool isWellSuited(Library library, bool b);
+        bool isWellSuited(Wool::Library l, bool b);
 
         /// This function tries to resolve user selected library choices and default libraries s.t. a user selection "wins" over default libraries
         /// and a runtime error is thrown, if there are contradicting constraints.
@@ -192,17 +198,12 @@ namespace Marble {
         /// \param l
         /// \param r
         /// \return the library, which "won"
-        Library resolveLibraries(Library l, Library r);
+        Wool::Library resolveLibraries(Wool::Library l, Wool::Library r);
 
 
-        friend M encrypt(long value, Library library);
+        friend M encrypt(long value, Wool::Library library);
 
         friend Ast make_AST(std::function<void()> f);
-
-        /// computes string from library enum
-        /// \param l
-        /// \return string to corresponding library enum
-        std::string toString(Library l);
 
     };
 

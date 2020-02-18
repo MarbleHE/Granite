@@ -9,6 +9,7 @@
 #include "BinaryExpr.h"
 #include "Operator.h"
 #include "UnaryExpr.h"
+#include "Wool.hpp"
 
 using namespace std;
 
@@ -34,10 +35,10 @@ namespace Marble {
     M::M() {
         this->plaintext = true;
         this->expr = new Variable("_var_");
-        this->library = Plaintext;
+        this->library = Wool::Library::Plaintext;
     }
 
-    M::M(long value,Library library,bool plaintext){
+    M::M(long value,Wool::Library library,bool plaintext){
         this->plaintext = plaintext;
         this->expr = new LiteralInt((int) value);
         this->library = library;
@@ -59,19 +60,19 @@ namespace Marble {
         this->plaintext = true;
         this->expr = new LiteralInt(
                 i); //TODO: long to int conversion is not a good idea. change LiteralInt to support longs
-        this->library = Plaintext;
+        this->library = Wool::Library::Plaintext;
     }
 
     M::M(int i) {
         this->plaintext = true;
         this->expr = new LiteralInt(i);
-        this->library = Plaintext;
+        this->library = Wool::Library::Plaintext;
     }
 
     M::M(bool b) {
         this->plaintext = true;
         this->expr = new LiteralBool(b);
-        this->library = Plaintext;
+        this->library = Wool::Library::Plaintext;
     }
 
     M &M::operator=(const M &other) {
@@ -93,7 +94,7 @@ namespace Marble {
         this->expr = new LiteralInt(i);
         if (!isWellSuited(this->library, i)) {
             throw std::runtime_error(
-                    "The library " + toString(this->library) + "is not well suited to work with longs.");
+                    "The library " + Wool::toString(this->library) + "is not well suited to work with longs.");
         }
         return *this;
     }
@@ -104,7 +105,7 @@ namespace Marble {
         this->expr = new LiteralBool(b);
         if (!isWellSuited(this->library, b)) {
             throw std::runtime_error(
-                    "The library " + toString(this->library) + "is not well suited to work with bools.");
+                    "The library " + Wool::toString(this->library) + "is not well suited to work with bools.");
         }
         return *this;
     }
@@ -114,7 +115,7 @@ namespace Marble {
         this->expr = new LiteralInt(i);
         if (!isWellSuited(this->library, i)) {
             throw std::runtime_error(
-                    "The library " + toString(this->library) + "is not well suited to work with ints.");
+                    "The library " + Wool::toString(this->library) + "is not well suited to work with ints.");
         }
         return *this;
     }
@@ -132,7 +133,7 @@ namespace Marble {
         this->expr = exp;
         if (!isWellSuited(this->library, rhs)) {
             throw std::runtime_error(
-                    "The library " + toString(this->library) + "is not well suited to work with longs.");
+                    "The library " + Wool::toString(this->library) + "is not well suited to work with longs.");
         }
         return *this;
     }
@@ -142,7 +143,7 @@ namespace Marble {
         this->expr = exp;
         if (!isWellSuited(this->library, rhs)) {
             throw std::runtime_error(
-                    "The library " + toString(this->library) + "is not well suited to work with ints.");
+                    "The library " + Wool::toString(this->library) + "is not well suited to work with ints.");
         }
         return *this;
     }
@@ -170,7 +171,7 @@ namespace Marble {
         this->expr = exp;
         if (!isWellSuited(this->library, rhs)) {
             throw std::runtime_error(
-                    "The library " + toString(this->library) + "is not well suited to work with longs.");
+                    "The library " + Wool::toString(this->library) + "is not well suited to work with longs.");
         }
         return *this;
     }
@@ -180,7 +181,7 @@ namespace Marble {
         this->expr = exp;
         if (!isWellSuited(this->library, rhs)) {
             throw std::runtime_error(
-                    "The library " + toString(this->library) + "is not well suited to work with ints.");
+                    "The library " + Wool::toString(this->library) + "is not well suited to work with ints.");
         }
         return *this;
     }
@@ -203,24 +204,42 @@ namespace Marble {
         return *this;
     }
 
-    M encrypt(long value, Library library) {
+    M encrypt(long value, Wool::Library library) {
         return M(value, library, false);
     }
+
+    M encrypt(long value){
+        return M(value, Wool::Library::Plaintext, false);
+    }
+
+    long decrypt(M m) {
+        return Wool::evaluate(m.getExpr(), m.getLib());
+    }
+
+    std::vector<long> decrypt(std::vector<M> mv) {
+        vector<long> dec;
+        for(auto x: mv){
+            dec.push_back(Wool::evaluate(x.getExpr(), x.getLib()));
+        }
+        return dec;
+    }
+
 
     M::M(AbstractExpr &expr, bool plaintext) {
         this->expr = &expr;
         this->plaintext = plaintext;
+        this->library = Wool::Plaintext;
     }
 
     M::~M() {
     }
 
-    Library M::resolveLibraries(Library l, Library r) {
-        if (l == Plaintext && r == Plaintext) return Plaintext;
-        if (l == Plaintext) return r;
-        if (r == Plaintext) return l;
+    Wool::Library M::resolveLibraries(Wool::Library l, Wool::Library r) {
+        if (l == Wool::Library::Plaintext && r == Wool::Library::Plaintext) return Wool::Library::Plaintext;
+        if (l == Wool::Library::Plaintext) return r;
+        if (r == Wool::Library::Plaintext) return l;
         if (l != r)
-            throw std::runtime_error("Cannot mix different HE libraries " + toString(l) + "and " + toString(r) + ".");
+            throw std::runtime_error("Cannot mix different HE libraries " + Wool::toString(l) + "and " + Wool::toString(r) + ".");
         return l;
     }
 
@@ -228,45 +247,25 @@ namespace Marble {
         return this->expr;
     }
 
-    Library M::getLib() {
+    Wool::Library M::getLib() {
         return this->library;
     }
 
     //TODO: validate for correctness
-    bool M::isWellSuited(Library library, long i) {
-        return !(library == LP or library == TFHEBool);
+    bool M::isWellSuited(Wool::Library l, long x) {
+        return !(l == Wool::Library::LP or l == Wool::Library::TFHEBool);
     }
 
-    bool M::isWellSuited(Library library, int i) {
-        return !(library == TFHEBool);
+    bool M::isWellSuited(Wool::Library l, int i) {
+        return !(l == Wool::Library::TFHEBool);
     }
 
-    bool M::isWellSuited(Library library, bool i) {
-        return !(library == SEALCKKS);
+    bool M::isWellSuited(Wool::Library l, bool i) {
+        return !(l == Wool::Library::SEALCKKS);
     }
 
     bool M::isPlaintext() {
         return this->plaintext;
     }
 
-    string M::toString(Library l) {
-        switch (l) {
-            case Plaintext:
-                return "Plaintext";
-            case LP:
-                return "LP";
-            case Palisade:
-                return "Palisade";
-            case SEALBFV:
-                return "SEALBFV";
-            case SEALCKKS:
-                return "SEALCKKS";
-            case TFHEBool:
-                return "TFHEBool";
-            case TFHECommon:
-                return "TFHECommon";
-            case TFHEInteger:
-                return "TFHEInteger";
-        }
-    }
 }

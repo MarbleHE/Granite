@@ -10,7 +10,7 @@
 #include "nlohmann/json.hpp"
 #include "Function.h"
 #include "Return.h"
-
+#include "Wool.hpp"
 
 using json = nlohmann::json;
 using namespace Marble;
@@ -137,7 +137,14 @@ TEST_F(FTest, LiteralIntEquality){
 }
 
 TEST(EncTest, WithLib){
-    M m = encrypt(5, Library::HElib);
-    EXPECT_EQ(m.getLib(), Library::HElib);
+    M m = encrypt(5, Wool::Library::HElib);
+    EXPECT_EQ(m.getLib(), Wool::Library::HElib);
     EXPECT_EQ(m.isPlaintext(), false);
+}
+
+
+TEST(DecTest, Plaintext){
+    M a = encrypt(4);
+    long res = decrypt(a);
+    EXPECT_EQ(res, 4);
 }
