@@ -33,38 +33,38 @@ TEST(BasicM, MImport) {
 TEST(MTest, EmptyConstructorExprTest) {
     std::ifstream file(expected_output + "empty_constructor_expr.json");
     json expected_json = json::parse(file);
-    EXPECT_EQ(M().expr->toString(), expected_json.dump());
+    EXPECT_EQ(M().getExpr()->toString(), expected_json.dump());
 
     M a = M();
-    EXPECT_EQ(a.expr->toString(), expected_json.dump());
+    EXPECT_EQ(a.getExpr()->toString(), expected_json.dump());
 
     M b;
-    EXPECT_EQ(b.expr->toString(), expected_json.dump());
+    EXPECT_EQ(b.getExpr()->toString(), expected_json.dump());
 }
 
 TEST(MTest, LiteralIntExprTest) {
     std::ifstream file(expected_output + "literal_int_expr.json");
     json expected_json = json::parse(file);
-    EXPECT_EQ(M(42).expr->toString(), expected_json.dump());
+    EXPECT_EQ(M(42).getExpr()->toString(), expected_json.dump());
 
     M a = M(42);
-    EXPECT_EQ(a.expr->toString(), expected_json.dump());
+    EXPECT_EQ(a.getExpr()->toString(), expected_json.dump());
 
     M b = 42;
-    EXPECT_EQ(b.expr->toString(), expected_json.dump());
+    EXPECT_EQ(b.getExpr()->toString(), expected_json.dump());
 }
 
 TEST(MTest, LiteralBoolExprTest) {
     std::ifstream file(expected_output + "literal_bool_expr.json");
     json expected_json = json::parse(file);
-    EXPECT_EQ(M(true).expr->toString(), expected_json.dump());
+    EXPECT_EQ(M(true).getExpr()->toString(), expected_json.dump());
 
     M a = M(true);
-    EXPECT_EQ(a.expr->toString(), expected_json.dump());
+    EXPECT_EQ(a.getExpr()->toString(), expected_json.dump());
 
 
     M b = M(true);
-    EXPECT_EQ(b.expr->toString(), expected_json.dump());
+    EXPECT_EQ(b.getExpr()->toString(), expected_json.dump());
 }
 
 TEST(MTest, ReturnLiteralIntTest){
@@ -74,7 +74,7 @@ TEST(MTest, ReturnLiteralIntTest){
     std::ifstream file(expected_output + "return_literal_int.json");
     json expected_json = json::parse(file);
 
-    func->addStatement(new Return((m.expr)));
+    func->addStatement(new Return((m.getExpr())));
 
     EXPECT_EQ(ast.getRootNode()->toString(), expected_json.dump());
 }
@@ -103,7 +103,7 @@ protected:
     std::function<void()> f;
 };
 
-TEST_F(FTest, LiteralIntAST) {
+TEST_F(FTest, EmptyFuncAST) {
     f = empty_func;
     std::ifstream file(expected_output + "empty_func.json");
     json expected_j = json::parse(file);
@@ -112,7 +112,6 @@ TEST_F(FTest, LiteralIntAST) {
     auto rn = ast->getRootNode();
 
     EXPECT_EQ(expected_j.dump(), rn->toString());
-    //TODO: SIGSEGV at destruction? SIGBUS when ~M() is manually implemented?
 }
 
 TEST_F(FTest, EmptyFuncEquality) {
@@ -122,4 +121,23 @@ TEST_F(FTest, EmptyFuncEquality) {
     auto rn = ast->getRootNode();
     auto rn2 = ast2->getRootNode();
     EXPECT_EQ(rn->toString(), rn2->toString());
+}
+
+TEST_F(FTest, LiteralIntEquality){
+    f = literalInt_func;
+    Ast* ast = M::make_AST(f);
+    Ast* ast2 = M::make_AST(literalInt_func2);
+    auto rn = ast->getRootNode();
+    auto rn2 = ast->getRootNode();
+    std::ifstream file(expected_output + "return_literal_int.json");
+    json expected_j = json::parse(file);
+
+    EXPECT_EQ(rn->toString(), rn2->toString());
+    EXPECT_EQ(rn->toString(), expected_j.dump());
+}
+
+TEST(EncTest, WithLib){
+    M m = encrypt(5, Library::HElib);
+    EXPECT_EQ(m.getLib(), Library::HElib);
+    EXPECT_EQ(m.isPlaintext(), false);
 }

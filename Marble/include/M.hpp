@@ -13,38 +13,10 @@
 namespace Marble {
     class M;
 
-    struct SelectorType {
-        int x = -1;
-    };
+    enum Library {Plaintext, HElib, LP, Palisade, SEALBFV, SEALCKKS, TFHEBool, TFHECommon, TFHEInteger};
 
-    /// Optimizations/shortcuts for fold functions
-    extern struct SelectorType sum;
-    extern struct SelectorType min;
-    extern struct SelectorType min_with_index;
-    extern struct SelectorType batched;
-
-    // Convenience functions with meaningful names (instead of just constructors)
-
-    M encrypt(SelectorType batched, long value, int bitSize, bool twos_complement);
-
-    M encrypt(SelectorType batched, std::vector<long> value, int bitSize = 32, bool twos_complement = true);
-
-    M encrypt(SelectorType batched, std::vector<bool> value, int bitSize = 1, bool twos_complement = false);
-
-    M encrypt(SelectorType batched, std::vector<int> value, int bitSize = 32, bool twos_complement = true);
-
-    M encrypt(long value, int bitSize, bool twos_complement);
-
-    std::vector<M> encrypt(std::vector<long> value, int bitSize = 32, bool twos_complement = true);
-
-    std::vector<M> encrypt(std::vector<bool> value, int bitSize = 1, bool twos_complement = false);
-
-    M encode(SelectorType batched, long value, int bitSize = 32, bool twos_complement = true);
-
-    M encode(SelectorType batched, std::vector<long> value, int bitSize = 32, bool twos_complement = true);
-
-    M encode(SelectorType batched, std::vector<int> value, int bitSize = 32, bool twos_complement = true);
-
+    // Enc and Dec
+    M encrypt(long value, Library library);
 
     // Output
 
@@ -52,21 +24,16 @@ namespace Marble {
 
     class M {
     public:
-        M(int i);
-
-/// a pointer to the AST responsible for its construction
-        AbstractExpr *expr;
-
         /// The method generating an AST from some function written with M classes.
         static Ast* make_AST(std::function<void()> f);
 
         /// Method for multdepth analysis will probably be within Wool. (Wrapper for Wool)
-        /// @return Maximum multiplicative depth of circuit composed from AST.
+        /// \return Maximum multiplicative depth of circuit composed from AST.
         static int analyse(std::function<void()> f);
 
         /// Method for evaluation/benchmarking will also be in Wool. (Wrapper for Wool, which wraps SHEEP)
         /// TODO: with which library will evaluation happen? Can we select?
-        /// @return duration elapsed in milleseconds
+        /// \return duration elapsed in milleseconds
         static double evaluate(std::function<void()> f);
 
         /// Return statement imitation
@@ -78,6 +45,9 @@ namespace Marble {
         /// Dummy contructor
         M();
 
+        /// full constructor
+        M(long value, Library library, bool plaintext);
+
         /// Copy constructor
         M(const M &other);
 
@@ -86,6 +56,9 @@ namespace Marble {
 
         /// Plaintext constructor
         M(long i);
+
+        /// Plaintext constructor
+        M(int i);
 
         /// Plaintext constructor
         M(bool b);
@@ -176,35 +149,60 @@ namespace Marble {
         /// Multiplication
         friend M operator*(const M &lhs, const M &rhs);
 
+        /// \return plaintext bool, true if the value is plaintext
+        bool isPlaintext();
+
+        /// \return library to be used at evaluation time
+        Library getLib();
+
+        /// set Library to be used at evaluation time
+        void setLib();
+
+        /// \return the pointer to the Expression responsible for its construction
+        AbstractExpr* getExpr();
+
     private:
-        /// This is the (temporary) Ast used to build the finally returned Ast by make_AST
+        /// This is the (temporary) Ast used by output(M m) to return the final AST to make_AST
         static Ast *output_ast;
 
+        /// a pointer to the AST responsible for its construction
+        AbstractExpr *expr;
+
+        /// Library to use when evaluating
+        Library library;
+
+        /// true, if value is a plaintext
         bool plaintext;
 
         /// Direct init with AST
         M(AbstractExpr &expr, bool plaintext);
 
+        /// \return true, if the library is well suited for int
+        bool isWellSuited(Library library, int i);
 
-/*
-        friend M encrypt(SelectorType batched, long value, int bitSize, bool twos_complement);
+        /// \return true, if the library is well suited for long
+        bool isWellSuited(Library library, long l);
 
-        friend M encode(SelectorType batched, long value, int bitSize, bool twos_complement);
+        /// \return true, if the library is well suited for bool
+        bool isWellSuited(Library library, bool b);
+
+        /// This function tries to resolve user selected library choices and default libraries s.t. a user selection "wins" over default libraries
+        /// and a runtime error is thrown, if there are contradicting constraints.
+        /// Default library is Plaintext.
+        /// \param l
+        /// \param r
+        /// \return the library, which "won"
+        Library resolveLibraries(Library l, Library r);
 
 
-        friend M encrypt(SelectorType batched, std::vector<long> value, int bitSize, bool twos_complement);
+        friend M encrypt(long value, Library library);
 
-        friend M encode(SelectorType batched, std::vector<long> value, int bitSize, bool twos_complement);
-
-        friend std::vector<M> encrypt(std::vector<long> values, int bitSize, bool twos_complement);
-
-        friend std::vector<M> encrypt(std::vector<bool> values, int bitSize, bool twos_complement);
-
-        friend M encrypt(long value, int bitSize, bool twos_complement);
-*/
         friend Ast make_AST(std::function<void()> f);
 
-        void enc_if_needed();
+        /// computes string from library enum
+        /// \param l
+        /// \return string to corresponding library enum
+        std::string toString(Library l);
 
     };
 

@@ -15,10 +15,10 @@ using namespace std;
 namespace Marble {
 
     // Initialize static member
-    Ast* M::output_ast = new Ast();
+    Ast *M::output_ast = new Ast();
 
 
-    Ast* M::make_AST(std::function<void()> f) {
+    Ast *M::make_AST(std::function<void()> f) {
         M::output_ast = new Ast(); // clear Ast
         f(); // execute function to parse by self-evaluation with the help of the operators defined by M. The output(M m) function sets M::output_ast
         //TODO: copy problem?
@@ -34,88 +34,124 @@ namespace Marble {
     M::M() {
         this->plaintext = true;
         this->expr = new Variable("_var_");
+        this->library = Plaintext;
+    }
+
+    M::M(long value,Library library,bool plaintext){
+        this->plaintext = plaintext;
+        this->expr = new LiteralInt((int) value);
+        this->library = library;
     }
 
     M::M(const M &other) {
         plaintext = other.plaintext;
         expr = other.expr;
+        library = other.library;
     }
 
     M::M(M &&other) {
         plaintext = other.plaintext;
         expr = other.expr;
+        library = other.library;
     }
 
     M::M(long i) {
         this->plaintext = true;
         this->expr = new LiteralInt(
                 i); //TODO: long to int conversion is not a good idea. change LiteralInt to support longs
+        this->library = Plaintext;
     }
 
     M::M(int i) {
         this->plaintext = true;
         this->expr = new LiteralInt(i);
+        this->library = Plaintext;
     }
 
     M::M(bool b) {
         this->plaintext = true;
         this->expr = new LiteralBool(b);
+        this->library = Plaintext;
     }
 
     M &M::operator=(const M &other) {
         plaintext = other.plaintext;
         expr = other.expr;
+        library = resolveLibraries(library, other.library);
         return *this;
     }
 
     M &M::operator=(M &&other) {
         plaintext = other.plaintext;
         expr = other.expr;
+        library = resolveLibraries(library, other.library);
         return *this;
     }
 
     M &M::operator=(long i) {
         this->plaintext = true;
         this->expr = new LiteralInt(i);
+        if (!isWellSuited(this->library, i)) {
+            throw std::runtime_error(
+                    "The library " + toString(this->library) + "is not well suited to work with longs.");
+        }
         return *this;
     }
 
 
     M &M::operator=(bool b) {
-        //*this = encrypt(SelectorType(), b, 1, false);
         this->plaintext = true;
         this->expr = new LiteralBool(b);
+        if (!isWellSuited(this->library, b)) {
+            throw std::runtime_error(
+                    "The library " + toString(this->library) + "is not well suited to work with bools.");
+        }
         return *this;
     }
 
     M &M::operator=(int i) {
-        //*this = encrypt(SelectorType(), i, 32, true);
         this->plaintext = true;
         this->expr = new LiteralInt(i);
+        if (!isWellSuited(this->library, i)) {
+            throw std::runtime_error(
+                    "The library " + toString(this->library) + "is not well suited to work with ints.");
+        }
         return *this;
     }
 
     M &M::operator+=(const M &rhs) {
         auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::addition, rhs.expr);
         this->expr = exp;
+        this->plaintext = this->plaintext && rhs.plaintext;
+        this->library = resolveLibraries(this->library, rhs.library);
         return *this;
     }
 
     M &M::operator+=(const long &rhs) {
         auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::addition, new LiteralInt(rhs));
         this->expr = exp;
+        if (!isWellSuited(this->library, rhs)) {
+            throw std::runtime_error(
+                    "The library " + toString(this->library) + "is not well suited to work with longs.");
+        }
         return *this;
     }
 
     M &M::operator+=(const int &rhs) {
         auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::addition, new LiteralInt(rhs));
         this->expr = exp;
+        if (!isWellSuited(this->library, rhs)) {
+            throw std::runtime_error(
+                    "The library " + toString(this->library) + "is not well suited to work with ints.");
+        }
         return *this;
     }
 
     M &M::operator-=(const M &rhs) {
         auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::subtraction, rhs.expr);
         this->expr = exp;
+        this->plaintext = this->plaintext && rhs.plaintext;
+        this->library = resolveLibraries(this->library, rhs.library);
         return *this;
     }
 
@@ -124,18 +160,28 @@ namespace Marble {
     M &M::operator*=(const M &rhs) {
         auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::multiplication, rhs.expr);
         this->expr = exp;
+        this->plaintext = this->plaintext && rhs.plaintext;
+        this->library = resolveLibraries(this->library, rhs.library);
         return *this;
     }
 
     M &M::operator*=(long &rhs) {
         auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::multiplication, new LiteralInt(rhs));
         this->expr = exp;
+        if (!isWellSuited(this->library, rhs)) {
+            throw std::runtime_error(
+                    "The library " + toString(this->library) + "is not well suited to work with longs.");
+        }
         return *this;
     }
 
     M &M::operator*=(int &rhs) {
         auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::multiplication, new LiteralInt(rhs));
         this->expr = exp;
+        if (!isWellSuited(this->library, rhs)) {
+            throw std::runtime_error(
+                    "The library " + toString(this->library) + "is not well suited to work with ints.");
+        }
         return *this;
     }
 
@@ -157,75 +203,10 @@ namespace Marble {
         return *this;
     }
 
-
-/*
-    M encode(SelectorType batched, long value, int bitSize, bool twos_complement) {
-        assert(bitSize > 0);
-        return M(value, bitSize, twos_complement, true);
-
+    M encrypt(long value, Library library) {
+        return M(value, library, false);
     }
 
-    M encrypt(SelectorType batched, long value, int bitSize, bool twos_complement) {
-        assert(bitSize > 0);
-        return M(value, bitSize, twos_complement, false);
-    }
-
-    M encrypt(SelectorType batched, vector<int> values, int bitSize, bool twos_complement) {
-        vector<long> v(values.size());
-        for (int i = 0; i < values.size(); ++i) {
-            v[i] = values[i];
-        }
-        return encrypt(batched, v, bitSize, twos_complement);
-    }
-
-    M encode(SelectorType batched, vector<long> values, int bitSize, bool twos_complement) {
-        assert(bitSize > 0);
-        return M(values, bitSize, twos_complement, true);
-    }
-
-    M encode(SelectorType batched, vector<int> values, int bitSize, bool twos_complement) {
-        vector<long> v(values.size());
-        for (int i = 0; i < values.size(); ++i) {
-            v[i] = values[i];
-        }
-        return encode(batched, v, bitSize, twos_complement);
-    }
-
-    M encrypt(SelectorType batched, vector<long> values, int bitSize, bool twos_complement) {
-        assert(bitSize > 0);
-        return M(values, bitSize, twos_complement, false);
-    }
-
-    M encrypt(SelectorType batched, vector<bool> values, int bitSize, bool twos_complement) {
-        vector<long> v(values.size());
-        for (int i = 0; i < values.size(); ++i) {
-            v[i] = values[i];
-        }
-        return encrypt(SelectorType(), v, bitSize, twos_complement);
-    }
-
-    M encrypt(long value, int bitSize, bool twos_complement) {
-        return M(value, bitSize, twos_complement, false);
-    }
-
-
-    vector<M> encrypt(vector<long> values, int bitSize, bool twos_complement) {
-        vector<M> vs;
-        for (int i = 0; i < values.size(); ++i) {
-            M t = M(values[i], bitSize, twos_complement, false);
-            vs.emplace_back(t);
-        }
-        return vs;
-    }
-
-    vector<M> encrypt(vector<bool> values, int bitSize, bool twos_complement) {
-        vector<long> v(values.size());
-        for (int i = 0; i < values.size(); ++i) {
-            v[i] = values[i];
-        }
-        return encrypt(v, bitSize, twos_complement);
-    }
-*/
     M::M(AbstractExpr &expr, bool plaintext) {
         this->expr = &expr;
         this->plaintext = plaintext;
@@ -234,8 +215,58 @@ namespace Marble {
     M::~M() {
     }
 
-    void M::enc_if_needed() {
-
+    Library M::resolveLibraries(Library l, Library r) {
+        if (l == Plaintext && r == Plaintext) return Plaintext;
+        if (l == Plaintext) return r;
+        if (r == Plaintext) return l;
+        if (l != r)
+            throw std::runtime_error("Cannot mix different HE libraries " + toString(l) + "and " + toString(r) + ".");
+        return l;
     }
 
+    AbstractExpr *M::getExpr() {
+        return this->expr;
+    }
+
+    Library M::getLib() {
+        return this->library;
+    }
+
+    //TODO: validate for correctness
+    bool M::isWellSuited(Library library, long i) {
+        return !(library == LP or library == TFHEBool);
+    }
+
+    bool M::isWellSuited(Library library, int i) {
+        return !(library == TFHEBool);
+    }
+
+    bool M::isWellSuited(Library library, bool i) {
+        return !(library == SEALCKKS);
+    }
+
+    bool M::isPlaintext() {
+        return this->plaintext;
+    }
+
+    string M::toString(Library l) {
+        switch (l) {
+            case Plaintext:
+                return "Plaintext";
+            case LP:
+                return "LP";
+            case Palisade:
+                return "Palisade";
+            case SEALBFV:
+                return "SEALBFV";
+            case SEALCKKS:
+                return "SEALCKKS";
+            case TFHEBool:
+                return "TFHEBool";
+            case TFHECommon:
+                return "TFHECommon";
+            case TFHEInteger:
+                return "TFHEInteger";
+        }
+    }
 }

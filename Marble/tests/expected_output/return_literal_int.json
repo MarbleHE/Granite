@@ -5,10 +5,12 @@
   "body": [
     {
       "type": "Return",
-      "value": {
+      "values": [
+        {
         "type": "LiteralInt",
         "value": 42
-      }
+        }
+        ]
     }
   ]
 }
