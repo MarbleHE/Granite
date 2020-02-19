@@ -5,3 +5,4 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(Wool)
 add_subdirectory(Marble)
+add_subdirectory(Examples)
