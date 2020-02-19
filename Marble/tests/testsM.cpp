@@ -33,38 +33,38 @@ TEST(BasicM, MImport) {
 TEST(MTest, EmptyConstructorExprTest) {
     std::ifstream file(expected_output + "empty_constructor_expr.json");
     json expected_json = json::parse(file);
-    EXPECT_EQ(M().getExpr()->toString(), expected_json.dump());
+    EXPECT_EQ(M().getExpr()->toJson().dump(), expected_json.dump());
 
     M a = M();
-    EXPECT_EQ(a.getExpr()->toString(), expected_json.dump());
+    EXPECT_EQ(a.getExpr()->toJson().dump(), expected_json.dump());
 
     M b;
-    EXPECT_EQ(b.getExpr()->toString(), expected_json.dump());
+    EXPECT_EQ(b.getExpr()->toJson().dump(), expected_json.dump());
 }
 
 TEST(MTest, LiteralIntExprTest) {
     std::ifstream file(expected_output + "literal_int_expr.json");
     json expected_json = json::parse(file);
-    EXPECT_EQ(M(42).getExpr()->toString(), expected_json.dump());
+    EXPECT_EQ(M(42).getExpr()->toJson().dump(), expected_json.dump());
 
     M a = M(42);
-    EXPECT_EQ(a.getExpr()->toString(), expected_json.dump());
+    EXPECT_EQ(a.getExpr()->toJson().dump(), expected_json.dump());
 
     M b = 42;
-    EXPECT_EQ(b.getExpr()->toString(), expected_json.dump());
+    EXPECT_EQ(b.getExpr()->toJson().dump(), expected_json.dump());
 }
 
 TEST(MTest, LiteralBoolExprTest) {
     std::ifstream file(expected_output + "literal_bool_expr.json");
     json expected_json = json::parse(file);
-    EXPECT_EQ(M(true).getExpr()->toString(), expected_json.dump());
+    EXPECT_EQ(M(true).getExpr()->toJson().dump(), expected_json.dump());
 
     M a = M(true);
-    EXPECT_EQ(a.getExpr()->toString(), expected_json.dump());
+    EXPECT_EQ(a.getExpr()->toJson().dump(), expected_json.dump());
 
 
     M b = M(true);
-    EXPECT_EQ(b.getExpr()->toString(), expected_json.dump());
+    EXPECT_EQ(b.getExpr()->toJson().dump(), expected_json.dump());
 }
 
 TEST(MTest, ReturnLiteralIntTest){
@@ -76,7 +76,7 @@ TEST(MTest, ReturnLiteralIntTest){
 
     func->addStatement(new Return((m.getExpr())));
 
-    EXPECT_EQ(ast.getRootNode()->toString(), expected_json.dump());
+    EXPECT_EQ(ast.getRootNode()->toJson().dump(), expected_json.dump());
 }
 
 void empty_func() {

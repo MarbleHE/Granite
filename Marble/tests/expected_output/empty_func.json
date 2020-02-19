@@ -5,10 +5,10 @@
     ],
     "body": [{
         "type": "Return",
-        "value": {
+        "values":[{
             "type": "Variable",
             "identifier": "_var_"
-        }
+        }]
     }
     ]
   }
