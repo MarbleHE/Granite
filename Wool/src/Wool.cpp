@@ -1,8 +1,5 @@
-//
-// Created by mario on 17.02.20.
-//
-
 #include <string>
+#include <exception>
 #include "Wool.hpp"
 #include "AbstractExpr.h"
 
@@ -32,7 +29,7 @@ namespace Wool{
     }
 
     long evaluate(AbstractExpr *ae, Library l) {
-        return 0;//TODO
+        throw std::runtime_error("Not yet implemented.");
     }
 
 }
