@@ -53,20 +53,36 @@ set(SOURCE_FILES
         src/M.cpp
 )
 
-add_executable(testsM tests/testsM.cpp
-        ${SOURCE_FILES}
+add_library(marble ${SOURCE_FILES})
+target_include_directories(marble PUBLIC
+        include
+        lib/ast/include/ast
+        lib/ast/include/optimizer
+        lib/ast/include/utilities
+        lib/ast/include/visitor
+        ../Wool/include
         )
+target_link_libraries(marble
+        ast_lib
+        wool
+        )
+
+
+
+add_executable(testsM tests/testsM.cpp)
 target_include_directories(testsM PUBLIC
         include
         lib/ast/include/ast
-        lib/ast/innclude/optimizer
+        lib/ast/include/optimizer
         lib/ast/include/utilities
         lib/ast/include/visitor
         ../Wool/include
         )
 target_link_libraries(testsM
+        marble
         gtest_main
         ast_lib
+        wool
         )
 
 #target_link_libraries(testsM sheep)

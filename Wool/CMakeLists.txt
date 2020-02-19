@@ -17,16 +17,30 @@ add_executable(testsWool tests/testsWool.cpp
         )
 target_include_directories(testsWool PUBLIC
         include
-        lib/SHEEP/backend/include
-        ../Marble/lib/ast/include/ast #TODO: Rework dependencies and find better structure
+        ../Marble/include
+        ../Marble/lib/SHEEP/backend/include
+        ../Marble/lib/ast/include/ast
+        ../Marble/lib/ast/include/visitor
         )
 target_link_libraries(testsWool
         gtest_main
         sheep
         )
+add_test(NAME testsWool COMMAND tests)
 
 #testing link... maybe googletest dl
 
 add_library(wool ${SOURCE_FILES})
+target_include_directories(wool PUBLIC
+        include
+        ../Marble/include
+        ../Marble/lib/SHEEP/backend/include
+        ../Marble/lib/ast/include/ast
+        ../Marble/lib/ast/include/visitor
+        )
+target_link_libraries(wool
+        sheep
+        ast_lib
+        )
 
-add_test(NAME testsWool COMMAND tests)
+
