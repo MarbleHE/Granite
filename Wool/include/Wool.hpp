@@ -42,6 +42,9 @@ namespace Wool {
         /// input to feed into Circuit
         std::vector<long> ptvec;
 
+        /// const input to feed into Circuit
+        std::vector<long> cptvec;
+
         /// Composes Circuit of AbstractExpr and saves it in c
         /// \param ae AbstractExpr to compose circuit from
         /// \return Circuit

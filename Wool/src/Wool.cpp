@@ -40,7 +40,7 @@ namespace Wool{
     long W::evaluateWith(Library l) {
         switch (l){
             case Wool::Plaintext:
-                return get<0>(eval<ContextClear<int32_t>, int32_t>())[0]; // TODO: With the aid of Bithelpers, determine int32_t type accurately
+                return get<0>(eval<SHEEP::ContextClear<int32_t>, int32_t>())[0]; // TODO: With the aid of Bithelpers, determine int32_t type accurately
             case  Wool::LP:
                 throw std::runtime_error("Not yet implemented.");
             case  Wool::Palisade:
@@ -80,7 +80,7 @@ namespace Wool{
         cout << "Evaluating..." << endl;
         PtVec ptv;
         try {
-            ptv = ctx.eval_with_plaintexts(c, inputs, dc);
+            ptv = ctx.eval_with_plaintexts(c, inputs, cptvec, dc);
         }
         catch (const GateNotImplemented &e) {
             throw GateNotImplemented();
@@ -93,9 +93,12 @@ namespace Wool{
     }
 
     void W::composeCircuit(AbstractExpr *ae) {
-        CircuitCompositionVisitor ccv(ae);
-        this->c = ccv.visit(ae);
+        CircuitCompositionVisitor ccv = CircuitCompositionVisitor();
+        ccv.visit(*ae);
+        this->c = ccv.getCircuit();
         this->ptvec = ccv.getPtvec();
+        this->cptvec = ccv.getCptvec();
+        //TODO: set recommended library
     }
 
 }

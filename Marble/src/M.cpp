@@ -213,13 +213,13 @@ namespace Marble {
     }
 
     long decrypt(M m) {
-        return Wool::evaluate(m.getExpr(), m.getLib());
+        return Wool::W(m.getExpr()).evaluateWith(m.getLib());
     }
 
     std::vector<long> decrypt(std::vector<M> mv) {
         vector<long> dec;
         for(auto x: mv){
-            dec.push_back(Wool::evaluate(x.getExpr(), x.getLib()));
+            dec.push_back(Wool::W(x.getExpr()).evaluateWith(x.getLib()));
         }
         return dec;
     }

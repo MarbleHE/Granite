@@ -11,7 +11,9 @@ add_subdirectory(lib/SHEEP/backend)
 ## Build wool library
 ####################################################################################
 set(SOURCE_FILES
-        src/Wool.cpp)
+        src/Wool.cpp
+        src/CircuitCompositionVisitor.cpp
+        )
 add_executable(testsWool tests/testsWool.cpp
         ${SOURCE_FILES}
         )

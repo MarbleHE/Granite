@@ -4,42 +4,115 @@
 
 #include "CircuitCompositionVisitor.hpp"
 #include "simple-circuits.hpp"
+#include "circuit-util.hpp"
+#include "LiteralBool.h"
+#include "LiteralInt.h"
+#include "LiteralString.h"
+#include "LiteralFloat.h"
+#include "LogicalExpr.h"
+#include "UnaryExpr.h"
+#include "BinaryExpr.h"
 
 std::vector<long> CircuitCompositionVisitor::getPtvec() {
     return this->ptvec;
 }
 
-Circuit CircuitCompositionVisitor::visit(LiteralBool &elem) {
-    throw std::runtime_error("not implemented");
-    return Visitor::visit(elem);
+std::vector<long> CircuitCompositionVisitor::getCptvec() {
+    return this->cptvec;
 }
 
-Circuit CircuitCompositionVisitor::visit(LiteralInt &elem) {
-    throw std::runtime_error("not implemented");
-    return Visitor::visit(elem);
+Circuit CircuitCompositionVisitor::getCircuit() {
+    if (this->cs.size() != 1){
+        throw std::runtime_error("Circuit stack contains " + std::to_string(cs.size()) + " Circuit(s).");
+    }
+    return this->cs.top();
 }
 
-Circuit CircuitCompositionVisitor::visit(LiteralString &elem) {
-    throw std::runtime_error("not implemented");
-    return Visitor::visit(elem);
+void CircuitCompositionVisitor::visit(AbstractExpr &elem) {
+    elem.accept(*this);
 }
 
-Circuit CircuitCompositionVisitor::visit(LiteralFloat &elem) {
-    throw std::runtime_error("not implemented");
-    return Visitor::visit(elem);
+void CircuitCompositionVisitor::visit(LiteralBool &elem) {
+    cs.push(single_unary_gate_circuit(Gate::Alias));
+    throw std::runtime_error("LiteralBool not implemented. Can't feed into vector<long>");
 }
 
-Circuit CircuitCompositionVisitor::visit(LogicalExpr &elem) {
-    throw std::runtime_error("not implemented");
-    return Visitor::visit(elem);
+void CircuitCompositionVisitor::visit(LiteralInt &elem) {
+    cs.push(single_unary_gate_circuit(Gate::Alias));
+    ptvec.push_back(elem.getValue());
 }
 
-Circuit CircuitCompositionVisitor::visit(UnaryExpr &elem) {
-    throw std::runtime_error("not implemented");
-    return Visitor::visit(elem);
+void CircuitCompositionVisitor::visit(LiteralString &elem) {
+    cs.push(single_unary_gate_circuit(Gate::Alias));
+    throw std::runtime_error("LiteralString not implemented. Can't feed into vector<long>");
 }
 
-Circuit CircuitCompositionVisitor::visit(BinaryExpr &elem) {
-    throw std::runtime_error("not implemented");
-    return Visitor::visit(elem);
+void CircuitCompositionVisitor::visit(LiteralFloat &elem) {
+    cs.push(single_unary_gate_circuit(Gate::Alias));
+    ptvec.push_back(elem.getValue());
+}
+
+void CircuitCompositionVisitor::visit(LogicalExpr &elem) {
+    elem.getLeft()->accept(*this);
+    auto l = cs.top();
+    cs.pop();
+    elem.getRight()->accept(*this);
+    auto r = cs.top();
+    cs.pop();
+
+    Circuit gateCircuit = toGateCircuit(elem.getOp()->getOperatorSymbol());
+
+    cs.push(seq(par(l, r), gateCircuit));
+}
+
+void CircuitCompositionVisitor::visit(UnaryExpr &elem) {
+    elem.getRight()->accept(*this);
+    auto r = cs.top();
+    cs.pop();
+
+    Circuit gateCircuit = toGateCircuit(elem.getOp()->getOperatorSymbol());
+
+    cs.push(seq(r, gateCircuit));
+}
+
+void CircuitCompositionVisitor::visit(BinaryExpr &elem) {
+    elem.getLeft()->accept(*this);
+    auto l = cs.top();
+    cs.pop();
+    elem.getRight()->accept(*this);
+    auto r = cs.top();
+    cs.pop();
+
+    Circuit gateCircuit = toGateCircuit(elem.getOp()->getOperatorSymbol());
+
+    cs.push(seq(par(l, r), gateCircuit));
+}
+
+Circuit
+CircuitCompositionVisitor::toGateCircuit(
+        const std::variant<OpSymb::BinaryOp, OpSymb::LogCompOp, OpSymb::UnaryOp> &variant) {
+    switch (variant.index()) {
+        case 0:
+            try {
+                return binopCircuitMap.at(std::get<OpSymb::BinaryOp>(variant));
+            }
+            catch (const std::out_of_range &e) {
+                throw std::runtime_error("Gate not implemented in SHEEP: " +
+                                         OpSymb::getTextRepr(variant)); //TODO: implement Division, Modulo...
+            }
+        case 1:
+            throw std::runtime_error(
+                    "Gate not implemented in SHEEP: " + OpSymb::getTextRepr(variant)); //TODO: implement logic gates
+        case 2:
+            switch (std::get<OpSymb::UnaryOp>(variant)) {
+                case OpSymb::UnaryOp::increment:
+                    cptvec.push_back(1);
+                    return single_binary_gate_circuit(Gate::AddConstant);
+                case OpSymb::UnaryOp::decrement:
+                    cptvec.push_back(-1);
+                    return single_binary_gate_circuit(Gate::AddConstant);
+                case OpSymb::UnaryOp::negation:
+                    return single_unary_gate_circuit(Gate::Negate);
+            }
+    }
 }

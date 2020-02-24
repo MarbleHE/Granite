@@ -4,6 +4,8 @@
 #include "gtest/gtest.h"
 #include "circuit.hpp"
 
+using namespace Marble;
+using namespace Wool;
 
 TEST(BasicTest, GoogleTestImport) {
     ASSERT_EQ(1, 1);
@@ -15,5 +17,4 @@ TEST(BasicSHEEP, CircuitImport) {
 
 
 TEST(BasicWool, EvalEasy){
-
 }
