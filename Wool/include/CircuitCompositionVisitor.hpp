@@ -18,48 +18,47 @@
 #include "AbstractExpr.h"
 
 class CircuitCompositionVisitor : Visitor {
-private:
-    /// plaintext vector
-    std::vector<long> ptvec;
+ private:
+  /// plaintext vector
+  std::vector<long> ptvec;
 
-    /// plaintext vector of constants
-    std::vector<long> cptvec;
+  /// plaintext vector of constants
+  std::vector<long> cptvec;
 
-    /// Stack of circuits, which gets gradually built until only the final Circuit is left.
-    std::stack<Circuit> cs;
+  /// Stack of circuits, which gets gradually built until only the final Circuit is left.
+  std::stack<Circuit> cs;
 
-    /// converts an OpSymb to the corresponding SHEEP gate
-    Circuit toGateCircuit(const std::variant<OpSymb::BinaryOp, OpSymb::LogCompOp, OpSymb::UnaryOp> &variant);
+  /// converts an OpSymb to the corresponding SHEEP gate
+  Circuit toGateCircuit(const std::variant<OpSymb::BinaryOp, OpSymb::LogCompOp, OpSymb::UnaryOp> &variant);
 
-    /// Mapping between OpSymb::BinaryOp from ast_lib and Gate from sheep
-    const std::map<OpSymb::BinaryOp, Circuit> binopCircuitMap = {
-            {OpSymb::BinaryOp::addition,       single_binary_gate_circuit(Gate::Add)},
-            {OpSymb::BinaryOp::subtraction,    single_binary_gate_circuit((Gate::Subtract))},
-            {OpSymb::BinaryOp::multiplication, single_binary_gate_circuit(Gate::Multiply)}
-    };
-public:
-    std::vector<long> getPtvec();
+  /// Mapping between OpSymb::BinaryOp from ast_lib and Gate from sheep
+  const std::map<OpSymb::BinaryOp, Circuit> binopCircuitMap = {
+      {OpSymb::BinaryOp::addition, single_binary_gate_circuit(Gate::Add)},
+      {OpSymb::BinaryOp::subtraction, single_binary_gate_circuit((Gate::Subtract))},
+      {OpSymb::BinaryOp::multiplication, single_binary_gate_circuit(Gate::Multiply)}
+  };
+ public:
+  std::vector<long> getPtvec();
 
-    std::vector<long> getCptvec();
+  std::vector<long> getCptvec();
 
-    void visit(AbstractExpr &elem) override;
+  void visit(AbstractExpr &elem) override;
 
-    void visit(LiteralBool &elem) override;
+  void visit(LiteralBool &elem) override;
 
-    void visit(LiteralInt &elem) override;
+  void visit(LiteralInt &elem) override;
 
-    void visit(LiteralString &elem) override;
+  void visit(LiteralString &elem) override;
 
-    void visit(LiteralFloat &elem) override;
+  void visit(LiteralFloat &elem) override;
 
-    void visit(LogicalExpr &elem) override;
+  void visit(LogicalExpr &elem) override;
 
-    void visit(UnaryExpr &elem) override;
+  void visit(UnaryExpr &elem) override;
 
-    void visit(BinaryExpr &elem) override;
+  void visit(BinaryExpr &elem) override;
 
-    Circuit getCircuit();
+  Circuit getCircuit();
 };
-
 
 #endif //GRANITE_CIRCUITCOMPOSITIONVISITOR_HPP

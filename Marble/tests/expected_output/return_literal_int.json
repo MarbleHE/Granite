@@ -7,10 +7,10 @@
       "type": "Return",
       "values": [
         {
-        "type": "LiteralInt",
-        "value": 42
+          "type": "LiteralInt",
+          "value": 42
         }
-        ]
+      ]
     }
   ]
 }

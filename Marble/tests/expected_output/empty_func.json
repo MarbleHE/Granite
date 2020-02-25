@@ -1,14 +1,17 @@
 {
-    "type": "Function",
-    "name": "f",
-    "params": [
-    ],
-    "body": [{
-        "type": "Return",
-        "values":[{
-            "type": "Variable",
-            "identifier": "_var_"
-        }]
+  "type": "Function",
+  "name": "f",
+  "params": [
+  ],
+  "body": [
+    {
+      "type": "Return",
+      "values": [
+        {
+          "type": "Variable",
+          "identifier": "_var_"
+        }
+      ]
     }
-    ]
-  }
+  ]
+}

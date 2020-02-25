@@ -14,105 +14,102 @@
 #include "BinaryExpr.h"
 
 std::vector<long> CircuitCompositionVisitor::getPtvec() {
-    return this->ptvec;
+  return this->ptvec;
 }
 
 std::vector<long> CircuitCompositionVisitor::getCptvec() {
-    return this->cptvec;
+  return this->cptvec;
 }
 
 Circuit CircuitCompositionVisitor::getCircuit() {
-    if (this->cs.size() != 1){
-        throw std::runtime_error("Circuit stack contains " + std::to_string(cs.size()) + " Circuit(s).");
-    }
-    return this->cs.top();
+  if (this->cs.size()!=1) {
+    throw std::runtime_error("Circuit stack contains " + std::to_string(cs.size()) + " Circuit(s).");
+  }
+  return this->cs.top();
 }
 
 void CircuitCompositionVisitor::visit(AbstractExpr &elem) {
-    elem.accept(*this);
+  elem.accept(*this);
 }
 
 void CircuitCompositionVisitor::visit(LiteralBool &elem) {
-    cs.push(single_unary_gate_circuit(Gate::Alias));
-    throw std::runtime_error("LiteralBool not implemented. Can't feed into vector<long>");
+  cs.push(single_unary_gate_circuit(Gate::Alias));
+  throw std::runtime_error("LiteralBool not implemented. Can't feed into vector<long>");
 }
 
 void CircuitCompositionVisitor::visit(LiteralInt &elem) {
-    cs.push(single_unary_gate_circuit(Gate::Alias));
-    ptvec.push_back(elem.getValue());
+  cs.push(single_unary_gate_circuit(Gate::Alias));
+  ptvec.push_back(elem.getValue());
 }
 
 void CircuitCompositionVisitor::visit(LiteralString &elem) {
-    cs.push(single_unary_gate_circuit(Gate::Alias));
-    throw std::runtime_error("LiteralString not implemented. Can't feed into vector<long>");
+  cs.push(single_unary_gate_circuit(Gate::Alias));
+  throw std::runtime_error("LiteralString not implemented. Can't feed into vector<long>");
 }
 
 void CircuitCompositionVisitor::visit(LiteralFloat &elem) {
-    cs.push(single_unary_gate_circuit(Gate::Alias));
-    ptvec.push_back(elem.getValue());
+  cs.push(single_unary_gate_circuit(Gate::Alias));
+  ptvec.push_back(elem.getValue());
 }
 
 void CircuitCompositionVisitor::visit(LogicalExpr &elem) {
-    elem.getLeft()->accept(*this);
-    auto l = cs.top();
-    cs.pop();
-    elem.getRight()->accept(*this);
-    auto r = cs.top();
-    cs.pop();
+  elem.getLeft()->accept(*this);
+  auto l = cs.top();
+  cs.pop();
+  elem.getRight()->accept(*this);
+  auto r = cs.top();
+  cs.pop();
 
-    Circuit gateCircuit = toGateCircuit(elem.getOp()->getOperatorSymbol());
+  Circuit gateCircuit = toGateCircuit(elem.getOp()->getOperatorSymbol());
 
-    cs.push(seq(par(l, r), gateCircuit));
+  cs.push(seq(par(l, r), gateCircuit));
 }
 
 void CircuitCompositionVisitor::visit(UnaryExpr &elem) {
-    elem.getRight()->accept(*this);
-    auto r = cs.top();
-    cs.pop();
+  elem.getRight()->accept(*this);
+  auto r = cs.top();
+  cs.pop();
 
-    Circuit gateCircuit = toGateCircuit(elem.getOp()->getOperatorSymbol());
+  Circuit gateCircuit = toGateCircuit(elem.getOp()->getOperatorSymbol());
 
-    cs.push(seq(r, gateCircuit));
+  cs.push(seq(r, gateCircuit));
 }
 
 void CircuitCompositionVisitor::visit(BinaryExpr &elem) {
-    elem.getLeft()->accept(*this);
-    auto l = cs.top();
-    cs.pop();
-    elem.getRight()->accept(*this);
-    auto r = cs.top();
-    cs.pop();
+  elem.getLeft()->accept(*this);
+  auto l = cs.top();
+  cs.pop();
+  elem.getRight()->accept(*this);
+  auto r = cs.top();
+  cs.pop();
 
-    Circuit gateCircuit = toGateCircuit(elem.getOp()->getOperatorSymbol());
+  Circuit gateCircuit = toGateCircuit(elem.getOp()->getOperatorSymbol());
 
-    cs.push(seq(par(l, r), gateCircuit));
+  cs.push(seq(par(l, r), gateCircuit));
 }
 
 Circuit
 CircuitCompositionVisitor::toGateCircuit(
-        const std::variant<OpSymb::BinaryOp, OpSymb::LogCompOp, OpSymb::UnaryOp> &variant) {
-    switch (variant.index()) {
-        case 0:
-            try {
-                return binopCircuitMap.at(std::get<OpSymb::BinaryOp>(variant));
-            }
-            catch (const std::out_of_range &e) {
-                throw std::runtime_error("Gate not implemented in SHEEP: " +
-                                         OpSymb::getTextRepr(variant)); //TODO: implement Division, Modulo...
-            }
-        case 1:
-            throw std::runtime_error(
-                    "Gate not implemented in SHEEP: " + OpSymb::getTextRepr(variant)); //TODO: implement logic gates
-        case 2:
-            switch (std::get<OpSymb::UnaryOp>(variant)) {
-                case OpSymb::UnaryOp::increment:
-                    cptvec.push_back(1);
-                    return single_binary_gate_circuit(Gate::AddConstant);
-                case OpSymb::UnaryOp::decrement:
-                    cptvec.push_back(-1);
-                    return single_binary_gate_circuit(Gate::AddConstant);
-                case OpSymb::UnaryOp::negation:
-                    return single_unary_gate_circuit(Gate::Negate);
-            }
-    }
+    const std::variant<OpSymb::BinaryOp, OpSymb::LogCompOp, OpSymb::UnaryOp> &variant) {
+  switch (variant.index()) {
+    case 0:
+      try {
+        return binopCircuitMap.at(std::get<OpSymb::BinaryOp>(variant));
+      }
+      catch (const std::out_of_range &e) {
+        throw std::runtime_error("Gate not implemented in SHEEP: " +
+            OpSymb::getTextRepr(variant)); //TODO: implement Division, Modulo...
+      }
+    case 1:
+      throw std::runtime_error(
+          "Gate not implemented in SHEEP: " + OpSymb::getTextRepr(variant)); //TODO: implement logic gates
+    case 2:
+      switch (std::get<OpSymb::UnaryOp>(variant)) {
+        case OpSymb::UnaryOp::increment:cptvec.push_back(1);
+          return single_binary_gate_circuit(Gate::AddConstant);
+        case OpSymb::UnaryOp::decrement:cptvec.push_back(-1);
+          return single_binary_gate_circuit(Gate::AddConstant);
+        case OpSymb::UnaryOp::negation:return single_unary_gate_circuit(Gate::Negate);
+      }
+  }
 }

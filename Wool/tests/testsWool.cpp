@@ -8,13 +8,12 @@ using namespace Marble;
 using namespace Wool;
 
 TEST(BasicTest, GoogleTestImport) {
-    ASSERT_EQ(1, 1);
+  ASSERT_EQ(1, 1);
 }
 
 TEST(BasicSHEEP, CircuitImport) {
-    ASSERT_NO_THROW(Circuit());
+  ASSERT_NO_THROW(Circuit());
 }
 
-
-TEST(BasicWool, EvalEasy){
+TEST(BasicWool, EvalEasy) {
 }
