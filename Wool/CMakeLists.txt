@@ -6,7 +6,12 @@ set(CMAKE_CXX_STANDARD 17)
 ####################################################################################
 ## Build sheep library
 ####################################################################################
+find_package(PALISADE) # Palisade includes and exposes google test to the build
+if (NOT PALISADE_FOUND)
+    set(APP_TESTING TRUE) # This flag decides if RPN/SHEEP's own googletest download is executed
+endif()
 add_subdirectory(lib/SHEEP/backend)
+
 ####################################################################################
 ## Build wool library
 ####################################################################################
@@ -14,24 +19,6 @@ set(SOURCE_FILES
         src/Wool.cpp
         src/CircuitCompositionVisitor.cpp
         )
-add_executable(testsWool tests/testsWool.cpp
-        ${SOURCE_FILES}
-        )
-target_include_directories(testsWool PUBLIC
-        include
-        lib/SHEEP/backend/include
-        ../Marble/include
-        ../Marble/lib/ast/include/ast
-        ../Marble/lib/ast/include/visitor
-        )
-target_link_libraries(testsWool
-        gtest_main
-        sheep
-        ast_lib
-        )
-add_test(NAME testsWool COMMAND tests)
-
-#testing link... maybe googletest dl
 
 add_library(wool ${SOURCE_FILES})
 target_include_directories(wool PUBLIC
@@ -46,4 +33,7 @@ target_link_libraries(wool
         ast_lib
         )
 
-
+####################################################################################
+## Wool testing
+####################################################################################
+add_subdirectory(tests)

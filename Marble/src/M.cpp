@@ -186,17 +186,21 @@ namespace Marble {
         return *this;
     }
 
-    M &M::operator++() {
-        auto exp = new UnaryExpr(OpSymb::UnaryOp::increment, this->expr);
-        this->expr = exp;
-        return *this;
-    }
+M &M::operator++() {
+  //TODO: implement with +1
+  //
+  //  auto exp = new UnaryExpr(OpSymb::UnaryOp::increment, this->expr);
+  //  this->expr = exp;
+  return *this;
+}
 
-    M &M::operator--() {
-        auto exp = new UnaryExpr(OpSymb::UnaryOp::decrement, this->expr);
-        this->expr = exp;
-        return *this;
-    }
+M &M::operator--() {
+  // TODO: implement with -1
+  //
+  // auto exp = new UnaryExpr(OpSymb::UnaryOp::decrement, this->expr);
+  // this->expr = exp;
+  return *this;
+}
 
     M &M::operator!() {
         auto exp = new UnaryExpr(OpSymb::UnaryOp::negation, this->expr);
