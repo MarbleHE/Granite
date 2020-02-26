@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <functional>
+#include <OpSymbEnum.h>
 
 #include "AbstractExpr.h"
 #include "Wool.hpp"
@@ -31,7 +32,7 @@ void output(M value);
 class M {
  public:
   /// The method generating an AST from some function written with M classes.
-  static Ast *make_AST(std::function<void()> f);
+  static Ast *makeAST(std::function<void()> f);
 
   /// Method for multdepth analysis will probably be within Wool. (Wrapper for Wool)
   /// \return Maximum multiplicative depth of circuit composed from AST.
@@ -52,7 +53,7 @@ class M {
   M();
 
   /// full constructor
-  M(long value, Wool::Library library, bool plaintext);
+  M(long value, bool plaintext, Wool::Library library);
 
   /// Copy constructor
   M(const M &other);
@@ -95,6 +96,12 @@ class M {
 
   /// Subtraction
   M &operator-=(const M &rhs);
+
+  /// Subtraction
+  M &operator-=(const long &rhs);
+
+  /// Subtraction
+  M &operator-=(const int &rhs);
 
   /// Multiplication
   M &operator*=(const M &rhs);
@@ -156,19 +163,19 @@ class M {
   friend M operator*(const M &lhs, const M &rhs);
 
   /// \return plaintext bool, true if the value is plaintext
-  bool isPlaintext();
+  bool isPlaintext() const;
 
   /// \return library to be used at evaluation time
-  Wool::Library getLib();
+  Wool::Library getLib() const;
 
   /// set Library to be used at evaluation time
-  void setLib();
+  void setLib(Wool::Library l);
 
   /// \return the pointer to the Expression responsible for its construction
   AbstractExpr *getExpr();
 
  private:
-  /// This is the (temporary) Ast used by output(M m) to return the final AST to make_AST
+  /// This is the (temporary) Ast used by output(M m) to return the final AST to makeAST
   static Ast *output_ast;
 
   /// a pointer to the AST responsible for its construction
@@ -181,7 +188,10 @@ class M {
   bool plaintext;
 
   /// Direct init with AST
-  M(AbstractExpr &expr, bool plaintext);
+  M(AbstractExpr *expr, bool plaintext);
+
+  /// Direct init with all fields
+  M(AbstractExpr *expr, bool plaintext, Wool::Library l);
 
   /// \return true, if the library is well suited for int
   bool isWellSuited(Wool::Library l, int i);
@@ -198,7 +208,7 @@ class M {
   /// \param l
   /// \param r
   /// \return the library, which "won"
-  Wool::Library resolveLibraries(Wool::Library l, Wool::Library r);
+  static Wool::Library resolveLibraries(Wool::Library l, Wool::Library r);
 
   friend M encrypt(long value, Wool::Library library);
 

@@ -10,6 +10,7 @@
 #include "Operator.h"
 #include "UnaryExpr.h"
 #include "Wool.hpp"
+#include "LogicalExpr.h"
 
 using namespace std;
 
@@ -18,7 +19,7 @@ namespace Marble {
 // Initialize static member
 Ast *M::output_ast = new Ast();
 
-Ast *M::make_AST(std::function<void()> f) {
+Ast *M::makeAST(std::function<void()> f) {
   M::output_ast = new Ast(); // clear Ast
   f(); // execute function to parse by self-evaluation with the help of the operators defined by M. The output(M m) function sets M::output_ast
   //TODO: copy problem?
@@ -37,10 +38,16 @@ M::M() {
   this->library = Wool::Library::Plaintext;
 }
 
-M::M(long value, Wool::Library library, bool plaintext) {
+M::M(long value, bool plaintext, Wool::Library library) {
   this->plaintext = plaintext;
   this->expr = new LiteralInt((int) value);
   this->library = library;
+}
+
+M::M(AbstractExpr *expr, bool plaintext, Wool::Library l){
+    this->plaintext = plaintext;
+    this->expr = expr;
+    this->library = l;
 }
 
 M::M(const M &other) {
@@ -154,7 +161,26 @@ M &M::operator-=(const M &rhs) {
   return *this;
 }
 
-//TODO: -= long &rhs missing?
+
+M &M::operator-=(const long &rhs) {
+    auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::subtraction, new LiteralInt(rhs));
+    this->expr = exp;
+    if (!isWellSuited(this->library, rhs)) {
+        throw std::runtime_error(
+                "The library " + Wool::toString(this->library) + "is not well suited to work with longs.");
+    }
+    return *this;
+}
+
+M &M::operator-=(const int &rhs) {
+    auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::subtraction, new LiteralInt(rhs));
+    this->expr = exp;
+    if (!isWellSuited(this->library, rhs)) {
+        throw std::runtime_error(
+                "The library " + Wool::toString(this->library) + "is not well suited to work with ints.");
+    }
+    return *this;
+}
 
 M &M::operator*=(const M &rhs) {
   auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::multiplication, rhs.expr);
@@ -185,18 +211,14 @@ M &M::operator*=(int &rhs) {
 }
 
 M &M::operator++() {
-  //TODO: implement with +1
-  //
-  //  auto exp = new UnaryExpr(OpSymb::UnaryOp::increment, this->expr);
-  //  this->expr = exp;
+  auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::addition, new LiteralInt(1));
+  this->expr = exp;
   return *this;
 }
 
 M &M::operator--() {
-  // TODO: implement with -1
-  //
-  // auto exp = new UnaryExpr(OpSymb::UnaryOp::decrement, this->expr);
-  // this->expr = exp;
+  auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::subtraction, new LiteralInt(1));
+  this->expr = exp;
   return *this;
 }
 
@@ -206,12 +228,76 @@ M &M::operator!() {
   return *this;
 }
 
+
+M operator==(const M &lhs, const M &rhs) {
+    auto exp = new LogicalExpr(lhs.expr, OpSymb::LogCompOp::equal, rhs.expr);
+    bool pt = lhs.isPlaintext() && rhs.isPlaintext();
+    Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
+    return M(exp, pt, l);
+}
+
+M operator!=(const M &lhs, const M &rhs) {
+    auto exp = new LogicalExpr(lhs.expr, OpSymb::LogCompOp::unequal, rhs.expr);
+    bool pt = lhs.isPlaintext() && rhs.isPlaintext();
+    Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
+    return M(exp, pt, l);
+}
+
+M operator>=(const M &lhs, const M &rhs) {
+    auto exp = new LogicalExpr(lhs.expr, OpSymb::LogCompOp::greaterEqual, rhs.expr);
+    bool pt = lhs.isPlaintext() && rhs.isPlaintext();
+    Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
+    return M(exp, pt, l);
+}
+
+M operator>(const M &lhs, const M &rhs) {
+    auto exp = new LogicalExpr(lhs.expr, OpSymb::LogCompOp::greater, rhs.expr);
+    bool pt = lhs.isPlaintext() && rhs.isPlaintext();
+    Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
+    return M(exp, pt, l);
+}
+
+M operator<=(const M &lhs, const M &rhs) {
+    auto exp = new LogicalExpr(lhs.expr, OpSymb::LogCompOp::smallerEqual, rhs.expr);
+    bool pt = lhs.isPlaintext() && rhs.isPlaintext();
+    Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
+    return M(exp, pt, l);
+}
+
+M operator<(const M &lhs, const M &rhs) {
+    auto exp = new LogicalExpr(lhs.expr, OpSymb::LogCompOp::smaller, rhs.expr);
+    bool pt = lhs.isPlaintext() && rhs.isPlaintext();
+    Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
+    return M(exp, pt, l);
+}
+
+M operator+(const M &lhs, const M &rhs) {
+    auto exp = new BinaryExpr(lhs.expr, OpSymb::BinaryOp::addition, rhs.expr);
+    bool pt = lhs.isPlaintext() && rhs.isPlaintext();
+    Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
+    return M(exp, pt, l);
+}
+
+M operator-(const M &lhs, const M &rhs) {
+    auto exp = new BinaryExpr(lhs.expr, OpSymb::BinaryOp::subtraction, rhs.expr);
+    bool pt = lhs.isPlaintext() && rhs.isPlaintext();
+    Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
+    return M(exp, pt, l);
+}
+
+M operator*(const M &lhs, const M &rhs) {
+    auto exp = new BinaryExpr(lhs.expr, OpSymb::BinaryOp::multiplication, rhs.expr);
+    bool pt = lhs.isPlaintext() && rhs.isPlaintext();
+    Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
+    return M(exp, pt, l);
+}
+
 M encrypt(long value, Wool::Library library) {
-  return M(value, library, false);
+  return M(value, false, library);
 }
 
 M encrypt(long value) {
-  return M(value, Wool::Library::Plaintext, false);
+  return M(value, false, Wool::Library::Plaintext);
 }
 
 long decrypt(M m) {
@@ -226,8 +312,8 @@ std::vector<long> decrypt(std::vector<M> mv) {
   return dec;
 }
 
-M::M(AbstractExpr &expr, bool plaintext) {
-  this->expr = &expr;
+M::M(AbstractExpr *expr, bool plaintext) {
+  this->expr = expr;
   this->plaintext = plaintext;
   this->library = Wool::Plaintext;
 }
@@ -249,7 +335,7 @@ AbstractExpr *M::getExpr() {
   return this->expr;
 }
 
-Wool::Library M::getLib() {
+Wool::Library M::getLib() const {
   return this->library;
 }
 
@@ -266,8 +352,14 @@ bool M::isWellSuited(Wool::Library l, bool i) {
   return !(l==Wool::Library::SEALCKKS);
 }
 
-bool M::isPlaintext() {
+bool M::isPlaintext() const {
   return this->plaintext;
 }
+
+void M::setLib(Wool::Library l) {
+    this->library = l;
+    //TODO: check if l is a sane choice for its expr.
+}
+
 
 }

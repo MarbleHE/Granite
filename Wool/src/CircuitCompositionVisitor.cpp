@@ -105,10 +105,6 @@ CircuitCompositionVisitor::toGateCircuit(
           "Gate not implemented in SHEEP: " + OpSymb::getTextRepr(variant)); //TODO: implement logic gates
     case 2:
       switch (std::get<OpSymb::UnaryOp>(variant)) {
-        case OpSymb::UnaryOp::increment:cptvec.push_back(1);
-          return single_binary_gate_circuit(Gate::AddConstant);
-        case OpSymb::UnaryOp::decrement:cptvec.push_back(-1);
-          return single_binary_gate_circuit(Gate::AddConstant);
         case OpSymb::UnaryOp::negation:return single_unary_gate_circuit(Gate::Negate);
       }
   }
