@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(M)
+project(Examples)
 
 
 set(CMAKE_CXX_STANDARD 17)
@@ -17,3 +17,5 @@ target_link_libraries(example
         ast_lib
         wool
         )
+
+add_subdirectory(MarbleSamples)
