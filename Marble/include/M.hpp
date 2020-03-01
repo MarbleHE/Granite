@@ -20,6 +20,12 @@ M encrypt(long value, Wool::Library library);
 
 M encrypt(long value);
 
+std::vector<M> encrypt(std::vector<bool> v);
+
+std::vector<M> encrypt(std::vector<int> v);
+
+std::vector<M> encrypt(std::vector<long> v);
+
 /// Evaluates the expression in m according to the selected library (Plaintext default) and returns its result.
 long decrypt(M m);
 
@@ -38,10 +44,13 @@ class M {
   /// \return Maximum multiplicative depth of circuit composed from AST.
   static int analyse(std::function<void()> f);
 
-  /// Method for evaluation/benchmarking will also be in Wool. (Wrapper for Wool, which wraps SHEEP)
-  /// TODO: with which library will evaluation happen? Can we select?
+  /// Method for benchmarking will also be in Wool. (Wrapper for Wool, which wraps SHEEP)
   /// \return duration elapsed in milleseconds
   static double evaluate(std::function<void()> f);
+
+  /// Method to get the result of the computation
+  /// \return result of f() decrypted (if it has an output statement)
+  static long result(std::function<void()> f);
 
   /// Return statement imitation
   static void output(const M &m);

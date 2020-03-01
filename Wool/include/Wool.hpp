@@ -26,7 +26,7 @@ class W {
   /// Basic constructor initializes Circuit c
   explicit W(AbstractExpr *ae);
 
-  //TODO: W(Ast a);
+  explicit W(Ast a);
 
   /// Evaluates Circuit c of instance with library l.
   /// \param l Library with which we want to evaluate.
@@ -34,7 +34,11 @@ class W {
   long evaluateWith(Library l);
 
   //TODO getCircuit();
- private:
+
+  /// Benchmarks the Circuit  c of with library l.
+  /// \return time in milliseconds
+  double benchmarkWith(Library l);
+private:
   /// Circuit which was derived from AbstractExpr or AST
   Circuit c;
 
@@ -57,11 +61,6 @@ class W {
   /// \return first element is the result and second element is timing information
   template<typename genericContext, typename intType_t>
   std::tuple<std::vector<long>, DurationContainer> eval();
-
-  /// Recursively builds a Circuit from an Expression and all its subexpression
-  /// \param ae
-  /// \return Circuit built from ae
-  Circuit generateCircuit(AbstractExpr *ae);
 };
 
 };

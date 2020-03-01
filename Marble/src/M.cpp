@@ -1,3 +1,4 @@
+#include <chrono>
 #include "M.hpp"
 #include "BitHelpers.h"
 #include "Ast.h"
@@ -22,8 +23,35 @@ Ast *M::output_ast = new Ast();
 Ast *M::makeAST(std::function<void()> f) {
   M::output_ast = new Ast(); // clear Ast
   f(); // execute function to parse by self-evaluation with the help of the operators defined by M. The output(M m) function sets M::output_ast
-  //TODO: copy problem?
   return M::output_ast;
+}
+
+double M::evaluate(std::function<void ()> f) {
+    //f(); //TODO: this might need to set a static variable so we can get that to find out which library was set.
+    using namespace std::chrono;
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+    Ast* ast = M::makeAST(f); // self eval happening here. Intermediate results will get calculated instantly, which is why we benchmark this too
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+
+    duration<double, std::milli> time_span = t2 - t1;
+    double self_eval_time =  time_span.count();
+
+    double time = Wool::W(*ast).benchmarkWith(Wool::Library::Plaintext); //TODO: set library
+    return self_eval_time + time;
+}
+
+int M::analyse(std::function<void()> f){
+    throw std::runtime_error("not yet implemented");
+    return 0;
+}
+
+long M::result(std::function<void()> f){
+    Ast* ast = makeAST(f);
+    return Wool::W(*ast).evaluateWith(Wool::Library::Plaintext); //TODO set correct library
+}
+
+void output(M value){
+    M::output(value);
 }
 
 void M::output(const M &m) {
@@ -298,6 +326,30 @@ M encrypt(long value, Wool::Library library) {
 
 M encrypt(long value) {
   return M(value, false, Wool::Library::Plaintext);
+}
+
+vector<M> encrypt(vector<bool> v){
+    vector<M> mv;
+    for (auto x: v){
+        mv.emplace_back(x, false, Wool::Library::Plaintext);
+    }
+    return mv;
+}
+
+vector<M> encrypt(vector<int> v){
+    vector<M> mv;
+    for (auto x: v){
+        mv.emplace_back(x, false, Wool::Library::Plaintext);
+    }
+    return mv;
+}
+
+vector<M> encrypt(vector<long> v){
+    vector<M> mv;
+    for (auto x: v){
+        mv.emplace_back(x, false, Wool::Library::Plaintext);
+    }
+    return mv;
 }
 
 long decrypt(M m) {

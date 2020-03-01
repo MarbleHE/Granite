@@ -1,11 +1,12 @@
 #include <string>
-#include <exception>
 #include "Wool.hpp"
 #include "AbstractExpr.h"
 #include "circuit.hpp"
 #include "context.hpp"
 #include "context-clear.hpp"
 #include "CircuitCompositionVisitor.hpp"
+#include "Return.h"
+#include "Function.h"
 
 using namespace std;
 
@@ -28,6 +29,14 @@ W::W(AbstractExpr *ae) {
   composeCircuit(ae);
 }
 
+//TODO: this is extremely vulnerable to any changes
+W::W(Ast a) {
+   Function* f = (Function *) a.getRootNode();
+   Return* r = (Return *) f->getBodyStatements()[0];
+   AbstractExpr * ae = r->getReturnExpressions()[0];
+  composeCircuit(ae);
+}
+
 long W::evaluateWith(Library l) {
   switch (l) {
     case Wool::Plaintext:
@@ -42,6 +51,24 @@ long W::evaluateWith(Library l) {
     case Wool::TFHEInteger:throw std::runtime_error("Not yet implemented.");
   }
   throw std::runtime_error("No valid library at evaluation.");
+}
+
+
+double W::benchmarkWith(Library l){
+    DurationContainer dc;
+    switch (l) {
+        case Wool::Plaintext:
+            dc =  get<1>(eval<SHEEP::ContextClear<int32_t>, int32_t>()); // TODO: With the aid of Bithelpers, determine int32_t type accurately
+            return dc.first[0].count() / 1000 + dc.first[1].count() / 1000 + dc.first[2].count() / 1000; // enc, eval and dec times all added
+        case Wool::LP:throw std::runtime_error("Not yet implemented.");
+        case Wool::Palisade:throw std::runtime_error("Not yet implemented.");
+        case Wool::SEALBFV:throw std::runtime_error("Not yet implemented.");
+        case Wool::SEALCKKS:throw std::runtime_error("Not yet implemented.");
+        case Wool::TFHEBool:throw std::runtime_error("Not yet implemented.");
+        case Wool::TFHECommon:throw std::runtime_error("Not yet implemented.");
+        case Wool::TFHEInteger:throw std::runtime_error("Not yet implemented.");
+    }
+    throw std::runtime_error("No valid library at evaluation.");
 }
 
 //TODO: vector<long>? vector<T>?
@@ -77,6 +104,7 @@ tuple<vector<long>, DurationContainer> W::eval() {
   return make_tuple(iptv, dc);
 }
 
+
 void W::composeCircuit(AbstractExpr *ae) {
   CircuitCompositionVisitor ccv = CircuitCompositionVisitor();
   ccv.visit(*ae);
@@ -85,5 +113,6 @@ void W::composeCircuit(AbstractExpr *ae) {
   this->cptvec = ccv.getCptvec();
   //TODO: set recommended library
 }
+
 
 }
