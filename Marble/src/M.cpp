@@ -7,7 +7,8 @@
 #include "LiteralBool.h"
 #include "Function.h"
 #include "Return.h"
-#include "BinaryExpr.h"
+#include "AbstractBinaryExpr.h"
+#include "ArithmeticExpr.h"
 #include "Operator.h"
 #include "UnaryExpr.h"
 #include "Wool.hpp"
@@ -30,7 +31,7 @@ double M::evaluate(std::function<void ()> f) {
     //f(); //TODO: this might need to set a static variable so we can get that to find out which library was set.
     using namespace std::chrono;
     high_resolution_clock::time_point t1 = high_resolution_clock::now();
-    Ast* ast = M::makeAST(f); // self eval happening here. Intermediate results will get calculated instantly, which is why we benchmark this too
+    Ast* ast = M::makeAST(f); // self eval happening here. Intermediate results will get calculated instantly, which is why we benchmark this too. This means unwanted overhead from the M class in the final result.
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
 
     duration<double, std::milli> time_span = t2 - t1;
@@ -154,7 +155,7 @@ M &M::operator=(int i) {
 }
 
 M &M::operator+=(const M &rhs) {
-  auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::addition, rhs.expr);
+  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::addition, rhs.expr);
   this->expr = exp;
   this->plaintext = this->plaintext && rhs.plaintext;
   this->library = resolveLibraries(this->library, rhs.library);
@@ -162,7 +163,7 @@ M &M::operator+=(const M &rhs) {
 }
 
 M &M::operator+=(const long &rhs) {
-  auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::addition, new LiteralInt(rhs));
+  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::addition, new LiteralInt(rhs));
   this->expr = exp;
   if (!isWellSuited(this->library, rhs)) {
     throw std::runtime_error(
@@ -172,7 +173,7 @@ M &M::operator+=(const long &rhs) {
 }
 
 M &M::operator+=(const int &rhs) {
-  auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::addition, new LiteralInt(rhs));
+  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::addition, new LiteralInt(rhs));
   this->expr = exp;
   if (!isWellSuited(this->library, rhs)) {
     throw std::runtime_error(
@@ -182,7 +183,7 @@ M &M::operator+=(const int &rhs) {
 }
 
 M &M::operator-=(const M &rhs) {
-  auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::subtraction, rhs.expr);
+  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::subtraction, rhs.expr);
   this->expr = exp;
   this->plaintext = this->plaintext && rhs.plaintext;
   this->library = resolveLibraries(this->library, rhs.library);
@@ -191,7 +192,7 @@ M &M::operator-=(const M &rhs) {
 
 
 M &M::operator-=(const long &rhs) {
-    auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::subtraction, new LiteralInt(rhs));
+    auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::subtraction, new LiteralInt(rhs));
     this->expr = exp;
     if (!isWellSuited(this->library, rhs)) {
         throw std::runtime_error(
@@ -201,7 +202,7 @@ M &M::operator-=(const long &rhs) {
 }
 
 M &M::operator-=(const int &rhs) {
-    auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::subtraction, new LiteralInt(rhs));
+    auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::subtraction, new LiteralInt(rhs));
     this->expr = exp;
     if (!isWellSuited(this->library, rhs)) {
         throw std::runtime_error(
@@ -211,7 +212,7 @@ M &M::operator-=(const int &rhs) {
 }
 
 M &M::operator*=(const M &rhs) {
-  auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::multiplication, rhs.expr);
+  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::multiplication, rhs.expr);
   this->expr = exp;
   this->plaintext = this->plaintext && rhs.plaintext;
   this->library = resolveLibraries(this->library, rhs.library);
@@ -219,7 +220,7 @@ M &M::operator*=(const M &rhs) {
 }
 
 M &M::operator*=(long &rhs) {
-  auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::multiplication, new LiteralInt(rhs));
+  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::multiplication, new LiteralInt(rhs));
   this->expr = exp;
   if (!isWellSuited(this->library, rhs)) {
     throw std::runtime_error(
@@ -229,7 +230,7 @@ M &M::operator*=(long &rhs) {
 }
 
 M &M::operator*=(int &rhs) {
-  auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::multiplication, new LiteralInt(rhs));
+  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::multiplication, new LiteralInt(rhs));
   this->expr = exp;
   if (!isWellSuited(this->library, rhs)) {
     throw std::runtime_error(
@@ -239,82 +240,82 @@ M &M::operator*=(int &rhs) {
 }
 
 M &M::operator++() {
-  auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::addition, new LiteralInt(1));
+  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::addition, new LiteralInt(1));
   this->expr = exp;
   return *this;
 }
 
 M &M::operator--() {
-  auto exp = new BinaryExpr(this->expr, OpSymb::BinaryOp::subtraction, new LiteralInt(1));
+  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::subtraction, new LiteralInt(1));
   this->expr = exp;
   return *this;
 }
 
 M &M::operator!() {
-  auto exp = new UnaryExpr(OpSymb::UnaryOp::negation, this->expr);
+  auto exp = new UnaryExpr(UnaryOp::negation, this->expr);
   this->expr = exp;
   return *this;
 }
 
 
 M operator==(const M &lhs, const M &rhs) {
-    auto exp = new LogicalExpr(lhs.expr, OpSymb::LogCompOp::equal, rhs.expr);
+    auto exp = new LogicalExpr(lhs.expr, LogCompOp::equal, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator!=(const M &lhs, const M &rhs) {
-    auto exp = new LogicalExpr(lhs.expr, OpSymb::LogCompOp::unequal, rhs.expr);
+    auto exp = new LogicalExpr(lhs.expr, LogCompOp::unequal, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator>=(const M &lhs, const M &rhs) {
-    auto exp = new LogicalExpr(lhs.expr, OpSymb::LogCompOp::greaterEqual, rhs.expr);
+    auto exp = new LogicalExpr(lhs.expr, LogCompOp::greaterEqual, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator>(const M &lhs, const M &rhs) {
-    auto exp = new LogicalExpr(lhs.expr, OpSymb::LogCompOp::greater, rhs.expr);
+    auto exp = new LogicalExpr(lhs.expr, LogCompOp::greater, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator<=(const M &lhs, const M &rhs) {
-    auto exp = new LogicalExpr(lhs.expr, OpSymb::LogCompOp::smallerEqual, rhs.expr);
+    auto exp = new LogicalExpr(lhs.expr, LogCompOp::smallerEqual, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator<(const M &lhs, const M &rhs) {
-    auto exp = new LogicalExpr(lhs.expr, OpSymb::LogCompOp::smaller, rhs.expr);
+    auto exp = new LogicalExpr(lhs.expr, LogCompOp::smaller, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator+(const M &lhs, const M &rhs) {
-    auto exp = new BinaryExpr(lhs.expr, OpSymb::BinaryOp::addition, rhs.expr);
+    auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::addition, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator-(const M &lhs, const M &rhs) {
-    auto exp = new BinaryExpr(lhs.expr, OpSymb::BinaryOp::subtraction, rhs.expr);
+    auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::subtraction, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator*(const M &lhs, const M &rhs) {
-    auto exp = new BinaryExpr(lhs.expr, OpSymb::BinaryOp::multiplication, rhs.expr);
+    auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::multiplication, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);

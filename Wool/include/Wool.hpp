@@ -14,7 +14,7 @@ namespace Wool {
 class W;
 
 /// Libraries supported by SHEEP
-enum Library { Plaintext, HElib, LP, Palisade, SEALBFV, SEALCKKS, TFHEBool, TFHECommon, TFHEInteger };
+enum Library { Plaintext, HElib, LP, Palisade, SEALBFV, SEALCKKS, TFHEBool, TFHEInteger };
 
 /// computes string from library enum
 /// \param l
@@ -38,6 +38,13 @@ class W {
   /// Benchmarks the Circuit  c of with library l.
   /// \return time in milliseconds
   double benchmarkWith(Library l);
+
+  /// Returns multiplicative depth of circuit
+  /// \return
+  int getMultDepth();
+
+  /// prints the circuit for debugging, etc...
+  void printCircuit();
 private:
   /// Circuit which was derived from AbstractExpr or AST
   Circuit c;
@@ -47,6 +54,9 @@ private:
 
   /// const input to feed into Circuit
   std::vector<long> cptvec;
+
+  /// Multiplicative depth of circuit c
+  int multDepth;
 
   /// Composes Circuit of AbstractExpr and saves it in c
   /// \param ae AbstractExpr to compose circuit from
@@ -61,6 +71,14 @@ private:
   /// \return first element is the result and second element is timing information
   template<typename genericContext, typename intType_t>
   std::tuple<std::vector<long>, DurationContainer> eval();
+
+  /// Evaluates the Circuit c given a SHEEP context and int type.
+  /// \tparam intType_t
+  /// \param ctx
+  /// \return first element is te result and the second element is timing information
+  template <typename intType_t>
+  std::tuple<std::vector<long>, DurationContainer> eval(BaseContext<intType_t> *ctx);
+
 };
 
 };

@@ -16,6 +16,7 @@
 #include "simple-circuits.hpp"
 #include "circuit-util.hpp"
 #include "AbstractExpr.h"
+#include "AbstractBinaryExpr.h"
 
 class CircuitCompositionVisitor : Visitor {
  private:
@@ -29,13 +30,13 @@ class CircuitCompositionVisitor : Visitor {
   std::stack<Circuit> cs;
 
   /// converts an OpSymb to the corresponding SHEEP gate
-  Circuit toGateCircuit(const std::variant<OpSymb::BinaryOp, OpSymb::LogCompOp, OpSymb::UnaryOp> &variant);
+  Circuit toGateCircuit(const OpSymbolVariant &variant);
 
   /// Mapping between OpSymb::BinaryOp from ast_lib and Gate from sheep
-  const std::map<OpSymb::BinaryOp, Circuit> binopCircuitMap = {
-      {OpSymb::BinaryOp::addition, single_binary_gate_circuit(Gate::Add)},
-      {OpSymb::BinaryOp::subtraction, single_binary_gate_circuit((Gate::Subtract))},
-      {OpSymb::BinaryOp::multiplication, single_binary_gate_circuit(Gate::Multiply)}
+  const std::map<ArithmeticOp, Circuit> binopCircuitMap = {
+      {ArithmeticOp::addition, single_binary_gate_circuit(Gate::Add)},
+      {ArithmeticOp::subtraction, single_binary_gate_circuit((Gate::Subtract))},
+      {ArithmeticOp::multiplication, single_binary_gate_circuit(Gate::Multiply)}
   };
  public:
   std::vector<long> getPtvec();
@@ -56,9 +57,12 @@ class CircuitCompositionVisitor : Visitor {
 
   void visit(UnaryExpr &elem) override;
 
-  void visit(BinaryExpr &elem) override;
+  void visit(ArithmeticExpr &elem) override;
+
+  void visit(Function &elem);
 
   Circuit getCircuit();
+
 };
 
 #endif //GRANITE_CIRCUITCOMPOSITIONVISITOR_HPP

@@ -11,7 +11,11 @@
 #include "LiteralFloat.h"
 #include "LogicalExpr.h"
 #include "UnaryExpr.h"
-#include "BinaryExpr.h"
+#include "AbstractBinaryExpr.h"
+#include "ArithmeticExpr.h"
+#include "Function.h"
+
+using namespace std;
 
 std::vector<long> CircuitCompositionVisitor::getPtvec() {
   return this->ptvec;
@@ -75,7 +79,7 @@ void CircuitCompositionVisitor::visit(UnaryExpr &elem) {
   cs.push(seq(r, gateCircuit));
 }
 
-void CircuitCompositionVisitor::visit(BinaryExpr &elem) {
+void CircuitCompositionVisitor::visit(ArithmeticExpr &elem) {
   elem.getLeft()->accept(*this);
   auto l = cs.top();
   cs.pop();
@@ -88,13 +92,17 @@ void CircuitCompositionVisitor::visit(BinaryExpr &elem) {
   cs.push(seq(par(l, r), gateCircuit));
 }
 
+void CircuitCompositionVisitor::visit(Function &elem){
+    vector<FunctionParameter *> params = elem.getParameters();
+}
+
 Circuit
 CircuitCompositionVisitor::toGateCircuit(
-    const std::variant<OpSymb::BinaryOp, OpSymb::LogCompOp, OpSymb::UnaryOp> &variant) {
+    const OpSymbolVariant &variant) {
   switch (variant.index()) {
     case 0:
       try {
-        return binopCircuitMap.at(std::get<OpSymb::BinaryOp>(variant));
+        return binopCircuitMap.at(std::get<ArithmeticOp>(variant));
       }
       catch (const std::out_of_range &e) {
         throw std::runtime_error("Gate not implemented in SHEEP: " +
@@ -104,8 +112,8 @@ CircuitCompositionVisitor::toGateCircuit(
       throw std::runtime_error(
           "Gate not implemented in SHEEP: " + OpSymb::getTextRepr(variant)); //TODO: implement logic gates
     case 2:
-      switch (std::get<OpSymb::UnaryOp>(variant)) {
-        case OpSymb::UnaryOp::negation:return single_unary_gate_circuit(Gate::Negate);
+      switch (std::get<UnaryOp>(variant)) {
+        case UnaryOp::negation:return single_unary_gate_circuit(Gate::Negate);
       }
   }
 }

@@ -2,11 +2,30 @@
 #include "Wool.hpp"
 #include "AbstractExpr.h"
 #include "circuit.hpp"
-#include "context.hpp"
-#include "context-clear.hpp"
 #include "CircuitCompositionVisitor.hpp"
 #include "Return.h"
 #include "Function.h"
+#include "MultDepthVisitor.h"
+#include "context.hpp"
+#include "context-clear.hpp"
+#ifdef HAVE_LP
+#include "context-lp.hpp"
+#endif
+#ifdef HAVE_PALISADE
+#include "context-palisade.hpp"
+#endif
+#ifdef HAVE_SEAL_BFV
+#include "context-seal-bfv.hpp"
+#endif
+#ifdef HAVE_SEAL_CKKS
+#include "context-seal-ckks.hpp"
+#endif
+#ifdef HAVE_TFHE_BOOL
+#include "context-tfhe-bool.hpp"
+#endif
+#ifdef HAVE_TFHE_INTEGER
+#include "context-tfhe-integer.hpp"
+#endif
 
 using namespace std;
 
@@ -20,37 +39,72 @@ string toString(Wool::Library l) {
     case Wool::SEALBFV:return "SEALBFV";
     case Wool::SEALCKKS:return "SEALCKKS";
     case Wool::TFHEBool:return "TFHEBool";
-    case Wool::TFHECommon:return "TFHECommon";
     case Wool::TFHEInteger:return "TFHEInteger";
   }
 }
 
 W::W(AbstractExpr *ae) {
   composeCircuit(ae);
+  Ast ast = Ast();
+  Function *func = dynamic_cast<Function *>(ast.setRootNode(new Function("f")));
+  func->addStatement(new Return(ae));
+  MultDepthVisitor mdv = MultDepthVisitor();
+  mdv.visit(ast);
+  this->multDepth = mdv.getMaxDepth();
 }
 
 //TODO: this is extremely vulnerable to any changes
 W::W(Ast a) {
-   Function* f = (Function *) a.getRootNode();
-   Return* r = (Return *) f->getBodyStatements()[0];
-   AbstractExpr * ae = r->getReturnExpressions()[0];
+  Function* f = (Function *) a.getRootNode();
+  Return* r = (Return *) f->getBodyStatements()[0];
+  AbstractExpr * ae = r->getReturnExpressions()[0];
   composeCircuit(ae);
+  MultDepthVisitor mdv = MultDepthVisitor();
+  mdv.visit(a);
+  this->multDepth = mdv.getMaxDepth();
 }
 
 long W::evaluateWith(Library l) {
+    BaseContext<int32_t>* ctx = nullptr;
   switch (l) {
     case Wool::Plaintext:
+       // return get<0>(eval(SHEEP::ContextClear<int32_t>()))[0];
       return get<0>(eval<SHEEP::ContextClear<int32_t>,
                          int32_t>())[0]; // TODO: With the aid of Bithelpers, determine int32_t type accurately
+#ifdef HAVE_LP
     case Wool::LP:throw std::runtime_error("Not yet implemented.");
+#endif
+#ifdef HAVE_PALISADE
     case Wool::Palisade:throw std::runtime_error("Not yet implemented.");
-    case Wool::SEALBFV:throw std::runtime_error("Not yet implemented.");
-    case Wool::SEALCKKS:throw std::runtime_error("Not yet implemented.");
-    case Wool::TFHEBool:throw std::runtime_error("Not yet implemented.");
-    case Wool::TFHECommon:throw std::runtime_error("Not yet implemented.");
+#endif
+#ifdef HAVE_SEAL_BFV
+    case Wool::SEALBFV:
+        cout << "Evaluating... with SEALBFV" << endl;
+        ctx = reinterpret_cast<BaseContext<int32_t> *>(new SHEEP::ContextSealBFV<int32_t>());
+        break;
+#endif
+#ifdef HAVE_SEAL_CKKS
+    case Wool::SEALCKKS:
+        cout << "Evaluating... with SEALCKKS" << endl;
+        ctx = reinterpret_cast<BaseContext<int32_t> *>(new SHEEP::ContextSealCKKS<double>());
+        break;
+#endif
+#ifdef HAVE_TFHE_BOOL
+    case Wool::TFHEBool:
+        ctx = reinterpret_cast<BaseContext<int32_t> *>(new SHEEP::ContextTFHE<bool>());
+        break;
+#endif
+#ifdef HAVE_TFHE_INTEGER
     case Wool::TFHEInteger:throw std::runtime_error("Not yet implemented.");
+#endif
   }
-  throw std::runtime_error("No valid library at evaluation.");
+  if (!ctx){
+      cout << "Warning. No valid library at evaluation. Clear context selected." << endl;
+      ctx = reinterpret_cast<BaseContext<int32_t> *>(new SHEEP::ContextClear<int32_t>());
+  }
+  auto r = get<0>(eval<int32_t>(ctx))[0];
+  delete ctx;
+    return r;
 }
 
 
@@ -65,10 +119,43 @@ double W::benchmarkWith(Library l){
         case Wool::SEALBFV:throw std::runtime_error("Not yet implemented.");
         case Wool::SEALCKKS:throw std::runtime_error("Not yet implemented.");
         case Wool::TFHEBool:throw std::runtime_error("Not yet implemented.");
-        case Wool::TFHECommon:throw std::runtime_error("Not yet implemented.");
         case Wool::TFHEInteger:throw std::runtime_error("Not yet implemented.");
     }
     throw std::runtime_error("No valid library at evaluation.");
+}
+
+//TODO: template with separate plaintext and ciphertext types
+template <typename intType_t>
+tuple<vector<long>, DurationContainer> W::eval(BaseContext<intType_t> *ctx){
+    typedef vector<vector<intType_t>> PtVec;
+
+    DurationContainer dc;
+
+    PtVec inputs;
+    for (auto i: ptvec) {
+        vector<intType_t> v = {(intType_t) i};
+        inputs.push_back(v);
+    }
+
+    cout << "Inputs are: ";
+    for (auto x : inputs) cout << to_string(x[0]) << " ";
+    cout << endl;
+    cout << "Const Inputs are: ";
+    for (auto x : cptvec) cout << to_string(x) << " ";
+    cout << endl;
+
+    PtVec ptv;
+    try {
+        ptv = ctx->eval_with_plaintexts(c, inputs, cptvec, dc);
+    }
+    catch (const GateNotImplemented &e) {
+        throw GateNotImplemented();
+    }
+    vector<long> iptv;
+    for (auto x: ptv) {
+        iptv.push_back((int) x[0]);
+    }
+    return make_tuple(iptv, dc);
 }
 
 //TODO: vector<long>? vector<T>?
@@ -88,6 +175,9 @@ tuple<vector<long>, DurationContainer> W::eval() {
   cout << "Inputs are: ";
   for (auto x : inputs) cout << to_string(x[0]) << " ";
   cout << endl;
+  cout << "Const Inputs are: ";
+  for (auto x : cptvec) cout << to_string(x) << " ";
+  cout << endl;
 
   cout << "Evaluating..." << endl;
   PtVec ptv;
@@ -104,7 +194,6 @@ tuple<vector<long>, DurationContainer> W::eval() {
   return make_tuple(iptv, dc);
 }
 
-
 void W::composeCircuit(AbstractExpr *ae) {
   CircuitCompositionVisitor ccv = CircuitCompositionVisitor();
   ccv.visit(*ae);
@@ -114,5 +203,12 @@ void W::composeCircuit(AbstractExpr *ae) {
   //TODO: set recommended library
 }
 
+int W::getMultDepth(){
+    return this->multDepth;
+}
+
+void W::printCircuit(){
+    cout << c << endl;
+}
 
 }
