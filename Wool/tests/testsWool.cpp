@@ -51,3 +51,38 @@ TEST(BasicWool, MultDepthTest){
     W w = W(*M::makeAST(f_md));
     ASSERT_EQ(w.getMultDepth(), 3);
 }
+
+void f_dec(){
+    M a = 10;
+    M b = encrypt(20);
+    long c = decrypt(a*b);
+    c += 10;
+    M x = encrypt(c);
+    M y = 1;
+    output(x + y);
+}
+
+TEST(BasicWool, DecTest){
+    Ast* ast = M::makeAST(f_dec);
+    W w = W(*ast);
+    long res = w.evaluateWith(Library::SEALBFV);
+    ASSERT_EQ(res, 211);
+}
+
+void f_dec_setlibBFV(){
+    M a = 10;
+    M b = encrypt(20);
+    b.setLib(Library::SEALBFV);
+    long c = decrypt(a*b);
+    c += 10;
+    M x = encrypt(c);
+    M y = 1;
+    output(x + y);
+}
+
+TEST(BasicWool, DecTestsetLibBFV){
+    Ast* ast = M::makeAST(f_dec_setlibBFV);
+    W w = W(*ast);
+    long res = w.evaluateWith(Library::Plaintext);
+    ASSERT_EQ(res, 211);
+}

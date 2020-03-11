@@ -27,8 +27,7 @@ Ast *M::makeAST(std::function<void()> f) {
   return M::output_ast;
 }
 
-double M::evaluate(std::function<void ()> f) {
-    //f(); //TODO: this might need to set a static variable so we can get that to find out which library was set.
+double M::evaluate(std::function<void ()> f, Wool::Library l) {
     using namespace std::chrono;
     high_resolution_clock::time_point t1 = high_resolution_clock::now();
     Ast* ast = M::makeAST(f); // self eval happening here. Intermediate results will get calculated instantly, which is why we benchmark this too. This means unwanted overhead from the M class in the final result.
@@ -37,13 +36,14 @@ double M::evaluate(std::function<void ()> f) {
     duration<double, std::milli> time_span = t2 - t1;
     double self_eval_time =  time_span.count();
 
-    double time = Wool::W(*ast).benchmarkWith(Wool::Library::Plaintext); //TODO: set library
+    double time = Wool::W(*ast).benchmarkWith(l);
     return self_eval_time + time;
 }
 
+
 int M::analyse(std::function<void()> f){
-    throw std::runtime_error("not yet implemented");
-    return 0;
+    Ast* ast = M::makeAST(f);
+    return Wool::W(*ast).getMultDepth();
 }
 
 long M::result(std::function<void()> f){
@@ -55,6 +55,7 @@ void output(M value){
     M::output(value);
 }
 
+// known issue: this has no option to transfer info about the desired crypto library.
 void M::output(const M &m) {
   M::output_ast = new Ast();
   Function *func = dynamic_cast<Function *>(M::output_ast->setRootNode(new Function("f")));
@@ -354,6 +355,8 @@ vector<M> encrypt(vector<long> v){
 }
 
 long decrypt(M m) {
+  if (m.isPlaintext() && m.getLib() != Wool::Library::Plaintext) throw  std::runtime_error("Computation uses crypto library, but no value was ever encrypted.");
+  if (m.isPlaintext()) return Wool::W(m.getExpr()).evaluateWith(Wool::Library::Plaintext); // Plaintext computations are performed always in plaintext
   return Wool::W(m.getExpr()).evaluateWith(m.getLib());
 }
 

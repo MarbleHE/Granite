@@ -5,7 +5,7 @@
 #include <string>
 #include "gtest/gtest.h"
 #include "Ast.h"
-#include "BinaryExpr.h"
+#include "AbstractBinaryExpr.h"
 #include "M.hpp"
 #include "nlohmann/json.hpp"
 #include "Function.h"
@@ -108,7 +108,7 @@ TEST_F(FTest, EmptyFuncAST) {
   Ast *ast = M::makeAST(f);
   auto rn = ast->getRootNode();
 
-  EXPECT_EQ(expected_j.dump(), rn->toString());
+  EXPECT_EQ(expected_j.dump(), rn->toString(true));
 }
 
 TEST_F(FTest, EmptyFuncEquality) {
@@ -117,7 +117,7 @@ TEST_F(FTest, EmptyFuncEquality) {
   Ast *ast2 = M::makeAST(empty_func2);
   auto rn = ast->getRootNode();
   auto rn2 = ast2->getRootNode();
-  EXPECT_EQ(rn->toString(), rn2->toString());
+  EXPECT_EQ(rn->toString(true), rn2->toString(true));
 }
 
 TEST_F(FTest, LiteralIntEquality) {
@@ -129,8 +129,8 @@ TEST_F(FTest, LiteralIntEquality) {
   std::ifstream file(expected_output + "return_literal_int.json");
   json expected_j = json::parse(file);
 
-  EXPECT_EQ(rn->toString(), rn2->toString());
-  EXPECT_EQ(rn->toString(), expected_j.dump());
+  EXPECT_EQ(rn->toString(true), rn2->toString(true));
+  EXPECT_EQ(rn->toString(true), expected_j.dump());
 }
 
 TEST(EncTest, WithLib) {
@@ -143,4 +143,34 @@ TEST(DecTest, Plaintext) {
   M a = encrypt(4);
   long res = decrypt(a);
   EXPECT_EQ(res, 4);
+}
+
+
+void f_dec_setlibBFV(){
+    M a = 10;
+    M b = encrypt(20);
+    b.setLib(Wool::Library::SEALBFV);
+    long c = decrypt(a*b);
+    c += 10;
+    M x = encrypt(c);
+    M y = 1;
+    output(x + y);
+}
+
+TEST(EvalTest, DecTestsetLibBFV){
+    long ms = M::evaluate(f_dec_setlibBFV, Wool::Library::SEALBFV);
+    std::cout << ms;
+}
+
+/// maximum multiplicative depth should be 3
+void f_md(){
+    M a = 10;
+    a *= 10;
+    a *= 10;
+    a *= 10;
+    output(a);
+}
+
+TEST(BasicMultDepth, MultDepthTest){
+    ASSERT_EQ(M::analyse(f_md), 3);
 }

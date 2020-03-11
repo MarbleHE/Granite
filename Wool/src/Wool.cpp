@@ -53,7 +53,7 @@ W::W(AbstractExpr *ae) {
   this->multDepth = mdv.getMaxDepth();
 }
 
-//TODO: this is extremely vulnerable to any changes
+//TODO: make less vulnerable to any changes
 W::W(Ast a) {
   Function* f = (Function *) a.getRootNode();
   Return* r = (Return *) f->getBodyStatements()[0];
@@ -66,11 +66,13 @@ W::W(Ast a) {
 
 long W::evaluateWith(Library l) {
     BaseContext<int32_t>* ctx = nullptr;
+    //TODO: select parameters
+
   switch (l) {
     case Wool::Plaintext:
        // return get<0>(eval(SHEEP::ContextClear<int32_t>()))[0];
-      return get<0>(eval<SHEEP::ContextClear<int32_t>,
-                         int32_t>())[0]; // TODO: With the aid of Bithelpers, determine int32_t type accurately
+      return get<0>(eval<SHEEP::ContextClear<int64_t >,
+                         int64_t >())[0]; // TODO: With the aid of Bithelpers, determine type accurately
 #ifdef HAVE_LP
     case Wool::LP:throw std::runtime_error("Not yet implemented.");
 #endif
@@ -100,7 +102,7 @@ long W::evaluateWith(Library l) {
   }
   if (!ctx){
       cout << "Warning. No valid library at evaluation. Clear context selected." << endl;
-      ctx = reinterpret_cast<BaseContext<int32_t> *>(new SHEEP::ContextClear<int32_t>());
+      ctx = reinterpret_cast<BaseContext<int32_t> *>(new SHEEP::ContextClear<int64_t >());
   }
   auto r = get<0>(eval<int32_t>(ctx))[0];
   delete ctx;
@@ -112,11 +114,13 @@ double W::benchmarkWith(Library l){
     DurationContainer dc;
     switch (l) {
         case Wool::Plaintext:
-            dc =  get<1>(eval<SHEEP::ContextClear<int32_t>, int32_t>()); // TODO: With the aid of Bithelpers, determine int32_t type accurately
+            dc =  get<1>(eval<SHEEP::ContextClear<int64_t >, int64_t>()); // TODO: With the aid of Bithelpers, determine int64_t type accurately
             return dc.first[0].count() / 1000 + dc.first[1].count() / 1000 + dc.first[2].count() / 1000; // enc, eval and dec times all added
         case Wool::LP:throw std::runtime_error("Not yet implemented.");
         case Wool::Palisade:throw std::runtime_error("Not yet implemented.");
-        case Wool::SEALBFV:throw std::runtime_error("Not yet implemented.");
+        case Wool::SEALBFV:
+            dc =  get<1>(eval<SHEEP::ContextSealBFV<int64_t>, int64_t >()); // TODO: With the aid of Bithelpers, determine int64_t type accurately
+            return dc.first[0].count() / 1000 + dc.first[1].count() / 1000 + dc.first[2].count() / 1000; // enc, eval and dec times all added
         case Wool::SEALCKKS:throw std::runtime_error("Not yet implemented.");
         case Wool::TFHEBool:throw std::runtime_error("Not yet implemented.");
         case Wool::TFHEInteger:throw std::runtime_error("Not yet implemented.");
@@ -210,5 +214,6 @@ int W::getMultDepth(){
 void W::printCircuit(){
     cout << c << endl;
 }
+
 
 }

@@ -40,13 +40,16 @@ class M {
   /// The method generating an AST from some function written with M classes.
   static Ast *makeAST(std::function<void()> f);
 
-  /// Method for multdepth analysis will probably be within Wool. (Wrapper for Wool)
+  /// Method for multDepth analysis will (Wrapper for Wool).
+  /// The multDepth returned  is ignoring anything previous all decrypt statements and only measure statements on which output depends on directly.
   /// \return Maximum multiplicative depth of circuit composed from AST.
   static int analyse(std::function<void()> f);
 
-  /// Method for benchmarking will also be in Wool. (Wrapper for Wool, which wraps SHEEP)
-  /// \return duration elapsed in milleseconds
-  static double evaluate(std::function<void()> f);
+  /// Benchmarks the function. Not very accurate due to design issues.
+  /// \param f function to be benchmarked
+  /// \param l library with which the last expressions on which the output statement depends directly on should be evaluated with.
+  /// \return total evaluation time in milliseconds. (encryption and decryption included) has some overhead from M polluting the result.
+  static double evaluate(std::function<void()> f, Wool::Library l);
 
   /// Method to get the result of the computation
   /// \return result of f() decrypted (if it has an output statement)
