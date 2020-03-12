@@ -58,6 +58,9 @@ private:
   /// Multiplicative depth of circuit c
   int multDepth;
 
+  /// Maximum number of slots required by some batched gate within the circuit
+  int maxSlots;
+
   /// Composes Circuit of AbstractExpr and saves it in c
   /// \param ae AbstractExpr to compose circuit from
   /// \return Circuit
@@ -79,6 +82,16 @@ private:
   template <typename intType_t>
   std::tuple<std::vector<long>, DurationContainer> eval(BaseContext<intType_t> *ctx);
 
+  /// Estimates an upper bound on the number of bits required at decryption.
+  /// \return Number of bits required at decryption
+  int estimatePlaintextSize();
+
+  /// Generates a Context
+  /// \tparam intType plaintext type
+  /// \param l Library of context to be generated
+  /// \return the cryptographic context
+  template <typename intType>
+  BaseContext<intType>* generateContext(Library l);
 };
 
 };

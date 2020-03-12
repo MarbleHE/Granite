@@ -7,9 +7,10 @@
 
 #include "AbstractLiteral.h"
 
+/// DUMMY CLASS
 class LiteralVector : AbstractLiteral{
 public:
-    int size();
+    int size(){ return 1;};//TODO: refactor to correct LiteraLVector of AST
 };
 
 

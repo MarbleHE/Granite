@@ -375,6 +375,7 @@ M::M(AbstractExpr *expr, bool plaintext) {
 }
 
 M::~M() {
+    //TODO: fix memory leak. Possible solution: refactor M from expression pointers to Ast copies.
 }
 
 Wool::Library M::resolveLibraries(Wool::Library l, Wool::Library r) {

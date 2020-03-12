@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <math.h>
 #include <string>
 #include "Wool.hpp"
 #include "AbstractExpr.h"
@@ -6,6 +8,7 @@
 #include "Return.h"
 #include "Function.h"
 #include "MultDepthVisitor.h"
+#include "BatchingVisitor.hpp"
 #include "context.hpp"
 #include "context-clear.hpp"
 #ifdef HAVE_LP
@@ -51,6 +54,9 @@ W::W(AbstractExpr *ae) {
   MultDepthVisitor mdv = MultDepthVisitor();
   mdv.visit(ast);
   this->multDepth = mdv.getMaxDepth();
+  BatchingVisitor bv = BatchingVisitor();
+  bv.visit(*ae);
+  this->maxSlots = bv.getMaxSlots();
 }
 
 //TODO: make less vulnerable to any changes
@@ -62,53 +68,74 @@ W::W(Ast a) {
   MultDepthVisitor mdv = MultDepthVisitor();
   mdv.visit(a);
   this->multDepth = mdv.getMaxDepth();
+  BatchingVisitor bv = BatchingVisitor();
+  bv.visit(*ae);
+  this->maxSlots = bv.getMaxSlots();
 }
 
 long W::evaluateWith(Library l) {
-    BaseContext<int32_t>* ctx = nullptr;
-    //TODO: select parameters
+    int pt_size = estimatePlaintextSize();
+    long r;
+    if (pt_size < 8){
+        auto ctx = generateContext<int8_t>(l);
+        r = get<0>(eval<int8_t >(ctx))[0];
+    }
+    else if (pt_size < 16){
+        auto ctx = generateContext<int16_t>(l);
+        r =  get<0>(eval<int16_t >(ctx))[0];
+    }
+    else if (pt_size < 32){
+        auto ctx = generateContext<int32_t>(l);
+        r =  get<0>(eval<int32_t >(ctx))[0];
+    }
+    else {
+        cout << "Warning: Result might not fit into plaintext modulus.";
+        auto ctx = generateContext<int64_t> (l);
+        r =  get<0>(eval<int64_t >(ctx))[0];
+    }
+  //delete ctx;
+  return r;
+}
 
-  switch (l) {
-    case Wool::Plaintext:
-       // return get<0>(eval(SHEEP::ContextClear<int32_t>()))[0];
-      return get<0>(eval<SHEEP::ContextClear<int64_t >,
-                         int64_t >())[0]; // TODO: With the aid of Bithelpers, determine type accurately
+template <typename intType>
+BaseContext<intType>* W::generateContext(Library l){
+    //TODO: select parameters
+    //int Q = calcQ;
+    //int N = calcN();
+    switch (l) {
+        case Wool::Plaintext:
+           return new SHEEP::ContextClear<intType>();
 #ifdef HAVE_LP
-    case Wool::LP:throw std::runtime_error("Not yet implemented.");
+            case Wool::LP:throw std::runtime_error("Not yet implemented.");
 #endif
 #ifdef HAVE_PALISADE
-    case Wool::Palisade:throw std::runtime_error("Not yet implemented.");
+            case Wool::Palisade:throw std::runtime_error("Not yet implemented.");
 #endif
 #ifdef HAVE_SEAL_BFV
-    case Wool::SEALBFV:
-        cout << "Evaluating... with SEALBFV" << endl;
-        ctx = reinterpret_cast<BaseContext<int32_t> *>(new SHEEP::ContextSealBFV<int32_t>());
-        break;
+        case Wool::SEALBFV:
+            cout << "Evaluating... with SEALBFV" << endl;
+            return new SHEEP::ContextSealBFV<intType>();
 #endif
 #ifdef HAVE_SEAL_CKKS
-    case Wool::SEALCKKS:
-        cout << "Evaluating... with SEALCKKS" << endl;
-        ctx = reinterpret_cast<BaseContext<int32_t> *>(new SHEEP::ContextSealCKKS<double>());
-        break;
+        case Wool::SEALCKKS:
+            cout << "Evaluating... with SEALCKKS" << endl;
+            return new SHEEP::ContextSealCKKS<intType>();
 #endif
 #ifdef HAVE_TFHE_BOOL
-    case Wool::TFHEBool:
-        ctx = reinterpret_cast<BaseContext<int32_t> *>(new SHEEP::ContextTFHE<bool>());
+        case Wool::TFHEBool:
+        ctx = reinterpret_cast<BaseContext<intType> *>(new SHEEP::ContextTFHE<bool>());
         break;
 #endif
 #ifdef HAVE_TFHE_INTEGER
-    case Wool::TFHEInteger:throw std::runtime_error("Not yet implemented.");
+        case Wool::TFHEInteger:
+                ctx = reinterpret_cast<BaseContext<int32_t> *>(new SHEEP::ContextTFHE<long>());
+        break;
 #endif
-  }
-  if (!ctx){
-      cout << "Warning. No valid library at evaluation. Clear context selected." << endl;
-      ctx = reinterpret_cast<BaseContext<int32_t> *>(new SHEEP::ContextClear<int64_t >());
-  }
-  auto r = get<0>(eval<int32_t>(ctx))[0];
-  delete ctx;
-    return r;
-}
+    }
 
+    cout << "Warning. No valid library at evaluation. Clear context selected." << endl;
+    return new SHEEP::ContextClear<intType >();
+}
 
 double W::benchmarkWith(Library l){
     DurationContainer dc;
@@ -213,6 +240,21 @@ int W::getMultDepth(){
 
 void W::printCircuit(){
     cout << c << endl;
+}
+
+int W::estimatePlaintextSize() {
+    // The maximum possible number to achieve in a circuit is by multiplying the largest number multDepth times itself
+    auto ptv = ptvec;
+    auto cptv = cptvec;
+    if (ptv.empty()){
+        ptv.emplace_back(1);
+    }
+    if (cptv.empty()){
+        cptv.emplace_back(1);
+    }
+    auto ptmax = max_element(ptv.begin(),ptv.end());
+    auto cptmax = max_element(cptv.begin(),cptv.end());
+    return (multDepth + 1) * ceil(log2(max(*ptmax,*cptmax))); //TODO: handle 0 vectors...
 }
 
 
