@@ -6,7 +6,7 @@
 #define GRANITE_BATCHINGVISITOR_HPP
 
 #include "Visitor.h"
-#include "LiteralVector.hpp"
+#include "AbstractMatrix.h"
 #include "LiteralBool.h"
 #include "LiteralInt.h"
 #include "LiteralString.h"
@@ -20,23 +20,23 @@ class BatchingVisitor : Visitor {
 private:
     int maxSlots = 1;
 public:
-    void visit(LiteralVector &elem);
+    void visit(AbstractMatrix &elem) override;
 
-    void visit(AbstractExpr &elem);
+    void visit(AbstractExpr &elem) override;
 
-    void visit(LiteralBool &elem);
+    void visit(LiteralBool &elem) override;
 
-    void visit(LiteralInt &elem);
+    void visit(LiteralInt &elem) override;
 
-    void visit(LiteralString &elem);
+    void visit(LiteralString &elem) override;
 
-    void visit(LiteralFloat &elem);
+    void visit(LiteralFloat &elem) override;
 
-    void visit(LogicalExpr &elem);
+    void visit(LogicalExpr &elem) override;
 
-    void visit(UnaryExpr &elem);
+    void visit(UnaryExpr &elem) override;
 
-    void visit(ArithmeticExpr &elem);
+    void visit(ArithmeticExpr &elem) override;
 
     int getMaxSlots();
 };

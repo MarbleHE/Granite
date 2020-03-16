@@ -26,6 +26,10 @@ std::vector<M> encrypt(std::vector<int> v);
 
 std::vector<M> encrypt(std::vector<long> v);
 
+M batchEncrypt(std::vector<bool> v);
+
+M batchEncrypt(std::vector<int> v);
+
 /// Evaluates the expression in m according to the selected library (Plaintext default) and returns its result.
 long decrypt(M m);
 
@@ -34,6 +38,11 @@ std::vector<long> decrypt(std::vector<M> mv);
 
 /// Output imitates the return statement in HE functions.
 void output(M value);
+
+/// Rotates a batched vector by amount k.
+/// \param k Rotation amount. Positive rotates
+/// \return
+M rotate(M m, int k);
 
 class M {
  public:
@@ -64,7 +73,7 @@ class M {
   /// Dummy contructor
   M();
 
-  /// full constructor
+  /// full constructor for integers
   M(long value, bool plaintext, Wool::Library library);
 
   /// Copy constructor
@@ -222,7 +231,16 @@ class M {
   /// \return the library, which "won"
   static Wool::Library resolveLibraries(Wool::Library l, Wool::Library r);
 
+  /// Rotates a batched vector by amount k.
+  /// \param k Rotation amount. Positive rotates
+  /// \return
+  friend M rotate(M m, int k);
+
   friend M encrypt(long value, Wool::Library library);
+
+  friend  M batchEncrypt(std::vector<bool> v);
+
+  friend  M batchEncrypt(std::vector<int> v);
 
   friend Ast make_AST(std::function<void()> f);
 

@@ -13,6 +13,8 @@
 #include "UnaryExpr.h"
 #include "Wool.hpp"
 #include "LogicalExpr.h"
+#include "AbstractMatrix.h"
+#include "Rotate.h"
 
 using namespace std;
 
@@ -156,7 +158,7 @@ M &M::operator=(int i) {
 }
 
 M &M::operator+=(const M &rhs) {
-  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::addition, rhs.expr);
+  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::ADDITION, rhs.expr);
   this->expr = exp;
   this->plaintext = this->plaintext && rhs.plaintext;
   this->library = resolveLibraries(this->library, rhs.library);
@@ -164,7 +166,7 @@ M &M::operator+=(const M &rhs) {
 }
 
 M &M::operator+=(const long &rhs) {
-  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::addition, new LiteralInt(rhs));
+  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::ADDITION, new LiteralInt(rhs));
   this->expr = exp;
   if (!isWellSuited(this->library, rhs)) {
     throw std::runtime_error(
@@ -174,7 +176,7 @@ M &M::operator+=(const long &rhs) {
 }
 
 M &M::operator+=(const int &rhs) {
-  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::addition, new LiteralInt(rhs));
+  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::ADDITION, new LiteralInt(rhs));
   this->expr = exp;
   if (!isWellSuited(this->library, rhs)) {
     throw std::runtime_error(
@@ -184,7 +186,7 @@ M &M::operator+=(const int &rhs) {
 }
 
 M &M::operator-=(const M &rhs) {
-  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::subtraction, rhs.expr);
+  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::SUBTRACTION, rhs.expr);
   this->expr = exp;
   this->plaintext = this->plaintext && rhs.plaintext;
   this->library = resolveLibraries(this->library, rhs.library);
@@ -193,7 +195,7 @@ M &M::operator-=(const M &rhs) {
 
 
 M &M::operator-=(const long &rhs) {
-    auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::subtraction, new LiteralInt(rhs));
+    auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::SUBTRACTION, new LiteralInt(rhs));
     this->expr = exp;
     if (!isWellSuited(this->library, rhs)) {
         throw std::runtime_error(
@@ -203,7 +205,7 @@ M &M::operator-=(const long &rhs) {
 }
 
 M &M::operator-=(const int &rhs) {
-    auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::subtraction, new LiteralInt(rhs));
+    auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::SUBTRACTION, new LiteralInt(rhs));
     this->expr = exp;
     if (!isWellSuited(this->library, rhs)) {
         throw std::runtime_error(
@@ -213,7 +215,7 @@ M &M::operator-=(const int &rhs) {
 }
 
 M &M::operator*=(const M &rhs) {
-  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::multiplication, rhs.expr);
+  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::MULTIPLICATION, rhs.expr);
   this->expr = exp;
   this->plaintext = this->plaintext && rhs.plaintext;
   this->library = resolveLibraries(this->library, rhs.library);
@@ -221,7 +223,7 @@ M &M::operator*=(const M &rhs) {
 }
 
 M &M::operator*=(long &rhs) {
-  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::multiplication, new LiteralInt(rhs));
+  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::MULTIPLICATION, new LiteralInt(rhs));
   this->expr = exp;
   if (!isWellSuited(this->library, rhs)) {
     throw std::runtime_error(
@@ -231,7 +233,7 @@ M &M::operator*=(long &rhs) {
 }
 
 M &M::operator*=(int &rhs) {
-  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::multiplication, new LiteralInt(rhs));
+  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::MULTIPLICATION, new LiteralInt(rhs));
   this->expr = exp;
   if (!isWellSuited(this->library, rhs)) {
     throw std::runtime_error(
@@ -241,85 +243,90 @@ M &M::operator*=(int &rhs) {
 }
 
 M &M::operator++() {
-  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::addition, new LiteralInt(1));
+  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::ADDITION, new LiteralInt(1));
   this->expr = exp;
   return *this;
 }
 
 M &M::operator--() {
-  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::subtraction, new LiteralInt(1));
+  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::SUBTRACTION, new LiteralInt(1));
   this->expr = exp;
   return *this;
 }
 
 M &M::operator!() {
-  auto exp = new UnaryExpr(UnaryOp::negation, this->expr);
+  auto exp = new UnaryExpr(UnaryOp::NEGATION, this->expr);
   this->expr = exp;
   return *this;
 }
 
 
 M operator==(const M &lhs, const M &rhs) {
-    auto exp = new LogicalExpr(lhs.expr, LogCompOp::equal, rhs.expr);
+    auto exp = new LogicalExpr(lhs.expr, LogCompOp::EQUAL, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator!=(const M &lhs, const M &rhs) {
-    auto exp = new LogicalExpr(lhs.expr, LogCompOp::unequal, rhs.expr);
+    auto exp = new LogicalExpr(lhs.expr, LogCompOp::UNEQUAL, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator>=(const M &lhs, const M &rhs) {
-    auto exp = new LogicalExpr(lhs.expr, LogCompOp::greaterEqual, rhs.expr);
+    auto exp = new LogicalExpr(lhs.expr, LogCompOp::GREATER_EQUAL, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator>(const M &lhs, const M &rhs) {
-    auto exp = new LogicalExpr(lhs.expr, LogCompOp::greater, rhs.expr);
+    auto exp = new LogicalExpr(lhs.expr, LogCompOp::GREATER, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator<=(const M &lhs, const M &rhs) {
-    auto exp = new LogicalExpr(lhs.expr, LogCompOp::smallerEqual, rhs.expr);
+    auto exp = new LogicalExpr(lhs.expr, LogCompOp::SMALLER_EQUAL, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator<(const M &lhs, const M &rhs) {
-    auto exp = new LogicalExpr(lhs.expr, LogCompOp::smaller, rhs.expr);
+    auto exp = new LogicalExpr(lhs.expr, LogCompOp::SMALLER, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator+(const M &lhs, const M &rhs) {
-    auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::addition, rhs.expr);
+    auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::ADDITION, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator-(const M &lhs, const M &rhs) {
-    auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::subtraction, rhs.expr);
+    auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::SUBTRACTION, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator*(const M &lhs, const M &rhs) {
-    auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::multiplication, rhs.expr);
+    auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::MULTIPLICATION, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
+}
+
+M rotate(M m, int k){
+    auto exp = new Rotate(m.getExpr(), new LiteralInt(k));
+    return M(exp, m.isPlaintext(), m.getLib());
 }
 
 M encrypt(long value, Wool::Library library) {
@@ -333,7 +340,7 @@ M encrypt(long value) {
 vector<M> encrypt(vector<bool> v){
     vector<M> mv;
     for (auto x: v){
-        mv.emplace_back(x, false, Wool::Library::Plaintext);
+        mv.emplace_back(encrypt(x));
     }
     return mv;
 }
@@ -341,7 +348,7 @@ vector<M> encrypt(vector<bool> v){
 vector<M> encrypt(vector<int> v){
     vector<M> mv;
     for (auto x: v){
-        mv.emplace_back(x, false, Wool::Library::Plaintext);
+        mv.emplace_back(encrypt(x));
     }
     return mv;
 }
@@ -349,9 +356,21 @@ vector<M> encrypt(vector<int> v){
 vector<M> encrypt(vector<long> v){
     vector<M> mv;
     for (auto x: v){
-        mv.emplace_back(x, false, Wool::Library::Plaintext);
+        mv.emplace_back(encrypt(x));
     }
     return mv;
+}
+
+//TODO
+// would be nice if we could name this encrypt as well
+M batchEncrypt(vector<bool> v){
+    Matrix<bool>* mat = new Matrix<bool>(vector<vector<bool>> {v});
+    return M(new LiteralBool (mat), false);
+}
+
+M batchEncrypt(vector<int> v){
+    Matrix<int>* mat = new Matrix<int>(vector<vector<int>> {v});
+    return M(new LiteralInt (mat), false);
 }
 
 long decrypt(M m) {

@@ -50,7 +50,7 @@ private:
   Circuit c;
 
   /// input to feed into Circuit
-  std::vector<long> ptvec;
+  std::vector<std::vector<long>> ptvec;
 
   /// const input to feed into Circuit
   std::vector<long> cptvec;

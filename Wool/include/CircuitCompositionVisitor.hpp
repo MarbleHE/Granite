@@ -17,11 +17,13 @@
 #include "circuit-util.hpp"
 #include "AbstractExpr.h"
 #include "AbstractBinaryExpr.h"
+#include "AbstractMatrix.h"
+#include "Rotate.h"
 
 class CircuitCompositionVisitor : Visitor {
  private:
   /// plaintext vector
-  std::vector<long> ptvec;
+  std::vector<std::vector<long>> ptvec;
 
   /// plaintext vector of constants
   std::vector<long> cptvec;
@@ -34,16 +36,22 @@ class CircuitCompositionVisitor : Visitor {
 
   /// Mapping between OpSymb::BinaryOp from ast_lib and Gate from sheep
   const std::map<ArithmeticOp, Circuit> binopCircuitMap = {
-      {ArithmeticOp::addition, single_binary_gate_circuit(Gate::Add)},
-      {ArithmeticOp::subtraction, single_binary_gate_circuit((Gate::Subtract))},
-      {ArithmeticOp::multiplication, single_binary_gate_circuit(Gate::Multiply)}
+      {ArithmeticOp::ADDITION, single_binary_gate_circuit(Gate::Add)},
+      {ArithmeticOp::SUBTRACTION, single_binary_gate_circuit((Gate::Subtract))},
+      {ArithmeticOp::MULTIPLICATION, single_binary_gate_circuit(Gate::Multiply)}
   };
+
+  //TODO: use map<String, Circuit*> to optimize partially duplicate Circuits
  public:
-  std::vector<long> getPtvec();
+  std::vector<std::vector<long>> getPtvec();
 
   std::vector<long> getCptvec();
 
   void visit(AbstractExpr &elem) override;
+
+  void visit(AbstractMatrix &elem) override;
+
+  void visit(Rotate &elem) override;
 
   void visit(LiteralBool &elem) override;
 

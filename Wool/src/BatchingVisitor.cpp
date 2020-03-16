@@ -3,7 +3,7 @@
 //
 
 #include "BatchingVisitor.hpp"
-#include "LiteralVector.hpp"
+#include "AbstractMatrix.h"
 #include "LiteralBool.h"
 #include "LiteralInt.h"
 #include "LiteralString.h"
@@ -12,11 +12,11 @@
 #include "UnaryExpr.h"
 #include "AbstractBinaryExpr.h"
 #include "ArithmeticExpr.h"
+#include "Dimension.h"
 
-
-void BatchingVisitor::visit(LiteralVector &elem) {
-    if (elem.size() > maxSlots) {
-        maxSlots = elem.size();
+void BatchingVisitor::visit(AbstractMatrix &elem) {
+    if (elem.getDimensions().numColumns > maxSlots) {
+        maxSlots = elem.getDimensions().numColumns;
     }
 }
 

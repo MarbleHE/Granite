@@ -100,11 +100,12 @@ long W::evaluateWith(Library l) {
 template <typename intType>
 BaseContext<intType>* W::generateContext(Library l){
     //TODO: select parameters
-    //int Q = calcQ;
+    //int logQ = (multDepth + 1)* 60 // 60 bits each q_i
     //int N = calcN();
     switch (l) {
         case Wool::Plaintext:
-           return new SHEEP::ContextClear<intType>();
+            cout << "Evaluating... in Plaintext" << endl;
+            return new SHEEP::ContextClear<intType>();
 #ifdef HAVE_LP
             case Wool::LP:throw std::runtime_error("Not yet implemented.");
 #endif
@@ -164,20 +165,21 @@ tuple<vector<long>, DurationContainer> W::eval(BaseContext<intType_t> *ctx){
 
     PtVec inputs;
     for (auto i: ptvec) {
-        vector<intType_t> v = {(intType_t) i};
-        inputs.push_back(v);
+        vector<intType_t> in;
+        for (auto j: i){
+            in.push_back((intType_t) j);
+        }
+        inputs.push_back(in);
     }
-
-    cout << "Inputs are: ";
-    for (auto x : inputs) cout << to_string(x[0]) << " ";
-    cout << endl;
-    cout << "Const Inputs are: ";
-    for (auto x : cptvec) cout << to_string(x) << " ";
-    cout << endl;
 
     PtVec ptv;
     try {
-        ptv = ctx->eval_with_plaintexts(c, inputs, cptvec, dc);
+#ifdef HAVE_TBB
+    cout << "in parallel..." << endl;
+    ptv = ctx->eval_with_plaintexts(c, inputs, cptvec, dc, EvaluationStrategy::parallel);
+#else
+    ptv = ctx->eval_with_plaintexts(c, inputs, cptvec, dc);
+#endif
     }
     catch (const GateNotImplemented &e) {
         throw GateNotImplemented();
@@ -199,21 +201,22 @@ tuple<vector<long>, DurationContainer> W::eval() {
 
   PtVec inputs;
   for (auto i: ptvec) {
-    vector<intType_t> v = {(intType_t) i};
-    inputs.push_back(v);
+    vector<intType_t> in;
+    for (auto j: i){
+        in.push_back((intType_t) j);
+    }
+    inputs.push_back(in);
   }
-
-  cout << "Inputs are: ";
-  for (auto x : inputs) cout << to_string(x[0]) << " ";
-  cout << endl;
-  cout << "Const Inputs are: ";
-  for (auto x : cptvec) cout << to_string(x) << " ";
-  cout << endl;
 
   cout << "Evaluating..." << endl;
   PtVec ptv;
   try {
-    ptv = ctx.eval_with_plaintexts(c, inputs, cptvec, dc);
+#ifdef HAVE_TBB
+  cout << "in parallel..." << endl;
+  ptv = ctx.eval_with_plaintexts(c, inputs, cptvec, dc, EvaluationStrategy::parallel);
+#else
+  ptv = ctx.eval_with_plaintexts(c, inputs, cptvec, dc);
+#endif
   }
   catch (const GateNotImplemented &e) {
     throw GateNotImplemented();
@@ -252,9 +255,19 @@ int W::estimatePlaintextSize() {
     if (cptv.empty()){
         cptv.emplace_back(1);
     }
-    auto ptmax = max_element(ptv.begin(),ptv.end());
+    vector<long> ptmaxv;
+    for (auto x : ptvec){
+        if (!x.empty()){
+            auto me = max_element(x.begin(),x.end());
+            ptmaxv.push_back(*me);
+        }
+    }
     auto cptmax = max_element(cptv.begin(),cptv.end());
-    return (multDepth + 1) * ceil(log2(max(*ptmax,*cptmax))); //TODO: handle 0 vectors...
+    auto ptmax = max_element(ptmaxv.begin(),ptmaxv.end());
+    if (*ptmax == 0 == *cptmax){
+        *ptmax = 1; // handle 0 vectors... no log problems.
+    }
+    return (multDepth + 1) * ceil(log2(max(*ptmax,*cptmax)));
 }
 
 
