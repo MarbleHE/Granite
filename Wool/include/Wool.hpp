@@ -61,12 +61,27 @@ private:
   /// Maximum number of slots required by some batched gate within the circuit
   int maxSlots;
 
-  /// Composes Circuit of AbstractExpr and saves it in c
+  /// Second biggest amount of slots required by some batched gate within the circuit (!=maxSlots, default: 0)
+  int sndMaxSlots;
+
+  /// Possible Qs for 128bit security. (HE standard v1.1 March 16, 2018, smallest q of all tables)
+  ///                         N = 1024, 2048, 4096, 8192, 16384, 32768
+  const std::vector<int> Q128bit {25,    51,   101,  202,   411, 827};
+
+  /// N, for which Q is in the HE standard table table
+  const std::vector<int> slotsBFV {1024, 2048, 4096, 8192, 16384, 32768};
+
+  const std::vector<int> slotsCKKS {512, 1024, 2048, 4096, 8192, 16384};
+
+  //TODO find out what slots go with which N (or Q).
+  const std::vector<int> slotsBGV {};
+
+    /// Composes Circuit of AbstractExpr and saves it in c
   /// \param ae AbstractExpr to compose circuit from
   /// \return Circuit
   void composeCircuit(AbstractExpr *ae);
 
-  //TODO: composeCircuit(Ast a);
+  //TODO: composeCircuit(Ast a); (with variables)
 
   /// Evaluates the Circuit c given a SHEEP HE context and integer type.
   /// \tparam genericContext
@@ -92,6 +107,15 @@ private:
   /// \return the cryptographic context
   template <typename intType>
   BaseContext<intType>* generateContext(Library l);
+
+  /// Estimates parameter N of crypto library l
+  /// \param l crypto library
+  /// \return N
+  int estimateN(Library l);
+
+  /// Estimates the number of bits required for parameter Q
+  /// \return log2(Q)
+  int getSlotIndexViaQ(Library l);
 };
 
 };

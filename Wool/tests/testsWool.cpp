@@ -1,10 +1,14 @@
 //
 // Created by mario on 17.02.20.
 //
+#include <Return.h>
 #include "gtest/gtest.h"
 #include "circuit.hpp"
 #include "M.hpp"
 #include "Ast.h"
+#include "BatchingVisitor.hpp"
+#include "Return.h"
+#include "Function.h"
 
 using namespace Marble;
 using namespace Wool;
@@ -85,4 +89,19 @@ TEST(BasicWool, DecTestsetLibBFV){
     W w = W(*ast);
     long res = w.evaluateWith(Library::Plaintext);
     ASSERT_EQ(res, 211);
+}
+
+void f_batch(){
+    M a = batchEncrypt((std::vector <int>){1,2,3});
+    output(a);
+}
+
+TEST(BatchingTest, VisitorTest){
+    Ast* ast = M::makeAST(f_batch);
+    Function* f = (Function *) ast->getRootNode();
+    Return* r = (Return *) f->getBodyStatements()[0];
+    AbstractExpr * ae = r->getReturnExpressions()[0];
+    BatchingVisitor bv;
+    bv.visit(*ae);
+    ASSERT_EQ(3,bv.getMaxSlots());
 }

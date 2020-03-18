@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <math.h>
+#include <cmath>
 #include <string>
 #include "Wool.hpp"
 #include "AbstractExpr.h"
@@ -23,11 +23,12 @@
 #ifdef HAVE_SEAL_CKKS
 #include "context-seal-ckks.hpp"
 #endif
-#ifdef HAVE_TFHE_BOOL
+#ifdef HAVE_TFHE
 #include "context-tfhe-bool.hpp"
-#endif
-#ifdef HAVE_TFHE_INTEGER
 #include "context-tfhe-integer.hpp"
+#endif
+#ifdef HAVE_HElib
+#include "context-helib.hpp"
 #endif
 
 using namespace std;
@@ -57,6 +58,7 @@ W::W(AbstractExpr *ae) {
   BatchingVisitor bv = BatchingVisitor();
   bv.visit(*ae);
   this->maxSlots = bv.getMaxSlots();
+  this->sndMaxSlots = bv.getSndMaxSlots();
 }
 
 //TODO: make less vulnerable to any changes
@@ -71,6 +73,7 @@ W::W(Ast a) {
   BatchingVisitor bv = BatchingVisitor();
   bv.visit(*ae);
   this->maxSlots = bv.getMaxSlots();
+  this->sndMaxSlots = bv.getSndMaxSlots();
 }
 
 long W::evaluateWith(Library l) {
@@ -100,37 +103,41 @@ long W::evaluateWith(Library l) {
 template <typename intType>
 BaseContext<intType>* W::generateContext(Library l){
     //TODO: select parameters
-    //int logQ = (multDepth + 1)* 60 // 60 bits each q_i
-    //int N = calcN();
+    int N = estimateN(l);
     switch (l) {
         case Wool::Plaintext:
             cout << "Evaluating... in Plaintext" << endl;
             return new SHEEP::ContextClear<intType>();
+    //TODO: implement all libraries
 #ifdef HAVE_LP
-            case Wool::LP:throw std::runtime_error("Not yet implemented.");
+            case Wool::LP:
+                cout << "Evaluating... with LP" << endl;
+            return new SHEEP::ContextLP<intType>();
 #endif
 #ifdef HAVE_PALISADE
-            case Wool::Palisade:throw std::runtime_error("Not yet implemented.");
+            case Wool::Palisade:
+                cout << "Evaluating... with Palisade" << endl;
+            return new SHEEP::ContextPalisade<intType>();
+#endif
+#ifdef HAVE_HElib
+        case Wool::HElib:
+            cout << "Evaluating... with HElib" << endl;
+            return new SHEEP::ContextHElib<intType, intType>(); //TODO parameters
 #endif
 #ifdef HAVE_SEAL_BFV
         case Wool::SEALBFV:
             cout << "Evaluating... with SEALBFV" << endl;
-            return new SHEEP::ContextSealBFV<intType>();
+            return new SHEEP::ContextSealBFV<intType>(estimatePlaintextSize(),128,N, false);
 #endif
 #ifdef HAVE_SEAL_CKKS
         case Wool::SEALCKKS:
-            cout << "Evaluating... with SEALCKKS" << endl;
-            return new SHEEP::ContextSealCKKS<intType>();
+            throw std::runtime_error("Wrong template. Dont' try to use CKKS with integer types...");
 #endif
-#ifdef HAVE_TFHE_BOOL
+#ifdef HAVE_TFHE
         case Wool::TFHEBool:
-        ctx = reinterpret_cast<BaseContext<intType> *>(new SHEEP::ContextTFHE<bool>());
-        break;
-#endif
-#ifdef HAVE_TFHE_INTEGER
+            return new SHEEP::ContextTFHE<bool>()
         case Wool::TFHEInteger:
-                ctx = reinterpret_cast<BaseContext<int32_t> *>(new SHEEP::ContextTFHE<long>());
-        break;
+                return new SHEEP::ContextTFHE<long>();
 #endif
     }
 
@@ -138,6 +145,15 @@ BaseContext<intType>* W::generateContext(Library l){
     return new SHEEP::ContextClear<intType >();
 }
 
+//Only one library handling doubles so far...
+template <>
+BaseContext<double>* W::generateContext(Library l){
+    int N = estimateN(l);
+    cout << "Evaluating... with SEALCKKS" << endl;
+    return new SHEEP::ContextSealCKKS<double>(40961, N, 30);
+}
+
+//TODO: refactor such that it correctly selects parameters, as eval does
 double W::benchmarkWith(Library l){
     DurationContainer dc;
     switch (l) {
@@ -156,7 +172,6 @@ double W::benchmarkWith(Library l){
     throw std::runtime_error("No valid library at evaluation.");
 }
 
-//TODO: template with separate plaintext and ciphertext types
 template <typename intType_t>
 tuple<vector<long>, DurationContainer> W::eval(BaseContext<intType_t> *ctx){
     typedef vector<vector<intType_t>> PtVec;
@@ -186,7 +201,7 @@ tuple<vector<long>, DurationContainer> W::eval(BaseContext<intType_t> *ctx){
     }
     vector<long> iptv;
     for (auto x: ptv) {
-        iptv.push_back((int) x[0]);
+        iptv.push_back((long) x[0]);
     }
     return make_tuple(iptv, dc);
 }
@@ -223,7 +238,7 @@ tuple<vector<long>, DurationContainer> W::eval() {
   }
   vector<long> iptv;
   for (auto x: ptv) {
-    iptv.push_back((int) x[0]);
+    iptv.push_back((long) x[0]);
   }
   return make_tuple(iptv, dc);
 }
@@ -234,7 +249,7 @@ void W::composeCircuit(AbstractExpr *ae) {
   this->c = ccv.getCircuit();
   this->ptvec = ccv.getPtvec();
   this->cptvec = ccv.getCptvec();
-  //TODO: set recommended library
+  //TODO: set recommended library with visitor...
 }
 
 int W::getMultDepth(){
@@ -267,8 +282,59 @@ int W::estimatePlaintextSize() {
     if (*ptmax == 0 == *cptmax){
         *ptmax = 1; // handle 0 vectors... no log problems.
     }
+    //TODO count additions/subtractions and take maximum of both..
     return (multDepth + 1) * ceil(log2(max(*ptmax,*cptmax)));
 }
 
+int W::estimateN(Library l){
+    int slotInd = getSlotIndexViaQ(l);
+    vector<int> slots;
+    switch (l){
+        case SEALCKKS:
+            slots = slotsCKKS;
+            break;
+        case SEALBFV:
+            slots = slotsBFV;
+            break;
+        case HElib:
+            throw runtime_error("Parameter selection not implemented");
+            //slots = slotsBGV; TODO
+            break;
+        case LP:
+            return 0; //No N for LP
+        case Palisade: //TODO find out how these schemes handle slots
+        case TFHEBool:
+        case TFHEInteger:
+            throw runtime_error("Parameter selection not implemented");
+        case Plaintext:
+            return 0;  //No N for Plaintext
+    }
+    for (auto x : slots){
+        if (x == maxSlots && sndMaxSlots * 3 < maxSlots){
+            return max(x,slots[slotInd]);
+        }
+    }
+    for (auto x : slots){
+        if (3 * maxSlots < x){
+            return max(x,slots[slotInd]);
+        }
+    }
+    throw runtime_error("The maximum number of slots (" + to_string(maxSlots) +") in your function exceeds a sane value. ");
+}
+
+int W::getSlotIndexViaQ(Library l){
+    int Q = (multDepth + 1) * 60; // 60 bits each q_i
+    int j = 0;
+    for (size_t i = 0; i < Q128bit.size(); i++){
+        if (Q128bit[i] > Q){
+            break;
+        }
+        j++;
+    }
+    if (j >= Q128bit.size()){ // we have not found a good Q
+        throw std::runtime_error("No suitable Q found. MultDepth (" + to_string(multDepth) + ") might exceed limits.");
+    }
+    return j;
+}
 
 }

@@ -19,10 +19,12 @@
 class BatchingVisitor : Visitor {
 private:
     int maxSlots = 1;
-public:
-    void visit(AbstractMatrix &elem) override;
 
+    int sndMax = 0;
+public:
     void visit(AbstractExpr &elem) override;
+
+    void visit(AbstractMatrix &elem) override;
 
     void visit(LiteralBool &elem) override;
 
@@ -39,6 +41,8 @@ public:
     void visit(ArithmeticExpr &elem) override;
 
     int getMaxSlots();
+
+    int getSndMaxSlots();
 };
 
 

@@ -74,24 +74,28 @@ M::M(long value, bool plaintext, Wool::Library library) {
   this->plaintext = plaintext;
   this->expr = new LiteralInt((int) value);
   this->library = library;
+  this->exprSize = 1;
 }
 
 M::M(AbstractExpr *expr, bool plaintext, Wool::Library l){
     this->plaintext = plaintext;
     this->expr = expr;
     this->library = l;
+    //TODO set exprSize
 }
 
 M::M(const M &other) {
   plaintext = other.plaintext;
   expr = other.expr;
   library = other.library;
+  exprSize = other.exprSize;
 }
 
 M::M(M &&other) {
   plaintext = other.plaintext;
   expr = other.expr;
   library = other.library;
+  exprSize = other.exprSize;
 }
 
 M::M(long i) {
@@ -99,24 +103,28 @@ M::M(long i) {
   this->expr = new LiteralInt(
       i); //TODO: long to int conversion is not a good idea. change LiteralInt to support longs
   this->library = Wool::Library::Plaintext;
+  this->exprSize = 1;
 }
 
 M::M(int i) {
   this->plaintext = true;
   this->expr = new LiteralInt(i);
   this->library = Wool::Library::Plaintext;
+    this->exprSize = 1;
 }
 
 M::M(bool b) {
   this->plaintext = true;
   this->expr = new LiteralBool(b);
   this->library = Wool::Library::Plaintext;
+    this->exprSize = 1;
 }
 
 M &M::operator=(const M &other) {
   plaintext = other.plaintext;
   expr = other.expr;
   library = resolveLibraries(library, other.library);
+  exprSize = other.exprSize;
   return *this;
 }
 
@@ -124,7 +132,8 @@ M &M::operator=(M &&other) {
   plaintext = other.plaintext;
   expr = other.expr;
   library = resolveLibraries(library, other.library);
-  return *this;
+    exprSize = other.exprSize;
+    return *this;
 }
 
 M &M::operator=(long i) {
@@ -134,7 +143,8 @@ M &M::operator=(long i) {
     throw std::runtime_error(
         "The library " + Wool::toString(this->library) + "is not well suited to work with longs.");
   }
-  return *this;
+    this->exprSize = 1;
+    return *this;
 }
 
 M &M::operator=(bool b) {
@@ -144,7 +154,8 @@ M &M::operator=(bool b) {
     throw std::runtime_error(
         "The library " + Wool::toString(this->library) + "is not well suited to work with bools.");
   }
-  return *this;
+    this->exprSize = 1;
+    return *this;
 }
 
 M &M::operator=(int i) {
@@ -154,15 +165,23 @@ M &M::operator=(int i) {
     throw std::runtime_error(
         "The library " + Wool::toString(this->library) + "is not well suited to work with ints.");
   }
-  return *this;
+    this->exprSize = 1;
+    return *this;
 }
 
 M &M::operator+=(const M &rhs) {
-  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::ADDITION, rhs.expr);
-  this->expr = exp;
   this->plaintext = this->plaintext && rhs.plaintext;
   this->library = resolveLibraries(this->library, rhs.library);
-  return *this;
+    M rh = rhs;
+    if (exprSize < rhs.exprSize){
+        *this = this->pad<int, LiteralInt>(rhs.exprSize - exprSize);
+    }
+    else if (rhs.exprSize > exprSize){
+        rh = rhs.pad<int, LiteralInt>(exprSize - rhs.exprSize);
+    }
+    auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::ADDITION, rh.expr);
+    this->expr = exp;
+    return *this;
 }
 
 M &M::operator+=(const long &rhs) {
@@ -172,7 +191,7 @@ M &M::operator+=(const long &rhs) {
     throw std::runtime_error(
         "The library " + Wool::toString(this->library) + "is not well suited to work with longs.");
   }
-  return *this;
+    return *this;
 }
 
 M &M::operator+=(const int &rhs) {
@@ -182,15 +201,22 @@ M &M::operator+=(const int &rhs) {
     throw std::runtime_error(
         "The library " + Wool::toString(this->library) + "is not well suited to work with ints.");
   }
-  return *this;
+    return *this;
 }
 
 M &M::operator-=(const M &rhs) {
-  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::SUBTRACTION, rhs.expr);
-  this->expr = exp;
   this->plaintext = this->plaintext && rhs.plaintext;
   this->library = resolveLibraries(this->library, rhs.library);
-  return *this;
+    M rh = rhs;
+    if (exprSize < rhs.exprSize){
+        *this = this->pad<int, LiteralInt>(rhs.exprSize - exprSize);
+    }
+    else if (rhs.exprSize > exprSize){
+        rh = rhs.pad<int, LiteralInt>(exprSize - rhs.exprSize);
+    }
+    auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::SUBTRACTION, rh.expr);
+    this->expr = exp;
+    return *this;
 }
 
 
@@ -215,11 +241,18 @@ M &M::operator-=(const int &rhs) {
 }
 
 M &M::operator*=(const M &rhs) {
-  auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::MULTIPLICATION, rhs.expr);
-  this->expr = exp;
   this->plaintext = this->plaintext && rhs.plaintext;
   this->library = resolveLibraries(this->library, rhs.library);
-  return *this;
+    M rh = rhs;
+    if (exprSize < rhs.exprSize){
+        *this = this->pad<int, LiteralInt>(rhs.exprSize - exprSize);
+    }
+    else if (rhs.exprSize > exprSize){
+        rh = rhs.pad<int, LiteralInt>(exprSize - rhs.exprSize);
+    }
+    auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::MULTIPLICATION, rhs.expr);
+    this->expr = exp;
+    return *this;
 }
 
 M &M::operator*=(long &rhs) {
@@ -229,7 +262,7 @@ M &M::operator*=(long &rhs) {
     throw std::runtime_error(
         "The library " + Wool::toString(this->library) + "is not well suited to work with longs.");
   }
-  return *this;
+    return *this;
 }
 
 M &M::operator*=(int &rhs) {
@@ -239,94 +272,166 @@ M &M::operator*=(int &rhs) {
     throw std::runtime_error(
         "The library " + Wool::toString(this->library) + "is not well suited to work with ints.");
   }
-  return *this;
+    return *this;
 }
 
 M &M::operator++() {
   auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::ADDITION, new LiteralInt(1));
   this->expr = exp;
-  return *this;
+    return *this;
 }
 
 M &M::operator--() {
   auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::SUBTRACTION, new LiteralInt(1));
   this->expr = exp;
-  return *this;
+    return *this;
 }
 
 M &M::operator!() {
   auto exp = new UnaryExpr(UnaryOp::NEGATION, this->expr);
   this->expr = exp;
-  return *this;
+    return *this;
 }
 
-
+//TODO: How do I pad bools?
 M operator==(const M &lhs, const M &rhs) {
-    auto exp = new LogicalExpr(lhs.expr, LogCompOp::EQUAL, rhs.expr);
+    M rh = rhs;
+    M lh = lhs;
+    if (lhs.exprSize < rhs.exprSize){
+        lh = lh.pad<int, LiteralInt>(rhs.exprSize - lh.exprSize);
+    }
+    else if (rhs.exprSize > lh.exprSize){
+        rh = rhs.pad<int, LiteralInt>(lh.exprSize - rhs.exprSize);
+    }
+    auto exp = new LogicalExpr(lh.expr, LogCompOp::EQUAL, rh.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator!=(const M &lhs, const M &rhs) {
-    auto exp = new LogicalExpr(lhs.expr, LogCompOp::UNEQUAL, rhs.expr);
+    M rh = rhs;
+    M lh = lhs;
+    if (lhs.exprSize < rhs.exprSize){
+        lh = lh.pad<int, LiteralInt>(rhs.exprSize - lh.exprSize);
+    }
+    else if (rhs.exprSize > lh.exprSize){
+        rh = rhs.pad<int, LiteralInt>(lh.exprSize - rhs.exprSize);
+    }
+    auto exp = new LogicalExpr(lh.expr, LogCompOp::UNEQUAL, rh.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator>=(const M &lhs, const M &rhs) {
-    auto exp = new LogicalExpr(lhs.expr, LogCompOp::GREATER_EQUAL, rhs.expr);
+    M rh = rhs;
+    M lh = lhs;
+    if (lhs.exprSize < rhs.exprSize){
+        lh = lh.pad<int, LiteralInt>(rhs.exprSize - lh.exprSize);
+    }
+    else if (rhs.exprSize > lh.exprSize){
+        rh = rhs.pad<int, LiteralInt>(lh.exprSize - rhs.exprSize);
+    }
+    auto exp = new LogicalExpr(lh.expr, LogCompOp::GREATER_EQUAL, rh.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator>(const M &lhs, const M &rhs) {
-    auto exp = new LogicalExpr(lhs.expr, LogCompOp::GREATER, rhs.expr);
+    M rh = rhs;
+    M lh = lhs;
+    if (lhs.exprSize < rhs.exprSize){
+        lh = lh.pad<int, LiteralInt>(rhs.exprSize - lh.exprSize);
+    }
+    else if (rhs.exprSize > lh.exprSize){
+        rh = rhs.pad<int, LiteralInt>(lh.exprSize - rhs.exprSize);
+    }
+    auto exp = new LogicalExpr(lh.expr, LogCompOp::GREATER, rh.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator<=(const M &lhs, const M &rhs) {
-    auto exp = new LogicalExpr(lhs.expr, LogCompOp::SMALLER_EQUAL, rhs.expr);
+    M rh = rhs;
+    M lh = lhs;
+    if (lhs.exprSize < rhs.exprSize){
+        lh = lh.pad<int, LiteralInt>(rhs.exprSize - lh.exprSize);
+    }
+    else if (rhs.exprSize > lh.exprSize){
+        rh = rhs.pad<int, LiteralInt>(lh.exprSize - rhs.exprSize);
+    }
+    auto exp = new LogicalExpr(lh.expr, LogCompOp::SMALLER_EQUAL, rh.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator<(const M &lhs, const M &rhs) {
-    auto exp = new LogicalExpr(lhs.expr, LogCompOp::SMALLER, rhs.expr);
+    M rh = rhs;
+    M lh = lhs;
+    if (lhs.exprSize < rhs.exprSize){
+        lh = lh.pad<int, LiteralInt>(rhs.exprSize - lh.exprSize);
+    }
+    else if (rhs.exprSize > lh.exprSize){
+        rh = rhs.pad<int, LiteralInt>(lh.exprSize - rhs.exprSize);
+    }
+    auto exp = new LogicalExpr(lh.expr, LogCompOp::SMALLER, rh.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator+(const M &lhs, const M &rhs) {
-    auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::ADDITION, rhs.expr);
+    M rh = rhs;
+    M lh = lhs;
+    if (lhs.exprSize < rhs.exprSize){
+        lh = lh.pad<int, LiteralInt>(rhs.exprSize - lh.exprSize);
+    }
+    else if (rhs.exprSize > lh.exprSize){
+        rh = rhs.pad<int, LiteralInt>(lh.exprSize - rhs.exprSize);
+    }
+    auto exp = new ArithmeticExpr(lh.expr, ArithmeticOp::ADDITION, rh.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator-(const M &lhs, const M &rhs) {
-    auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::SUBTRACTION, rhs.expr);
+    M rh = rhs;
+    M lh = lhs;
+    if (lhs.exprSize < rhs.exprSize){
+        lh = lh.pad<int, LiteralInt>(rhs.exprSize - lh.exprSize);
+    }
+    else if (rhs.exprSize > lh.exprSize){
+        rh = rhs.pad<int, LiteralInt>(lh.exprSize - rhs.exprSize);
+    }
+    auto exp = new ArithmeticExpr(lh.expr, ArithmeticOp::SUBTRACTION, rh.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
 M operator*(const M &lhs, const M &rhs) {
-    auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::MULTIPLICATION, rhs.expr);
+    M rh = rhs;
+    M lh = lhs;
+    if (lhs.exprSize < rhs.exprSize){
+        lh = lh.pad<int, LiteralInt>(rhs.exprSize - lh.exprSize);
+    }
+    else if (rhs.exprSize > lh.exprSize){
+        rh = rhs.pad<int, LiteralInt>(lh.exprSize - rhs.exprSize);
+    }
+    auto exp = new ArithmeticExpr(lh.expr, ArithmeticOp::MULTIPLICATION, rh.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
     return M(exp, pt, l);
 }
 
-M rotate(M m, int k){
-    auto exp = new Rotate(m.getExpr(), new LiteralInt(k));
-    return M(exp, m.isPlaintext(), m.getLib());
+void M::rotate(int k){
+    auto exp = new Rotate(reinterpret_cast<LiteralInt*>(this->getExpr()), new LiteralInt(k)); //TODO: Bool, string, float support
+    this->expr = exp;
 }
 
 M encrypt(long value, Wool::Library library) {
@@ -361,16 +466,33 @@ vector<M> encrypt(vector<long> v){
     return mv;
 }
 
-//TODO
-// would be nice if we could name this encrypt as well
+
+M &M::fold(std::function<M(M, M)> f) {
+    // rotate down by half, then apply f to combine values
+    while(this->getExprSize() > 1) {
+        M t = *this;
+        t.rotate(t.getExprSize() / 2);
+        this->exprSize = t.getExprSize() / 2;
+        *this = f(*this,t);
+    }
+
+    return *this;
+}
+
+M M::sum(M ml,M mr){
+    return (ml + mr);
+}
+
+
+//TODO: Pad???
 M batchEncrypt(vector<bool> v){
     Matrix<bool>* mat = new Matrix<bool>(vector<vector<bool>> {v});
-    return M(new LiteralBool (mat), false);
+    return M(new LiteralBool (mat), false); //TODO set exprSize
 }
 
 M batchEncrypt(vector<int> v){
     Matrix<int>* mat = new Matrix<int>(vector<vector<int>> {v});
-    return M(new LiteralInt (mat), false);
+    return M(new LiteralInt (mat), false); //TODO set exprSize
 }
 
 long decrypt(M m) {
@@ -391,6 +513,7 @@ M::M(AbstractExpr *expr, bool plaintext) {
   this->expr = expr;
   this->plaintext = plaintext;
   this->library = Wool::Plaintext;
+  //TODO set expr size
 }
 
 M::~M() {
@@ -415,6 +538,10 @@ Wool::Library M::getLib() const {
   return this->library;
 }
 
+int M::getExprSize(){
+    return this->exprSize;
+}
+
 //TODO: validate for correctness
 bool M::isWellSuited(Wool::Library l, long x) {
   return !(l==Wool::Library::LP or l==Wool::Library::TFHEBool);
@@ -435,6 +562,19 @@ bool M::isPlaintext() const {
 void M::setLib(Wool::Library l) {
     this->library = l;
     //TODO: check if l is a sane choice for its expr.
+}
+
+template<typename intType, typename LiteralType>
+M M::pad(int amount) const {
+    M m = this;
+    vector<intType> v;
+    for (size_t i = 0; i < m.exprSize + amount; i++){
+        v.push_back(0);
+    }
+    auto exp = new ArithmeticExpr (new LiteralType (new Matrix<intType>({v})), ArithmeticOp::ADDITION, m.expr);
+    m.expr = exp;
+    m.exprSize += amount;
+    return m;
 }
 
 

@@ -39,11 +39,6 @@ std::vector<long> decrypt(std::vector<M> mv);
 /// Output imitates the return statement in HE functions.
 void output(M value);
 
-/// Rotates a batched vector by amount k.
-/// \param k Rotation amount. Positive rotates
-/// \return
-M rotate(M m, int k);
-
 class M {
  public:
   /// The method generating an AST from some function written with M classes.
@@ -183,6 +178,11 @@ class M {
   /// Multiplication
   friend M operator*(const M &lhs, const M &rhs);
 
+  /// Rotates a batched vector by amount k.
+  /// \param k Rotation amount. Positive rotates
+  /// \return
+  void rotate(int k);
+
   /// \return plaintext bool, true if the value is plaintext
   bool isPlaintext() const;
 
@@ -195,7 +195,14 @@ class M {
   /// \return the pointer to the Expression responsible for its construction
   AbstractExpr *getExpr();
 
- private:
+  /// \return Size of the current expression (batched vector)
+  int getExprSize();
+
+  M &fold(std::function<M(M, M)> f);
+
+  static M sum(M, M);
+
+private:
   /// This is the (temporary) Ast used by output(M m) to return the final AST to makeAST
   static Ast *output_ast;
 
@@ -207,6 +214,9 @@ class M {
 
   /// true, if value is a plaintext
   bool plaintext;
+
+  /// Size of the current expression (batched vector)
+  int exprSize;
 
   /// Direct init with AST
   M(AbstractExpr *expr, bool plaintext);
@@ -244,6 +254,8 @@ class M {
 
   friend Ast make_AST(std::function<void()> f);
 
+    template<typename intType, typename LiteralType>
+  M pad(int amount) const;
 };
 
 };

@@ -17,7 +17,8 @@
 #include "AbstractMatrix.h"
 #include "Rotate.h"
 #include "GetMatrixElement.h"
-#include "Matrix.h"
+#include "Dimension.h"
+#include "CircuitHelpers.hpp"
 
 using namespace std;
 
@@ -67,7 +68,7 @@ void CircuitCompositionVisitor::visit(LiteralInt &elem) {
         vector<long> v;
         for (auto i = 0; i < elem.getMatrix()->getDimensions().numColumns; i++){
             GetMatrixElement gme = GetMatrixElement(ae, 0, i);
-            LiteralInt* li = (LiteralInt *) gme.getOperand();
+            auto li = (LiteralInt *) gme.getOperand();
             v.push_back(li->getValue());
         }
             ptvec.push_back(v);
@@ -123,6 +124,12 @@ void CircuitCompositionVisitor::visit(ArithmeticExpr &elem) {
 
 void CircuitCompositionVisitor::visit(Function &elem){
     vector<FunctionParameter *> params = elem.getParameters();
+    throw std::runtime_error("not implemented");
+    //TODO: setup mapping between variables and inputs to support variables.
+    //Problem: currently constants in a circuit are fed into a vector. How do I leave empty spaces in a vector to feed in the values
+    // of the variables later? This either requires AddConst, etc. gates... (don't support batching), or some other solution which
+    // these mappings until evaluation.
+    // Solution: variant vector
 }
 
 Circuit
@@ -138,8 +145,29 @@ CircuitCompositionVisitor::toGateCircuit(
             OpSymb::getTextRepr(variant)); //TODO: implement Division, Modulo...
       }
     case 1:
-      throw std::runtime_error(
-          "Gate not implemented in SHEEP: " + OpSymb::getTextRepr(variant)); //TODO: implement logic gates
+        switch (std::get<LogCompOp>(variant)) {
+            case LogCompOp::GREATER:
+                return single_binary_gate_circuit(Gate::Compare);
+            case LogCompOp::GREATER_EQUAL:
+                return greaterEqualCircuit();
+            case LogCompOp::SMALLER_EQUAL:
+                return smallerEqualCircuit();
+            case LogCompOp::SMALLER:
+                return smallerCircuit();
+            case LogCompOp::EQUAL:
+                return equalCircuit();
+            case LogCompOp::UNEQUAL:
+                return unequalCircuit();
+            case LogCompOp::LOGICAL_OR:
+                return single_binary_gate_circuit(Gate::Add);
+            case LogCompOp::LOGICAL_AND:
+                return single_binary_gate_circuit(Gate::Multiply);
+            case LogCompOp::LOGICAL_XOR:
+                return unequalCircuit();
+            default:
+                throw std::runtime_error(
+                        "Gate not implemented in SHEEP: " + OpSymb::getTextRepr(variant));
+        }
     case 2:
       switch (std::get<UnaryOp>(variant)) {
         case UnaryOp::NEGATION:return single_unary_gate_circuit(Gate::Negate);

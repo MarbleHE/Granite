@@ -14,8 +14,8 @@ void hd_enc(vector<M> v, vector<M> u) {
 }
 
 int main() {
-    vector<bool> v = {0, 1, 1, 0, 0/*...*/};
-    vector<bool> u = {1, 0, 1, 0, 1/*...*/};
+    vector<int> v = {0, 1, 1, 0, 0/*...*/};
+    vector<int> u = {1, 0, 1, 0, 1/*...*/};
 
     vector<M> v_enc = encrypt(v);
     vector<M> u_enc = encrypt(u);
@@ -26,7 +26,7 @@ int main() {
 
     // Benchmarks the application,
     // using the most appropriate settings
-    double ms = M::evaluate(bind(hd_enc, v_enc, u_enc));
+    double ms = M::evaluate(bind(hd_enc, v_enc, u_enc), Wool::Library::SEALBFV);
 
     long res = M::result(bind(hd_enc, v_enc, u_enc));
     cout << res << endl;
