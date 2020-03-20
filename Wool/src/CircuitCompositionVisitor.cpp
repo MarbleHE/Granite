@@ -16,9 +16,9 @@
 #include "Function.h"
 #include "AbstractMatrix.h"
 #include "Rotate.h"
-#include "GetMatrixElement.h"
 #include "Dimension.h"
 #include "CircuitHelpers.hpp"
+#include "Matrix.h"
 
 using namespace std;
 
@@ -41,16 +41,38 @@ void CircuitCompositionVisitor::visit(AbstractExpr &elem) {
   elem.accept(*this);
 }
 
-void CircuitCompositionVisitor::visit(AbstractMatrix &elem){
-  //nothing to do. we already handle matrices in the literals...
-  throw runtime_error("AbstractMatrix CircuitCompositionVisitor not implemented");
+void CircuitCompositionVisitor::visit(AbstractMatrix &elem) {
+    if (dynamic_cast<Matrix<int>*> (&elem)) {
+        vector<long> v;
+        for (auto i = 0; i < elem.getDimensions().numColumns; i++) {
+            auto el = (LiteralInt*) elem.getElementAt(0,i);
+            v.push_back((long) el->getValue());
+        }
+        ptvec.push_back(v);
+        cs.push(single_unary_gate_circuit(Gate::Alias));
+    } else if(dynamic_cast<Matrix<LiteralInt>*> (&elem)) {
+        vector<long> v;
+        for (auto i = 0; i < elem.getDimensions().numColumns; i++) {
+            auto matLit = elem.getElementAt(0,i);
+            v.push_back(((LiteralInt*) matLit)->getValue());
+        }
+        ptvec.push_back(v);
+        cs.push(single_unary_gate_circuit(Gate::Alias));
+    } else if(dynamic_cast<Matrix<AbstractExpr*>*> (&elem)) {
+        for (auto i = 0; i < elem.getDimensions().numColumns; i++) {
+            elem.getElementAt(0, i)->accept(*this);
+        }
+    }
+    //TODO bool, etc. support
 }
 
+
 void CircuitCompositionVisitor::visit(Rotate &elem){
-    auto c = seq(cs.top(),single_binary_gate_circuit(Gate::Rotate)); //TODO: verify that const gets fed in correctly from cptvec and not from ptvec
+    elem.getOperand()->accept(*this);
+    auto c = seq(cs.top(),rotateCircuit());
     cs.pop();
     cs.push(c);
-    cptvec.push_back(((LiteralInt* ) elem.getRotationFactor())->getValue()); //TODO: verify that rotation amount is in constants input.
+    cptvec.push_back(((LiteralInt* ) elem.getRotationFactor())->getValue());
 }
 
 void CircuitCompositionVisitor::visit(LiteralBool &elem) {
@@ -59,20 +81,8 @@ void CircuitCompositionVisitor::visit(LiteralBool &elem) {
 }
 
 void CircuitCompositionVisitor::visit(LiteralInt &elem) {
-  cs.push(single_unary_gate_circuit(Gate::Alias));
-    try {
-        ptvec.push_back({elem.getValue()});
-    }
-    catch (const std::logic_error &e){
-        auto ae = (AbstractExpr*) elem.getMatrix();
-        vector<long> v;
-        for (auto i = 0; i < elem.getMatrix()->getDimensions().numColumns; i++){
-            GetMatrixElement gme = GetMatrixElement(ae, 0, i);
-            auto li = (LiteralInt *) gme.getOperand();
-            v.push_back(li->getValue());
-        }
-            ptvec.push_back(v);
-    }
+    auto mat = elem.getMatrix();
+    mat->accept(*this);
 }
 
 void CircuitCompositionVisitor::visit(LiteralString &elem) {
@@ -159,9 +169,9 @@ CircuitCompositionVisitor::toGateCircuit(
             case LogCompOp::UNEQUAL:
                 return unequalCircuit();
             case LogCompOp::LOGICAL_OR:
-                return single_binary_gate_circuit(Gate::Add);
+                return single_binary_gate_circuit(Gate::Add); //TODO: Might not work?
             case LogCompOp::LOGICAL_AND:
-                return single_binary_gate_circuit(Gate::Multiply);
+                return single_binary_gate_circuit(Gate::Multiply); //TODO: Might not work?
             case LogCompOp::LOGICAL_XOR:
                 return unequalCircuit();
             default:

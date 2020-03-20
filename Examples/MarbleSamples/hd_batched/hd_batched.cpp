@@ -25,7 +25,12 @@ int main() {
 
     // Benchmarks the application,
     // using the most appropriate settings
-    double ms = M::evaluate(bind(hd_batched, v_enc, u_enc), Wool::Library::TFHEBool);
+    double ms = M::evaluate(bind(hd_batched, v_enc, u_enc), Wool::Library::SEALBFV);
 
+    cout << md << endl;
+    cout << ms << endl;
+
+    cout << M::result(bind(hd_batched, v_enc, u_enc), Wool::Library::Plaintext) << endl;
+    cout << M::result(bind(hd_batched, v_enc, u_enc), Wool::Library::SEALBFV) << endl;
     return 0;
 }

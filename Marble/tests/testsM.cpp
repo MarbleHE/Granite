@@ -11,6 +11,7 @@
 #include "Function.h"
 #include "Return.h"
 #include "Wool.hpp"
+#include "PadVisitor.hpp"
 
 using json = nlohmann::json;
 using namespace Marble;
@@ -173,4 +174,37 @@ void f_md(){
 
 TEST(BasicMultDepth, MultDepthTest){
     ASSERT_EQ(M::analyse(f_md), 3);
+}
+
+void f_batch(){
+    M a = batchEncrypt(std::vector<int>{1,2,3});
+    output(a);
+}
+
+TEST(BasicBatch, PadTest){
+    Ast* ast = M::makeAST(f_batch);
+    pad(ast, Wool::Library::SEALBFV);
+    std::cout << ast->getRootNode()->toJson().dump();
+}
+
+void f_batch_add(){
+    M a = batchEncrypt(std::vector<int>{1,2,3,4});
+    M b = batchEncrypt(std::vector<int>{2,4,6,8});
+    output(a+b);
+}
+
+TEST(BasicBatch, PadAddTest){
+    Ast* ast = M::makeAST(f_batch_add);
+    std::cout << ast->getRootNode()->toJson().dump();
+    pad(ast, Wool::Library::SEALBFV);
+    std::cout << ast->getRootNode()->toJson().dump();
+}
+
+TEST(BasicBatch, AddResultTest){
+    std::cout << M::result(f_batch_add, Wool::SEALBFV);
+}
+
+
+TEST(BasicBatch, FoldTest){
+
 }

@@ -45,6 +45,11 @@ class W {
 
   /// prints the circuit for debugging, etc...
   void printCircuit();
+
+  /// Returns the recommended slot size for Library l
+  /// \param l
+  /// \return
+  int getSlotSize(Library l);
 private:
   /// Circuit which was derived from AbstractExpr or AST
   Circuit c;
@@ -65,11 +70,11 @@ private:
   int sndMaxSlots;
 
   /// Possible Qs for 128bit security. (HE standard v1.1 March 16, 2018, smallest q of all tables)
-  ///                         N = 1024, 2048, 4096, 8192, 16384, 32768
+  const std::vector<int> N =     {1024, 2048, 4096, 8192, 16384, 32768};
   const std::vector<int> Q128bit {25,    51,   101,  202,   411, 827};
 
   /// N, for which Q is in the HE standard table table
-  const std::vector<int> slotsBFV {1024, 2048, 4096, 8192, 16384, 32768};
+  const std::vector<int> slotsBFV {512, 1024, 2048, 4096, 8192, 16384};
 
   const std::vector<int> slotsCKKS {512, 1024, 2048, 4096, 8192, 16384};
 
@@ -108,14 +113,14 @@ private:
   template <typename intType>
   BaseContext<intType>* generateContext(Library l);
 
-  /// Estimates parameter N of crypto library l
-  /// \param l crypto library
-  /// \return N
-  int estimateN(Library l);
-
   /// Estimates the number of bits required for parameter Q
   /// \return log2(Q)
-  int getSlotIndexViaQ(Library l);
+  int estimateNViaQ(Library l);
+
+  /// Estimates dimension N of library l
+  /// \param l
+  /// \return N
+  int estimateN(Library l);
 };
 
 };

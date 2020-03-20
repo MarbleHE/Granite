@@ -18,7 +18,7 @@ add_subdirectory(lib/ast)
 set(SOURCE_FILES
         src/BitHelpers.cpp
         src/M.cpp
-)
+        src/PadVisitor.cpp)
 
 add_library(marble ${SOURCE_FILES})
 target_include_directories(marble PUBLIC

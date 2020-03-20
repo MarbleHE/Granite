@@ -96,8 +96,30 @@ long W::evaluateWith(Library l) {
         auto ctx = generateContext<int64_t> (l);
         r =  get<0>(eval<int64_t >(ctx))[0];
     }
-  //delete ctx;
   return r;
+}
+
+double W::benchmarkWith(Library l) {
+    int pt_size = estimatePlaintextSize();
+    DurationContainer dc;
+    if (pt_size < 8){
+        auto ctx = generateContext<int8_t>(l);
+        dc = get<1>(eval<int8_t >(ctx));
+    }
+    else if (pt_size < 16){
+        auto ctx = generateContext<int16_t>(l);
+        dc =  get<1>(eval<int16_t >(ctx));
+    }
+    else if (pt_size < 32){
+        auto ctx = generateContext<int32_t>(l);
+        dc =  get<1>(eval<int32_t >(ctx));
+    }
+    else {
+        cout << "Warning: Result might not fit into plaintext modulus.";
+        auto ctx = generateContext<int64_t> (l);
+        dc =  get<1>(eval<int64_t >(ctx));
+    }
+    return dc.first[0].count() / 1000 + dc.first[1].count() / 1000 + dc.first[2].count() / 1000; // enc, eval and dec times all added
 }
 
 template <typename intType>
@@ -153,24 +175,6 @@ BaseContext<double>* W::generateContext(Library l){
     return new SHEEP::ContextSealCKKS<double>(40961, N, 30);
 }
 
-//TODO: refactor such that it correctly selects parameters, as eval does
-double W::benchmarkWith(Library l){
-    DurationContainer dc;
-    switch (l) {
-        case Wool::Plaintext:
-            dc =  get<1>(eval<SHEEP::ContextClear<int64_t >, int64_t>()); // TODO: With the aid of Bithelpers, determine int64_t type accurately
-            return dc.first[0].count() / 1000 + dc.first[1].count() / 1000 + dc.first[2].count() / 1000; // enc, eval and dec times all added
-        case Wool::LP:throw std::runtime_error("Not yet implemented.");
-        case Wool::Palisade:throw std::runtime_error("Not yet implemented.");
-        case Wool::SEALBFV:
-            dc =  get<1>(eval<SHEEP::ContextSealBFV<int64_t>, int64_t >()); // TODO: With the aid of Bithelpers, determine int64_t type accurately
-            return dc.first[0].count() / 1000 + dc.first[1].count() / 1000 + dc.first[2].count() / 1000; // enc, eval and dec times all added
-        case Wool::SEALCKKS:throw std::runtime_error("Not yet implemented.");
-        case Wool::TFHEBool:throw std::runtime_error("Not yet implemented.");
-        case Wool::TFHEInteger:throw std::runtime_error("Not yet implemented.");
-    }
-    throw std::runtime_error("No valid library at evaluation.");
-}
 
 template <typename intType_t>
 tuple<vector<long>, DurationContainer> W::eval(BaseContext<intType_t> *ctx){
@@ -283,11 +287,11 @@ int W::estimatePlaintextSize() {
         *ptmax = 1; // handle 0 vectors... no log problems.
     }
     //TODO count additions/subtractions and take maximum of both..
-    return (multDepth + 1) * ceil(log2(max(*ptmax,*cptmax)));
+    return (multDepth + 1) * ceil(log2(max(*ptmax,*cptmax))) + 1;
 }
 
 int W::estimateN(Library l){
-    int slotInd = getSlotIndexViaQ(l);
+    int qN = estimateNViaQ(l);
     vector<int> slots;
     switch (l){
         case SEALCKKS:
@@ -309,20 +313,24 @@ int W::estimateN(Library l){
         case Plaintext:
             return 0;  //No N for Plaintext
     }
+    int i = 0;
     for (auto x : slots){
         if (x == maxSlots && sndMaxSlots * 3 < maxSlots){
-            return max(x,slots[slotInd]);
+            return max(N[i],qN);
         }
+        i++;
     }
+    i = 0;
     for (auto x : slots){
         if (3 * maxSlots < x){
-            return max(x,slots[slotInd]);
+            return max(N[i],qN);
         }
+        i++;
     }
     throw runtime_error("The maximum number of slots (" + to_string(maxSlots) +") in your function exceeds a sane value. ");
 }
 
-int W::getSlotIndexViaQ(Library l){
+int W::estimateNViaQ(Library l){
     int Q = (multDepth + 1) * 60; // 60 bits each q_i
     int j = 0;
     for (size_t i = 0; i < Q128bit.size(); i++){
@@ -334,7 +342,24 @@ int W::getSlotIndexViaQ(Library l){
     if (j >= Q128bit.size()){ // we have not found a good Q
         throw std::runtime_error("No suitable Q found. MultDepth (" + to_string(multDepth) + ") might exceed limits.");
     }
-    return j;
+    return N[j];
 }
+
+int W::getSlotSize(Library l){
+    if (maxSlots == 1) return 1;
+    switch (l){
+        case HElib:
+            throw runtime_error("not implemented"); //TODO
+        case SEALBFV:
+            return estimateN(l)/2;
+        case SEALCKKS:
+            return estimateN(l)/2;
+        default:
+            if (maxSlots > 1) throw std::runtime_error("Library selected, which does not support batching"); //TODO: move this throw to proper place
+            return 1; //TODO: other libraries with slots?
+    }
+
+}
+
 
 }

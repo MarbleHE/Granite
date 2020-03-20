@@ -1,7 +1,6 @@
 //
 // Created by mario on 17.02.20.
 //
-#include <Return.h>
 #include "gtest/gtest.h"
 #include "circuit.hpp"
 #include "M.hpp"
@@ -9,6 +8,10 @@
 #include "BatchingVisitor.hpp"
 #include "Return.h"
 #include "Function.h"
+#include "simple-circuits.hpp"
+#include "circuit-util.hpp"
+#include "context-clear.hpp"
+#include "CircuitHelpers.hpp"
 
 using namespace Marble;
 using namespace Wool;
@@ -104,4 +107,46 @@ TEST(BatchingTest, VisitorTest){
     BatchingVisitor bv;
     bv.visit(*ae);
     ASSERT_EQ(3,bv.getMaxSlots());
+    ASSERT_EQ(0,bv.getSndMaxSlots());
+}
+
+void f_batch_add(){
+    M a = batchEncrypt(std::vector<int>{1,2,3});
+    M b = batchEncrypt(std::vector<int>{1,2,3});
+    output(a+b);
+}
+
+TEST(BasicSlotSize, BatchingVisitorTest){
+    Ast* ast = M::makeAST(f_batch_add);
+    Function* f = (Function *) ast->getRootNode();
+    Return* r = (Return *) f->getBodyStatements()[0];
+    AbstractExpr * ae = r->getReturnExpressions()[0];
+    BatchingVisitor bv;
+    bv.visit(*ae);
+    ASSERT_EQ(3,bv.getMaxSlots());
+    ASSERT_EQ(0,bv.getSndMaxSlots());
+}
+
+
+
+TEST(BasicGate, RotateTest){
+    Circuit c = rotateCircuit();
+    std::vector<std::vector<long>> ptv = {{1,42,333}};
+    std::vector<long> cptv = {2};
+    DurationContainer dc;
+    auto ctx = SHEEP::ContextClear<int64_t >();
+    auto resv = ctx.eval_with_plaintexts(c, ptv, cptv, dc);
+    for (auto x: resv[0]){
+        std::cout << std::to_string(x) << " ";
+    }
+}
+
+TEST(SHEEPconstIn, ParTest){
+    Circuit c = par(single_unary_gate_circuit(Gate::Alias), constAliasCircuit());
+    std::cout << c;
+}
+
+TEST(SHEEPconstIn, SeqTest){
+    Circuit c = seq(single_unary_gate_circuit(Gate::Alias), rotateCircuit());
+    std::cout << c;
 }

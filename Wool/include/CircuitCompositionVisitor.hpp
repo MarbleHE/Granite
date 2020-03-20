@@ -9,16 +9,15 @@
 #include <stack>
 #include <variant>
 #include <map>
-#include <context.hpp>
 #include "Visitor.h"
 #include "circuit.hpp"
 #include "OpSymbEnum.h"
 #include "simple-circuits.hpp"
-#include "circuit-util.hpp"
 #include "AbstractExpr.h"
 #include "AbstractBinaryExpr.h"
 #include "AbstractMatrix.h"
 #include "Rotate.h"
+#include "Matrix.h"
 
 class CircuitCompositionVisitor : Visitor {
  private:
@@ -67,7 +66,7 @@ class CircuitCompositionVisitor : Visitor {
 
   void visit(ArithmeticExpr &elem) override;
 
-  void visit(Function &elem);
+  void visit(Function &elem) override;
 
   Circuit getCircuit();
 

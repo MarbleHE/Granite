@@ -15,6 +15,7 @@
 #include "LogicalExpr.h"
 #include "AbstractMatrix.h"
 #include "Rotate.h"
+#include "PadVisitor.hpp"
 
 using namespace std;
 
@@ -32,12 +33,14 @@ Ast *M::makeAST(std::function<void()> f) {
 double M::evaluate(std::function<void ()> f, Wool::Library l) {
     using namespace std::chrono;
     high_resolution_clock::time_point t1 = high_resolution_clock::now();
-    Ast* ast = M::makeAST(f); // self eval happening here. Intermediate results will get calculated instantly, which is why we benchmark this too. This means unwanted overhead from the M class in the final result.
+    Ast* ast = M::makeAST(f); // self eval happening here. Intermediate results will get calculated instantly, which is why we benchmark this too. This means unwanted overhead from the M class and f() in the final result.
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
 
     duration<double, std::milli> time_span = t2 - t1;
     double self_eval_time =  time_span.count();
+    //TODO: with visitor: find maxSlots and pad all to next slot size (replicate 3 times), except it fits perfectly && sndMaxSlots == 1. If sndMaxSlots > 1, pad to 3 * maxSlots.
 
+    //pad(ast,l); Not necessary. SHEEP pads itself.
     double time = Wool::W(*ast).benchmarkWith(l);
     return self_eval_time + time;
 }
@@ -48,16 +51,17 @@ int M::analyse(std::function<void()> f){
     return Wool::W(*ast).getMultDepth();
 }
 
-long M::result(std::function<void()> f){
+long M::result(std::function<void()> f, Wool::Library l){
     Ast* ast = makeAST(f);
-    return Wool::W(*ast).evaluateWith(Wool::Library::Plaintext); //TODO set correct library
+    //pad(ast,l); Not necessary. SHEEP pads itself.
+    return Wool::W(*ast).evaluateWith(l);
 }
 
 void output(M value){
     M::output(value);
 }
 
-// known issue: this has no option to transfer info about the desired crypto library.
+// known issue: this has no option to transfer info about the desired crypto library. Use evaluate with library instead.
 void M::output(const M &m) {
   M::output_ast = new Ast();
   Function *func = dynamic_cast<Function *>(M::output_ast->setRootNode(new Function("f")));
@@ -77,12 +81,6 @@ M::M(long value, bool plaintext, Wool::Library library) {
   this->exprSize = 1;
 }
 
-M::M(AbstractExpr *expr, bool plaintext, Wool::Library l){
-    this->plaintext = plaintext;
-    this->expr = expr;
-    this->library = l;
-    //TODO set exprSize
-}
 
 M::M(const M &other) {
   plaintext = other.plaintext;
@@ -172,14 +170,10 @@ M &M::operator=(int i) {
 M &M::operator+=(const M &rhs) {
   this->plaintext = this->plaintext && rhs.plaintext;
   this->library = resolveLibraries(this->library, rhs.library);
-    M rh = rhs;
-    if (exprSize < rhs.exprSize){
-        *this = this->pad<int, LiteralInt>(rhs.exprSize - exprSize);
+    if (exprSize < rhs.exprSize || rhs.exprSize < exprSize){
+        throw std::runtime_error("Expression size mismatch.");
     }
-    else if (rhs.exprSize > exprSize){
-        rh = rhs.pad<int, LiteralInt>(exprSize - rhs.exprSize);
-    }
-    auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::ADDITION, rh.expr);
+    auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::ADDITION, rhs.expr);
     this->expr = exp;
     return *this;
 }
@@ -207,14 +201,10 @@ M &M::operator+=(const int &rhs) {
 M &M::operator-=(const M &rhs) {
   this->plaintext = this->plaintext && rhs.plaintext;
   this->library = resolveLibraries(this->library, rhs.library);
-    M rh = rhs;
     if (exprSize < rhs.exprSize){
-        *this = this->pad<int, LiteralInt>(rhs.exprSize - exprSize);
+        throw std::runtime_error("Expression size mismatch.");
     }
-    else if (rhs.exprSize > exprSize){
-        rh = rhs.pad<int, LiteralInt>(exprSize - rhs.exprSize);
-    }
-    auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::SUBTRACTION, rh.expr);
+    auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::SUBTRACTION, rhs.expr);
     this->expr = exp;
     return *this;
 }
@@ -243,12 +233,8 @@ M &M::operator-=(const int &rhs) {
 M &M::operator*=(const M &rhs) {
   this->plaintext = this->plaintext && rhs.plaintext;
   this->library = resolveLibraries(this->library, rhs.library);
-    M rh = rhs;
     if (exprSize < rhs.exprSize){
-        *this = this->pad<int, LiteralInt>(rhs.exprSize - exprSize);
-    }
-    else if (rhs.exprSize > exprSize){
-        rh = rhs.pad<int, LiteralInt>(exprSize - rhs.exprSize);
+        throw std::runtime_error("Expression size mismatch.");
     }
     auto exp = new ArithmeticExpr(this->expr, ArithmeticOp::MULTIPLICATION, rhs.expr);
     this->expr = exp;
@@ -293,145 +279,106 @@ M &M::operator!() {
     return *this;
 }
 
-//TODO: How do I pad bools?
 M operator==(const M &lhs, const M &rhs) {
-    M rh = rhs;
-    M lh = lhs;
     if (lhs.exprSize < rhs.exprSize){
-        lh = lh.pad<int, LiteralInt>(rhs.exprSize - lh.exprSize);
+        throw std::runtime_error("Expression size mismatch.");
     }
-    else if (rhs.exprSize > lh.exprSize){
-        rh = rhs.pad<int, LiteralInt>(lh.exprSize - rhs.exprSize);
-    }
-    auto exp = new LogicalExpr(lh.expr, LogCompOp::EQUAL, rh.expr);
+    auto exp = new LogicalExpr(lhs.expr, LogCompOp::EQUAL, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
-    return M(exp, pt, l);
+    return M(exp, pt, l, lhs.exprSize);
 }
 
 M operator!=(const M &lhs, const M &rhs) {
-    M rh = rhs;
-    M lh = lhs;
     if (lhs.exprSize < rhs.exprSize){
-        lh = lh.pad<int, LiteralInt>(rhs.exprSize - lh.exprSize);
+        throw std::runtime_error("Expression size mismatch.");
     }
-    else if (rhs.exprSize > lh.exprSize){
-        rh = rhs.pad<int, LiteralInt>(lh.exprSize - rhs.exprSize);
-    }
-    auto exp = new LogicalExpr(lh.expr, LogCompOp::UNEQUAL, rh.expr);
+    auto exp = new LogicalExpr(lhs.expr, LogCompOp::UNEQUAL, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
-    return M(exp, pt, l);
+    return M(exp, pt, l, rhs.exprSize);
 }
 
 M operator>=(const M &lhs, const M &rhs) {
-    M rh = rhs;
-    M lh = lhs;
     if (lhs.exprSize < rhs.exprSize){
-        lh = lh.pad<int, LiteralInt>(rhs.exprSize - lh.exprSize);
+        throw std::runtime_error("Expression size mismatch.");
     }
-    else if (rhs.exprSize > lh.exprSize){
-        rh = rhs.pad<int, LiteralInt>(lh.exprSize - rhs.exprSize);
-    }
-    auto exp = new LogicalExpr(lh.expr, LogCompOp::GREATER_EQUAL, rh.expr);
+    auto exp = new LogicalExpr(lhs.expr, LogCompOp::GREATER_EQUAL, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
-    return M(exp, pt, l);
+    return M(exp, pt, l, rhs.exprSize);
 }
 
 M operator>(const M &lhs, const M &rhs) {
-    M rh = rhs;
-    M lh = lhs;
     if (lhs.exprSize < rhs.exprSize){
-        lh = lh.pad<int, LiteralInt>(rhs.exprSize - lh.exprSize);
+        throw std::runtime_error("Expression size mismatch.");
     }
-    else if (rhs.exprSize > lh.exprSize){
-        rh = rhs.pad<int, LiteralInt>(lh.exprSize - rhs.exprSize);
-    }
-    auto exp = new LogicalExpr(lh.expr, LogCompOp::GREATER, rh.expr);
+    auto exp = new LogicalExpr(lhs.expr, LogCompOp::GREATER, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
-    return M(exp, pt, l);
+    return M(exp, pt, l, rhs.exprSize);
 }
 
 M operator<=(const M &lhs, const M &rhs) {
-    M rh = rhs;
-    M lh = lhs;
     if (lhs.exprSize < rhs.exprSize){
-        lh = lh.pad<int, LiteralInt>(rhs.exprSize - lh.exprSize);
+        throw std::runtime_error("Expression size mismatch.");
     }
-    else if (rhs.exprSize > lh.exprSize){
-        rh = rhs.pad<int, LiteralInt>(lh.exprSize - rhs.exprSize);
-    }
-    auto exp = new LogicalExpr(lh.expr, LogCompOp::SMALLER_EQUAL, rh.expr);
+    auto exp = new LogicalExpr(lhs.expr, LogCompOp::SMALLER_EQUAL, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
-    return M(exp, pt, l);
+    return M(exp, pt, l, rhs.exprSize);
 }
 
 M operator<(const M &lhs, const M &rhs) {
-    M rh = rhs;
-    M lh = lhs;
     if (lhs.exprSize < rhs.exprSize){
-        lh = lh.pad<int, LiteralInt>(rhs.exprSize - lh.exprSize);
+        throw std::runtime_error("Expression size mismatch.");
     }
-    else if (rhs.exprSize > lh.exprSize){
-        rh = rhs.pad<int, LiteralInt>(lh.exprSize - rhs.exprSize);
-    }
-    auto exp = new LogicalExpr(lh.expr, LogCompOp::SMALLER, rh.expr);
+    auto exp = new LogicalExpr(lhs.expr, LogCompOp::SMALLER, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
-    return M(exp, pt, l);
+    return M(exp, pt, l, rhs.exprSize);
 }
 
 M operator+(const M &lhs, const M &rhs) {
-    M rh = rhs;
-    M lh = lhs;
     if (lhs.exprSize < rhs.exprSize){
-        lh = lh.pad<int, LiteralInt>(rhs.exprSize - lh.exprSize);
+        throw std::runtime_error("Expression size mismatch.");
     }
-    else if (rhs.exprSize > lh.exprSize){
-        rh = rhs.pad<int, LiteralInt>(lh.exprSize - rhs.exprSize);
-    }
-    auto exp = new ArithmeticExpr(lh.expr, ArithmeticOp::ADDITION, rh.expr);
+    auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::ADDITION, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
-    return M(exp, pt, l);
+    return M(exp, pt, l, rhs.exprSize);
 }
 
 M operator-(const M &lhs, const M &rhs) {
-    M rh = rhs;
-    M lh = lhs;
     if (lhs.exprSize < rhs.exprSize){
-        lh = lh.pad<int, LiteralInt>(rhs.exprSize - lh.exprSize);
+        throw std::runtime_error("Expression size mismatch.");
     }
-    else if (rhs.exprSize > lh.exprSize){
-        rh = rhs.pad<int, LiteralInt>(lh.exprSize - rhs.exprSize);
-    }
-    auto exp = new ArithmeticExpr(lh.expr, ArithmeticOp::SUBTRACTION, rh.expr);
+    auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::SUBTRACTION, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
-    return M(exp, pt, l);
+    return M(exp, pt, l, rhs.exprSize);
 }
 
 M operator*(const M &lhs, const M &rhs) {
-    M rh = rhs;
-    M lh = lhs;
     if (lhs.exprSize < rhs.exprSize){
-        lh = lh.pad<int, LiteralInt>(rhs.exprSize - lh.exprSize);
+        throw std::runtime_error("Expression size mismatch.");
     }
-    else if (rhs.exprSize > lh.exprSize){
-        rh = rhs.pad<int, LiteralInt>(lh.exprSize - rhs.exprSize);
-    }
-    auto exp = new ArithmeticExpr(lh.expr, ArithmeticOp::MULTIPLICATION, rh.expr);
+    auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::MULTIPLICATION, rhs.expr);
     bool pt = lhs.isPlaintext() && rhs.isPlaintext();
     Wool::Library l = M::resolveLibraries(lhs.library, rhs.library);
-    return M(exp, pt, l);
+    return M(exp, pt, l, rhs.exprSize);
 }
 
 void M::rotate(int k){
-    auto exp = new Rotate(reinterpret_cast<LiteralInt*>(this->getExpr()), new LiteralInt(k)); //TODO: Bool, string, float support
-    this->expr = exp;
+    //TODO: handle all Literals and expressions
+    if (!dynamic_cast<AbstractLiteral*>( this->getExpr())){
+        auto exp = new Rotate(new LiteralInt (new Matrix<AbstractExpr*> (this->getExpr())), k); //TODO: Bool, string, float support
+        this->expr = exp;
+    }
+    else {
+        auto exp = new Rotate(this->getExpr(), k);
+        this->expr = exp;
+    }
 }
 
 M encrypt(long value, Wool::Library library) {
@@ -472,7 +419,8 @@ M &M::fold(std::function<M(M, M)> f) {
     while(this->getExprSize() > 1) {
         M t = *this;
         t.rotate(t.getExprSize() / 2);
-        this->exprSize = t.getExprSize() / 2;
+        t.exprSize = t.exprSize / 2;
+        this->exprSize = t.getExprSize();
         *this = f(*this,t);
     }
 
@@ -484,20 +432,30 @@ M M::sum(M ml,M mr){
 }
 
 
-//TODO: Pad???
+M::M(AbstractExpr *ae, bool plaintext, Wool::Library library, int expressionSize){
+    this->expr = ae;
+    this->plaintext = plaintext;
+    this->library = library;
+    this->exprSize = expressionSize;
+}
+
 M batchEncrypt(vector<bool> v){
     Matrix<bool>* mat = new Matrix<bool>(vector<vector<bool>> {v});
-    return M(new LiteralBool (mat), false); //TODO set exprSize
+    return M(new LiteralBool (mat), false, Wool::Library::HElib,v.size()); //TODO or is TFHE Bool better?
 }
 
 M batchEncrypt(vector<int> v){
     Matrix<int>* mat = new Matrix<int>(vector<vector<int>> {v});
-    return M(new LiteralInt (mat), false); //TODO set exprSize
+    return M(new LiteralInt (mat), false, Wool::Library::SEALBFV, v.size());
 }
 
 long decrypt(M m) {
   if (m.isPlaintext() && m.getLib() != Wool::Library::Plaintext) throw  std::runtime_error("Computation uses crypto library, but no value was ever encrypted.");
-  if (m.isPlaintext()) return Wool::W(m.getExpr()).evaluateWith(Wool::Library::Plaintext); // Plaintext computations are performed always in plaintext
+  if (m.isPlaintext()){
+      //pad(m.getExpr(),Wool::Library::Plaintext); Not necessary. SHEEP pads itself.
+      return Wool::W(m.getExpr()).evaluateWith(Wool::Library::Plaintext); // Plaintext computations are performed always in plaintext
+  }
+  //pad(m.getExpr(), m.getLib()); Not necessary. SHEEP pads itself.
   return Wool::W(m.getExpr()).evaluateWith(m.getLib());
 }
 
@@ -564,18 +522,17 @@ void M::setLib(Wool::Library l) {
     //TODO: check if l is a sane choice for its expr.
 }
 
-template<typename intType, typename LiteralType>
-M M::pad(int amount) const {
-    M m = this;
-    vector<intType> v;
-    for (size_t i = 0; i < m.exprSize + amount; i++){
-        v.push_back(0);
-    }
-    auto exp = new ArithmeticExpr (new LiteralType (new Matrix<intType>({v})), ArithmeticOp::ADDITION, m.expr);
-    m.expr = exp;
-    m.exprSize += amount;
-    return m;
+
+void pad(Ast* ast, Wool::Library l){
+    Function * f = (Function *) ast->getRootNode();
+    auto exp = ((Return *) f->getBodyStatements()[0])->getReturnExpressions()[0];
+    pad(exp, l);
 }
 
+void pad(AbstractExpr* ae, Wool::Library l){
+    int nslots = Wool::W(ae).getSlotSize(l);
+    PadVisitor pv = PadVisitor(nslots);
+    pv.visit(*ae);
+}
 
 }

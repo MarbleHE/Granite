@@ -39,6 +39,12 @@ std::vector<long> decrypt(std::vector<M> mv);
 /// Output imitates the return statement in HE functions.
 void output(M value);
 
+/// Pads an AST to the correct slot size.
+/// \param ast
+void pad(Ast* ast, Wool::Library l);
+
+void pad(AbstractExpr* ae, Wool::Library l);
+
 class M {
  public:
   /// The method generating an AST from some function written with M classes.
@@ -57,7 +63,7 @@ class M {
 
   /// Method to get the result of the computation
   /// \return result of f() decrypted (if it has an output statement)
-  static long result(std::function<void()> f);
+  static long result(std::function<void()> f, Wool::Library l);
 
   /// Return statement imitation
   static void output(const M &m);
@@ -222,7 +228,7 @@ private:
   M(AbstractExpr *expr, bool plaintext);
 
   /// Direct init with all fields
-  M(AbstractExpr *expr, bool plaintext, Wool::Library l);
+  M(AbstractExpr *ae, bool plaintext, Wool::Library library, int expressionSize);
 
   /// \return true, if the library is well suited for int
   bool isWellSuited(Wool::Library l, int i);
@@ -254,8 +260,6 @@ private:
 
   friend Ast make_AST(std::function<void()> f);
 
-    template<typename intType, typename LiteralType>
-  M pad(int amount) const;
 };
 
 };
