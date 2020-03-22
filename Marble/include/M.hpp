@@ -224,9 +224,6 @@ private:
   /// Size of the current expression (batched vector)
   int exprSize;
 
-  /// Direct init with AST
-  M(AbstractExpr *expr, bool plaintext);
-
   /// Direct init with all fields
   M(AbstractExpr *ae, bool plaintext, Wool::Library library, int expressionSize);
 

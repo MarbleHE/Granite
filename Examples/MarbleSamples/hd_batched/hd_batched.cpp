@@ -32,5 +32,6 @@ int main() {
 
     cout << M::result(bind(hd_batched, v_enc, u_enc), Wool::Library::Plaintext) << endl;
     cout << M::result(bind(hd_batched, v_enc, u_enc), Wool::Library::SEALBFV) << endl;
+    cout << M::result(bind(hd_batched, v_enc, u_enc), Wool::Library::HElib) << endl;
     return 0;
 }

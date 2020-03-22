@@ -12,9 +12,11 @@
 #include "circuit-util.hpp"
 #include "context-clear.hpp"
 #include "CircuitHelpers.hpp"
+#include "context-tfhe-bool.hpp"
 
 using namespace Marble;
 using namespace Wool;
+using namespace std;
 
 TEST(BasicTest, GoogleTestImport) {
   ASSERT_EQ(1, 1);
@@ -150,3 +152,125 @@ TEST(SHEEPconstIn, SeqTest){
     Circuit c = seq(single_unary_gate_circuit(Gate::Alias), rotateCircuit());
     std::cout << c;
 }
+
+
+class LogicCircuitTest : public ::testing::Test {
+protected:
+    Circuit c;
+    BaseContext<bool>* ctx;
+    DurationContainer dc;
+    vector<vector<vector<bool>>> inputs;
+    vector<vector<bool>> results;
+    void SetUp() override {
+        ctx = new SHEEP::ContextClear<bool>();
+        inputs = {{{0},{0}},
+                  {{0},{1}},
+                  {{1},{0}},
+                  {{1},{1}}};
+    }
+    void TearDown() override {
+        delete ctx;
+    }
+    void eval(){
+        for (auto x : inputs){
+            results.push_back(ctx->eval_with_plaintexts(c,x,dc)[0]);
+        }
+    }
+    void verify(bool oo, bool oi, bool io, bool ii){
+        EXPECT_EQ(results[0][0],oo);
+        EXPECT_EQ(results[1][0], oi);
+        EXPECT_EQ(results[2][0], io);
+        EXPECT_EQ(results[3][0], ii);
+    }
+};
+
+TEST_F(LogicCircuitTest, BoolAdd){
+    c = single_binary_gate_circuit(Gate::Add);
+    eval();
+    verify(0,1,1,0);
+}
+
+TEST_F(LogicCircuitTest, BoolMultiply){
+    c = single_binary_gate_circuit(Gate::Multiply);
+    eval();
+    verify(0,0,0,1);
+}
+
+TEST_F(LogicCircuitTest, BoolNegate){
+    c = single_unary_gate_circuit(Gate::Negate);
+    EXPECT_EQ(ctx->eval_with_plaintexts(c,{{0}},dc)[0][0],1);
+    EXPECT_EQ(ctx->eval_with_plaintexts(c,{{1}},dc)[0][0],0);
+}
+
+TEST_F(LogicCircuitTest, BoolEqual) {
+    c = booleanEqualCircuit();
+    eval();
+    verify(1,0,0,1);
+}
+
+TEST_F(LogicCircuitTest, BoolOr){
+    c = booleanOrCircuit();
+    eval();
+    verify(0,1,1,1);
+}
+
+TEST_F(LogicCircuitTest, BoolCompare){
+    c = single_binary_gate_circuit(Gate::Compare);
+    eval();
+    verify(0,0,1,0);
+}
+
+
+class ArithmeticCircuitTest : public ::testing::Test {
+protected:
+    Circuit c;
+    BaseContext<int64_t>* ctx;
+    DurationContainer dc;
+    vector<vector<vector<long>>> inputs;
+    vector<vector<long>> results;
+    void SetUp() override {
+        ctx = new SHEEP::ContextClear<int64_t>();
+        inputs = {{{33},{33}},
+                  {{42},{1}},
+                  {{1},{42}},
+                  {{-1},{1}},
+                  {{-22},{-11}},
+                  {{-33},{-33}}};
+    }
+    void TearDown() override {
+        delete ctx;
+    }
+    void eval(){
+        for (auto x : inputs){
+            results.push_back(ctx->eval_with_plaintexts(c,x,dc)[0]);
+        }
+    }
+    void verify(vector<long> v){
+        EXPECT_EQ(results[0][0],v[0]);
+        EXPECT_EQ(results[1][0], v[1]);
+        EXPECT_EQ(results[2][0], v[2]);
+        EXPECT_EQ(results[3][0], v[3]);
+        EXPECT_EQ(results[4][0],v[4]);
+        EXPECT_EQ(results[5][0], v[5]);
+    }
+};
+
+TEST_F(ArithmeticCircuitTest, GreaterTest){
+    c = single_binary_gate_circuit(Gate::Compare);
+    eval();
+    verify({0,1,0,0,0,0,});
+}
+
+TEST_F(ArithmeticCircuitTest, SmallerTest){
+    c = smallerCircuit();
+    eval();
+    verify({0,0,1,1,1,0});
+}
+
+
+TEST_F(ArithmeticCircuitTest, UnequalTest){
+    c = unequalCircuit();
+    eval();
+    verify({0,1,1,1,1,0});
+}
+

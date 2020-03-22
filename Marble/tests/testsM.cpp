@@ -204,7 +204,16 @@ TEST(BasicBatch, AddResultTest){
     std::cout << M::result(f_batch_add, Wool::SEALBFV);
 }
 
+void f_fold(){
+    M a = batchEncrypt(std::vector<int>{1,2,3,4});
+    output(a.fold(M::sum));
+}
+
+TEST(BasicBatch, RotateTest){
+    Ast* ast = M::makeAST(f_fold);
+    Wool::W(*ast).printCircuit();
+}
 
 TEST(BasicBatch, FoldTest){
-
+    ASSERT_EQ(M::result(f_fold,Wool::Library::Plaintext),10);
 }

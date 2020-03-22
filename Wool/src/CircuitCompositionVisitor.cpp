@@ -159,21 +159,21 @@ CircuitCompositionVisitor::toGateCircuit(
             case LogCompOp::GREATER:
                 return single_binary_gate_circuit(Gate::Compare);
             case LogCompOp::GREATER_EQUAL:
-                return greaterEqualCircuit();
+                throw std::runtime_error("Any arithmetic circuit with equality or boolean negate not supported yet.");
             case LogCompOp::SMALLER_EQUAL:
-                return smallerEqualCircuit();
+                throw std::runtime_error("Any arithmetic circuit with equality or boolean negate not supported yet.");
             case LogCompOp::SMALLER:
                 return smallerCircuit();
             case LogCompOp::EQUAL:
-                return equalCircuit();
+                throw std::runtime_error("Any arithmetic circuit with equality or boolean negate not supported yet.");
             case LogCompOp::UNEQUAL:
                 return unequalCircuit();
             case LogCompOp::LOGICAL_OR:
-                return single_binary_gate_circuit(Gate::Add); //TODO: Might not work?
+                return booleanOrCircuit();
             case LogCompOp::LOGICAL_AND:
-                return single_binary_gate_circuit(Gate::Multiply); //TODO: Might not work?
+                return single_binary_gate_circuit(Gate::Multiply);
             case LogCompOp::LOGICAL_XOR:
-                return unequalCircuit();
+                return single_binary_gate_circuit(Gate::Add);
             default:
                 throw std::runtime_error(
                         "Gate not implemented in SHEEP: " + OpSymb::getTextRepr(variant));

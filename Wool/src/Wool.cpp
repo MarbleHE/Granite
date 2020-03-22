@@ -24,8 +24,7 @@
 #include "context-seal-ckks.hpp"
 #endif
 #ifdef HAVE_TFHE
-#include "context-tfhe-bool.hpp"
-#include "context-tfhe-integer.hpp"
+#include "context-tfhe.hpp"
 #endif
 #ifdef HAVE_HElib
 #include "context-helib.hpp"
@@ -156,10 +155,8 @@ BaseContext<intType>* W::generateContext(Library l){
             throw std::runtime_error("Wrong template. Dont' try to use CKKS with integer types...");
 #endif
 #ifdef HAVE_TFHE
-        case Wool::TFHEBool:
-            return new SHEEP::ContextTFHE<bool>()
         case Wool::TFHEInteger:
-                return new SHEEP::ContextTFHE<long>();
+             return new SHEEP::ContextTFHE<intType>(128);
 #endif
     }
 
@@ -167,6 +164,7 @@ BaseContext<intType>* W::generateContext(Library l){
     return new SHEEP::ContextClear<intType >();
 }
 
+#ifdef HAVE_SEAL_CKKS
 //Only one library handling doubles so far...
 template <>
 BaseContext<double>* W::generateContext(Library l){
@@ -174,7 +172,22 @@ BaseContext<double>* W::generateContext(Library l){
     cout << "Evaluating... with SEALCKKS" << endl;
     return new SHEEP::ContextSealCKKS<double>(40961, N, 30);
 }
+#endif
 
+#ifdef HAVE_TFHE
+//Only one library handling bools so far...
+template <>
+BaseContext<bool>* W::generateContext(Library l){
+    switch (l) {
+        case TFHEBool:
+            cout << "Evaluating... with TFHE<bool>" << endl;
+            return new SHEEP::ContextTFHE<bool>();
+        case Plaintext:
+            return new SHEEP::ContextClear<bool>();
+    }
+
+}
+#endif
 
 template <typename intType_t>
 tuple<vector<long>, DurationContainer> W::eval(BaseContext<intType_t> *ctx){
@@ -193,12 +206,13 @@ tuple<vector<long>, DurationContainer> W::eval(BaseContext<intType_t> *ctx){
 
     PtVec ptv;
     try {
+        /*TODO: find out why TBB evaluation gets keyerror, when it tries to lookup outputs in the eval_map at the end
 #ifdef HAVE_TBB
     cout << "in parallel..." << endl;
     ptv = ctx->eval_with_plaintexts(c, inputs, cptvec, dc, EvaluationStrategy::parallel);
-#else
+#else*/
     ptv = ctx->eval_with_plaintexts(c, inputs, cptvec, dc);
-#endif
+//#endif
     }
     catch (const GateNotImplemented &e) {
         throw GateNotImplemented();
@@ -309,7 +323,7 @@ int W::estimateN(Library l){
         case Palisade: //TODO find out how these schemes handle slots
         case TFHEBool:
         case TFHEInteger:
-            throw runtime_error("Parameter selection not implemented");
+            return 0;
         case Plaintext:
             return 0;  //No N for Plaintext
     }

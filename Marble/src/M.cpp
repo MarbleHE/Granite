@@ -419,7 +419,7 @@ M &M::fold(std::function<M(M, M)> f) {
     while(this->getExprSize() > 1) {
         M t = *this;
         t.rotate(t.getExprSize() / 2);
-        t.exprSize = t.exprSize / 2;
+        t.exprSize = ceil((float) t.exprSize / (float) 2);
         this->exprSize = t.getExprSize();
         *this = f(*this,t);
     }
@@ -467,12 +467,6 @@ std::vector<long> decrypt(std::vector<M> mv) {
   return dec;
 }
 
-M::M(AbstractExpr *expr, bool plaintext) {
-  this->expr = expr;
-  this->plaintext = plaintext;
-  this->library = Wool::Plaintext;
-  //TODO set expr size
-}
 
 M::~M() {
     //TODO: fix memory leak. Possible solution: refactor M from expression pointers to Ast copies.

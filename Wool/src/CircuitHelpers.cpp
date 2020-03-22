@@ -17,15 +17,25 @@ Circuit duplicatorCircuit(){
     return duplicator;
 }
 
-Circuit equalCircuit(){
-    Circuit dup = duplicatorCircuit();
-    Circuit first = seq(par(dup,dup), par(single_binary_gate_circuit(Gate::Add), single_binary_gate_circuit(Gate::Multiply)));
-    Circuit second = seq(first, par(single_unary_gate_circuit(Gate::Negate), single_unary_gate_circuit(Gate::Alias)));
-    return seq(second, single_binary_gate_circuit(Gate::Multiply));
-}
 
 Circuit unequalCircuit(){
-    return seq(equalCircuit(), single_unary_gate_circuit(Gate::Negate));
+    Circuit dup1 = duplicatorCircuit();
+    Circuit dup2 = duplicatorCircuit();
+    Circuit allin = par(dup1,dup2);
+    Circuit t1 = par(par(single_unary_gate_circuit(Gate::Alias), smallerCircuit()),single_unary_gate_circuit(Gate::Alias));
+    Circuit t2 = par(swapCircuit(),single_unary_gate_circuit(Gate::Alias));
+    Circuit t1seqt2 = seq(t1,t2);
+    Circuit t3 = par(single_unary_gate_circuit(Gate::Alias), greaterCircuit());
+    Circuit t1tot3 = seq(t1seqt2, t3);
+    return seq(allin, seq(t1tot3, single_binary_gate_circuit(Gate::Add)));
+}
+
+Circuit booleanUnequalCircuit(){
+    return single_binary_gate_circuit(Gate::Add);
+}
+
+Circuit booleanEqualCircuit(){
+    return seq(booleanUnequalCircuit(), single_unary_gate_circuit(Gate::Negate));
 }
 
 Circuit swapCircuit(){
@@ -39,17 +49,15 @@ Circuit swapCircuit(){
     return swap;
 }
 
-Circuit smallerEqualCircuit(){
-    return seq(single_binary_gate_circuit(Gate::Compare),single_unary_gate_circuit(Gate::Negate));
-}
 
 Circuit smallerCircuit(){
     return seq(swapCircuit(), single_binary_gate_circuit(Gate::Compare));
 }
 
-Circuit greaterEqualCircuit(){
-    return seq(smallerCircuit(), single_unary_gate_circuit(Gate::Negate));
+Circuit greaterCircuit(){
+    return single_binary_gate_circuit(Gate::Compare);
 }
+
 
 Circuit rotateCircuit(){
     Circuit rot;
@@ -66,4 +74,37 @@ Circuit constAliasCircuit(){
     Wire out1 = c.add_assignment("out1", Gate::Alias, cin1);
     c.set_output(out1);
     return c;
+}
+
+Circuit booleanOrCircuit(){
+    Circuit eq;
+    Wire in1 = eq.add_input("in1");
+    Wire in2 = eq.add_input("in2");
+    Wire t1 = eq.add_assignment("t1", Gate::Multiply, in1, in2);
+    Wire b1 = eq.add_assignment("t2", Gate::Add, in1, in2);
+    Wire out = eq.add_assignment("out", Gate::Add, t1, b1);
+    eq.set_output(out);
+    return eq;
+}
+
+Circuit greaterZeroCircuit(){
+    Circuit dup = duplicatorCircuit();
+    Circuit first = seq(dup, par(single_unary_gate_circuit(Gate::Alias), single_unary_gate_circuit(Gate::Negate)));
+    return seq(first, single_binary_gate_circuit(Gate::Compare));
+};
+
+Circuit smallerZeroCircuit(){
+    Circuit dup = duplicatorCircuit();
+    Circuit first = seq(dup, par(single_unary_gate_circuit(Gate::Negate), single_unary_gate_circuit(Gate::Alias)));
+    return seq(first, single_binary_gate_circuit(Gate::Compare));
+}
+
+Circuit arithmeticOr(){
+    return seq(single_binary_gate_circuit(Gate::Add),greaterZeroCircuit());
+}
+
+Circuit reBoolCircuit(){
+    Circuit dup = duplicatorCircuit();
+    Circuit t = seq(dup, par(greaterZeroCircuit(), smallerZeroCircuit()));
+    return seq(seq(t,single_unary_gate_circuit(Gate::Add)), greaterZeroCircuit());
 }

@@ -7,22 +7,31 @@
 
 #include "circuit.hpp"
 
-Circuit duplicatorCircuit();
 
-Circuit equalCircuit();
+Circuit duplicatorCircuit();
 
 Circuit unequalCircuit();
 
+Circuit booleanUnequalCircuit();
+
+Circuit booleanEqualCircuit();
+
 Circuit swapCircuit();
 
-Circuit smallerEqualCircuit();
-
 Circuit smallerCircuit();
-
-Circuit greaterEqualCircuit();
 
 Circuit rotateCircuit();
 
 Circuit constAliasCircuit();
+
+Circuit booleanOrCircuit();
+
+Circuit greaterZeroCircuit();
+
+Circuit smallerZeroCircuit();
+
+Circuit arithmeticOr();
+
+Circuit greaterCircuit();
 
 #endif //GRANITE_CIRCUITHELPERS_HPP
