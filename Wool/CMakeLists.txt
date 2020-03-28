@@ -71,9 +71,9 @@ add_library(wool ${SOURCE_FILES})
 target_include_directories(wool PUBLIC
         include
         lib/SHEEP/backend/include
-        ../Marble/include
-        ../Marble/lib/ast/include/ast
-        ../Marble/lib/ast/include/visitor
+        ../Granite/include
+        ../Granite/lib/ast/include/ast
+        ../Granite/lib/ast/include/visitor
         lib/SHEEP/backend/include
         #TODO: is this even necessary?
         lib/SHEEP/backend/lib/HElib/src

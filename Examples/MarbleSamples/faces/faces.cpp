@@ -1,24 +1,24 @@
 #include <vector>
 #include <functional>
-#include "M.hpp"
+#include "G.hpp"
 
 using namespace std;
-using namespace Marble;
+using namespace Granite;
 
-void faces(M in, M db, int dim, int n) {
+void faces(G in, G db, int dim, int n) {
     output(in,"in");
     output(db,"db");
-    M diff = in - db;
+    G diff = in - db;
     output(diff,"diff");
-    M sq = diff * diff;
+    G sq = diff * diff;
     output(sq,"sq");
 
     // SIMD-summation over all dimensions of each face
-    M res = sq.fold(sum, dim);
+    G res = sq.fold(sum, dim);
     output(res,"res");
     // SIMD-minimum-index
-    M index;
-    M min = res.fold(min_with_index, index, dim, 1);
+    G index;
+    G min = res.fold(min_with_index, index, dim, 1);
     output(min, "min");
     output(index, "index");
 }
@@ -46,10 +46,10 @@ int main() {
         }
     }
 
-    M db_enc = encrypt(batched, db_batched, /*bitSize=*/8);
-    M in_enc = encrypt(batched, in_batched, /*bitSize=*/8);
+    G db_enc = encrypt(batched, db_batched, /*bitSize=*/8);
+    G in_enc = encrypt(batched, in_batched, /*bitSize=*/8);
 
-    M::evaluate(bind(faces, in_enc, db_enc, dim, n));
+    G::evaluate(bind(faces, in_enc, db_enc, dim, n));
 
     return 0;
 }

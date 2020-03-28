@@ -5,9 +5,9 @@ add_executable(testsWool testsWool.cpp)
 target_include_directories(testsWool PUBLIC
         ../include
         ../lib/SHEEP/backend/include
-        ../../Marble/include
-        ../../Marble/lib/ast/include/ast
-        ../../Marble/lib/ast/include/visitor
+        ../../Granite/include
+        ../../Granite/lib/ast/include/ast
+        ../../Granite/lib/ast/include/visitor
 
         lib/SHEEP/backend/lib/HElib/src
         lib/SHEEP/backend/lib/HElib/src/misc
@@ -26,6 +26,6 @@ target_link_libraries(testsWool
         sheep
         ast_lib
         wool
-        marble
+        granite
         )
 add_test(NAME testsWool COMMAND tests)

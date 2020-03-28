@@ -1,0 +1,37 @@
+{"name":"f","params":[],
+  "type":"Function",
+  "body": [{"type":"Return",
+    "values":[{
+      "type":"ArithmeticExpr",
+      "leftOperand": {
+        "type":"ArithmeticExpr",
+        "leftOperand":{"type":"LiteralInt","value":[[1,2,3,4]]},
+        "operator":"add",
+        "rightOperand": {
+          "type":"Rotate",
+          "operand":{"type":"LiteralInt", "value":[[1,2,3,4]]},
+          "rotationFactor":{"type":"LiteralInt","value":2}
+          }
+        },
+      "operator":"add",
+      "rightOperand":{
+        "type":"Rotate",
+        "rotationFactor":{"type":"LiteralInt","value":1},
+        "operand":{
+          "type":"LiteralInt",
+          "value":[[{
+            "type":"ArithmeticExpr",
+            "leftOperand":{"type":"LiteralInt","value":[[1,2,3,4]]},
+            "operator":"add",
+            "rightOperand":{
+              "type":"Rotate",
+              "operand":{"type":"LiteralInt","value":[[1,2,3,4]]},
+              "rotationFactor":{"type":"LiteralInt","value":2}
+            }
+          }]]
+        }
+      }
+    }]
+  }
+  ]
+}

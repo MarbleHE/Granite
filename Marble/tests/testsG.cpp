@@ -6,7 +6,7 @@
 #include "gtest/gtest.h"
 #include "Ast.h"
 #include "AbstractBinaryExpr.h"
-#include "M.hpp"
+#include "G.hpp"
 #include "nlohmann/json.hpp"
 #include "Function.h"
 #include "Return.h"
@@ -14,9 +14,9 @@
 #include "PadVisitor.hpp"
 
 using json = nlohmann::json;
-using namespace Marble;
+using namespace Granite;
 
-std::string expected_output = "../../Marble/tests/expected_output/";
+std::string expected_output = "../../../Granite/tests/expected_output/";
 
 TEST(BasicTest, GoogleTestImport) {
   ASSERT_EQ(1, 1);
@@ -27,47 +27,47 @@ TEST(BasicAst, AstImport) {
 }
 
 TEST(BasicM, MImport) {
-  ASSERT_NO_THROW(Marble::M());
+  ASSERT_NO_THROW(Granite::G());
 }
 
 TEST(MTest, EmptyConstructorExprTest) {
   std::ifstream file(expected_output + "empty_constructor_expr.json");
   json expected_json = json::parse(file);
-  EXPECT_EQ(M().getExpr()->toJson().dump(), expected_json.dump());
+  EXPECT_EQ(G().getExpr()->toJson().dump(), expected_json.dump());
 
-  M a = M();
+  G a = G();
   EXPECT_EQ(a.getExpr()->toJson().dump(), expected_json.dump());
 
-  M b;
+  G b;
   EXPECT_EQ(b.getExpr()->toJson().dump(), expected_json.dump());
 }
 
 TEST(MTest, LiteralIntExprTest) {
   std::ifstream file(expected_output + "literal_int_expr.json");
   json expected_json = json::parse(file);
-  EXPECT_EQ(M(42).getExpr()->toJson().dump(), expected_json.dump());
+  EXPECT_EQ(G(42).getExpr()->toJson().dump(), expected_json.dump());
 
-  M a = M(42);
+  G a = G(42);
   EXPECT_EQ(a.getExpr()->toJson().dump(), expected_json.dump());
 
-  M b = 42;
+  G b = 42;
   EXPECT_EQ(b.getExpr()->toJson().dump(), expected_json.dump());
 }
 
 TEST(MTest, LiteralBoolExprTest) {
   std::ifstream file(expected_output + "literal_bool_expr.json");
   json expected_json = json::parse(file);
-  EXPECT_EQ(M(true).getExpr()->toJson().dump(), expected_json.dump());
+  EXPECT_EQ(G(true).getExpr()->toJson().dump(), expected_json.dump());
 
-  M a = M(true);
+  G a = G(true);
   EXPECT_EQ(a.getExpr()->toJson().dump(), expected_json.dump());
 
-  M b = M(true);
+  G b = G(true);
   EXPECT_EQ(b.getExpr()->toJson().dump(), expected_json.dump());
 }
 
 TEST(MTest, ReturnLiteralIntTest) {
-  M m = 42;
+  G m = 42;
   Ast ast = Ast();
   Function *func = dynamic_cast<Function *>(ast.setRootNode(new Function("f")));
   std::ifstream file(expected_output + "return_literal_int.json");
@@ -79,21 +79,21 @@ TEST(MTest, ReturnLiteralIntTest) {
 }
 
 void empty_func() {
-  M::output(M());
+  G::output(G());
 }
 
 void empty_func2() {
-  M x = M();
-  M::output(x);
+  G x = G();
+  G::output(x);
 }
 
 void literalInt_func() {
-  M::output(M(42));
+  G::output(G(42));
 }
 
 void literalInt_func2() {
-  M a = 42;
-  M::output(a);
+  G a = 42;
+  G::output(a);
 }
 
 class FTest : public ::testing::Test {
@@ -106,7 +106,7 @@ TEST_F(FTest, EmptyFuncAST) {
   std::ifstream file(expected_output + "empty_func.json");
   json expected_j = json::parse(file);
 
-  Ast *ast = M::makeAST(f);
+  Ast *ast = G::makeAST(f);
   auto rn = ast->getRootNode();
 
   EXPECT_EQ(expected_j.dump(), rn->toString(true));
@@ -114,8 +114,8 @@ TEST_F(FTest, EmptyFuncAST) {
 
 TEST_F(FTest, EmptyFuncEquality) {
   f = empty_func;
-  Ast *ast = M::makeAST(f);
-  Ast *ast2 = M::makeAST(empty_func2);
+  Ast *ast = G::makeAST(f);
+  Ast *ast2 = G::makeAST(empty_func2);
   auto rn = ast->getRootNode();
   auto rn2 = ast2->getRootNode();
   EXPECT_EQ(rn->toString(true), rn2->toString(true));
@@ -123,8 +123,8 @@ TEST_F(FTest, EmptyFuncEquality) {
 
 TEST_F(FTest, LiteralIntEquality) {
   f = literalInt_func;
-  Ast *ast = M::makeAST(f);
-  Ast *ast2 = M::makeAST(literalInt_func2);
+  Ast *ast = G::makeAST(f);
+  Ast *ast2 = G::makeAST(literalInt_func2);
   auto rn = ast->getRootNode();
   auto rn2 = ast->getRootNode();
   std::ifstream file(expected_output + "return_literal_int.json");
@@ -135,37 +135,37 @@ TEST_F(FTest, LiteralIntEquality) {
 }
 
 TEST(EncTest, WithLib) {
-  M m = encrypt(5, Wool::Library::HElib);
+  G m = encrypt(5, Wool::Library::HElib);
   EXPECT_EQ(m.getLib(), Wool::Library::HElib);
   EXPECT_EQ(m.isPlaintext(), false);
 }
 
 TEST(DecTest, Plaintext) {
-  M a = encrypt(4);
+  G a = encrypt(4);
   long res = decrypt(a);
   EXPECT_EQ(res, 4);
 }
 
 
 void f_dec_setlibBFV(){
-    M a = 10;
-    M b = encrypt(20);
+    G a = 10;
+    G b = encrypt(20);
     b.setLib(Wool::Library::SEALBFV);
     long c = decrypt(a*b);
     c += 10;
-    M x = encrypt(c);
-    M y = 1;
+    G x = encrypt(c);
+    G y = 1;
     output(x + y);
 }
 
 TEST(EvalTest, DecTestsetLibBFV){
-    long ms = M::evaluate(f_dec_setlibBFV, Wool::Library::SEALBFV);
+    long ms = G::evaluate(f_dec_setlibBFV, Wool::Library::SEALBFV);
     std::cout << ms;
 }
 
 /// maximum multiplicative depth should be 3
 void f_md(){
-    M a = 10;
+    G a = 10;
     a *= 10;
     a *= 10;
     a *= 10;
@@ -173,47 +173,47 @@ void f_md(){
 }
 
 TEST(BasicMultDepth, MultDepthTest){
-    ASSERT_EQ(M::analyse(f_md), 3);
+    ASSERT_EQ(G::analyse(f_md), 3);
 }
 
 void f_batch(){
-    M a = batchEncrypt(std::vector<int>{1,2,3});
+    G a = batchEncrypt(std::vector<int>{1, 2, 3});
     output(a);
 }
 
 TEST(BasicBatch, PadTest){
-    Ast* ast = M::makeAST(f_batch);
+    Ast* ast = G::makeAST(f_batch);
     pad(ast, Wool::Library::SEALBFV);
     std::cout << ast->getRootNode()->toJson().dump();
 }
 
 void f_batch_add(){
-    M a = batchEncrypt(std::vector<int>{1,2,3,4});
-    M b = batchEncrypt(std::vector<int>{2,4,6,8});
+    G a = batchEncrypt(std::vector<int>{1, 2, 3, 4});
+    G b = batchEncrypt(std::vector<int>{2, 4, 6, 8});
     output(a+b);
 }
 
 TEST(BasicBatch, PadAddTest){
-    Ast* ast = M::makeAST(f_batch_add);
+    Ast* ast = G::makeAST(f_batch_add);
     std::cout << ast->getRootNode()->toJson().dump();
     pad(ast, Wool::Library::SEALBFV);
     std::cout << ast->getRootNode()->toJson().dump();
 }
 
 TEST(BasicBatch, AddResultTest){
-    std::cout << M::result(f_batch_add, Wool::SEALBFV);
+    std::cout << G::result(f_batch_add, Wool::SEALBFV);
 }
 
 void f_fold(){
-    M a = batchEncrypt(std::vector<int>{1,2,3,4});
-    output(a.fold(M::sum));
+    G a = batchEncrypt(std::vector<int>{1, 2, 3, 4});
+    output(a.fold(G::sum));
 }
 
 TEST(BasicBatch, RotateTest){
-    Ast* ast = M::makeAST(f_fold);
+    Ast* ast = G::makeAST(f_fold);
     Wool::W(*ast).printCircuit();
 }
 
 TEST(BasicBatch, FoldTest){
-    ASSERT_EQ(M::result(f_fold,Wool::Library::Plaintext),10);
+    ASSERT_EQ(G::result(f_fold, Wool::Library::Plaintext), 10);
 }

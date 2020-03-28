@@ -7,9 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(faces faces.cpp)
 target_include_directories(faces PUBLIC
-        ../../../Marble/include
-        ../../../Marble/lib/SHEEP/backend/include
-        ../../../Marble/lib/ast/include/ast
+        ../../../Granite/include
+        ../../../Granite/lib/SHEEP/backend/include
+        ../../../Granite/lib/ast/include/ast
         ../../../Wool/include
         )
 target_link_libraries(faces

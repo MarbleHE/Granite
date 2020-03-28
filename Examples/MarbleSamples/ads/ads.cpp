@@ -1,17 +1,17 @@
 
 #include <vector>
 #include <functional>
-#include "M.hpp"
+#include "G.hpp"
 
 using namespace std;
-using namespace Marble;
+using namespace Granite;
 
-void ads(M x_u, M y_u, M r_inv, M x, M y) {
-    M d1 = x_u - x;
-    M d2 = y_u - y;
-    M ctr = r_inv * (d1 * d1 + d2 * d2);
-    M index;
-    M min = ctr.fold(min_with_index, index);
+void ads(G x_u, G y_u, G r_inv, G x, G y) {
+    G d1 = x_u - x;
+    G d2 = y_u - y;
+    G ctr = r_inv * (d1 * d1 + d2 * d2);
+    G index;
+    G min = ctr.fold(min_with_index, index);
     output(index);
 }
 
@@ -25,13 +25,13 @@ int main() {
     vector<int> x_u = {17, 17, 17 , 17/*...*/};
     vector<int> y_u = {158, 158, 158, 158 /*...*/};
 
-    M x_enc = encode(batched, x, /*bitSize=*/8);
-    M y_enc = encode(batched, y, /*bitSize=*/8);
-    M r_inv_enc = encode(batched, r_inv, /*bitSize=*/8);
-    M x_u_enc = encrypt(batched, x_u,/*bitSize=*/8);
-    M y_u_enc = encrypt(batched, y_u,/*bitSize=*/8);
+    G x_enc = encode(batched, x, /*bitSize=*/8);
+    G y_enc = encode(batched, y, /*bitSize=*/8);
+    G r_inv_enc = encode(batched, r_inv, /*bitSize=*/8);
+    G x_u_enc = encrypt(batched, x_u,/*bitSize=*/8);
+    G y_u_enc = encrypt(batched, y_u,/*bitSize=*/8);
 
-    M::evaluate(bind(ads, x_u_enc, y_u_enc, r_inv_enc, x_enc, y_enc));
+    G::evaluate(bind(ads, x_u_enc, y_u_enc, r_inv_enc, x_enc, y_enc));
 
     return 0;
 }

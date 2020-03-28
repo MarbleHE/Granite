@@ -1,5 +1,5 @@
 [submodule "AST"]
-	path = Marble/lib/ast
+	path = Granite/lib/ast
 	url = https://github.com/MarbleHE/AST-Optimizer.git
 	update = rebase
 [submodule "SHEEP"]

@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.8)
-project(M)
+project(G)
 
 
 set(CMAKE_CXX_STANDARD 17)
@@ -17,11 +17,11 @@ add_subdirectory(lib/ast)
 #Linking against libraries gtest, ast, wool, sheep
 set(SOURCE_FILES
         src/BitHelpers.cpp
-        src/M.cpp
+        src/G.cpp
         src/PadVisitor.cpp)
 
-add_library(marble ${SOURCE_FILES})
-target_include_directories(marble PUBLIC
+add_library(granite ${SOURCE_FILES})
+target_include_directories(granite PUBLIC
         include
         lib/ast/include/ast
         lib/ast/include/optimizer
@@ -29,7 +29,7 @@ target_include_directories(marble PUBLIC
         lib/ast/include/visitor
         ../Wool/include
         )
-target_link_libraries(marble
+target_link_libraries(granite
         ast_lib
         wool
         )

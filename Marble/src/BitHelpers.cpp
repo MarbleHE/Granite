@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <vector>
 
-namespace Marble {
+namespace Granite {
 std::pair<long, int> find_log_scale(double d, unsigned int max_bits) {
   // The exponent has at most 11 bits + some bias, so should fit into int
   if (d!=0) {

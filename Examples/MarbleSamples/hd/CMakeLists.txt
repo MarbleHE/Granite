@@ -7,9 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(hd hd.cpp)
 target_include_directories(hd PUBLIC
-        ../../../Marble/include
-        ../../../Marble/lib/SHEEP/backend/include
-        ../../../Marble/lib/ast/include/ast
+        ../../../Granite/include
+        ../../../Granite/lib/SHEEP/backend/include
+        ../../../Granite/lib/ast/include/ast
         ../../../Wool/include
         )
 target_link_libraries(hd

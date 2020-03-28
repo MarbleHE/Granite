@@ -5,7 +5,7 @@
 #include <cmath>
 #include <stdexcept>
 
-namespace Marble {
+namespace Granite {
 
 /// Check if an integer @p a can be expressed in two's complement with @p n bits
 inline bool overflow(long long a, long long n) {

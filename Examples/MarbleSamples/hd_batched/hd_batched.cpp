@@ -1,14 +1,14 @@
 #include <vector>
 #include <functional>
-#include "M.hpp"
+#include "G.hpp"
 
 using namespace std;
-using namespace Marble;
+using namespace Granite;
 
 
-void hd_batched(M v, M u) {
-    M diff = (v != u);
-    diff.fold(M::sum);
+void hd_batched(G v, G u) {
+    G diff = (v != u);
+    diff.fold(G::sum);
     output(diff);
 }
 
@@ -16,22 +16,22 @@ int main() {
     vector<int> v = {0, 1, 1, 0, 0/*...*/};
     vector<int> u = {1, 0, 1, 0, 1/*...*/};
 
-    M v_enc = batchEncrypt(v);
-    M u_enc = batchEncrypt(u);
+    G v_enc = batchEncrypt(v);
+    G u_enc = batchEncrypt(u);
 
     // Simulates the execution and
     // reports e.g. multiplicative depth
-    int md = M::analyse(bind(hd_batched, v_enc, u_enc));
+    int md = G::analyse(bind(hd_batched, v_enc, u_enc));
 
     // Benchmarks the application,
     // using the most appropriate settings
-    double ms = M::evaluate(bind(hd_batched, v_enc, u_enc), Wool::Library::SEALBFV);
+    double ms = G::evaluate(bind(hd_batched, v_enc, u_enc), Wool::Library::SEALBFV);
 
     cout << md << endl;
     cout << ms << endl;
 
-    cout << M::result(bind(hd_batched, v_enc, u_enc), Wool::Library::Plaintext) << endl;
-    cout << M::result(bind(hd_batched, v_enc, u_enc), Wool::Library::SEALBFV) << endl;
-    cout << M::result(bind(hd_batched, v_enc, u_enc), Wool::Library::HElib) << endl;
+    cout << G::result(bind(hd_batched, v_enc, u_enc), Wool::Library::Plaintext) << endl;
+    cout << G::result(bind(hd_batched, v_enc, u_enc), Wool::Library::SEALBFV) << endl;
+    cout << G::result(bind(hd_batched, v_enc, u_enc), Wool::Library::HElib) << endl;
     return 0;
 }

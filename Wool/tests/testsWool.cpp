@@ -3,7 +3,7 @@
 //
 #include "gtest/gtest.h"
 #include "circuit.hpp"
-#include "M.hpp"
+#include "G.hpp"
 #include "Ast.h"
 #include "BatchingVisitor.hpp"
 #include "Return.h"
@@ -14,7 +14,7 @@
 #include "CircuitHelpers.hpp"
 #include "context-tfhe-bool.hpp"
 
-using namespace Marble;
+using namespace Granite;
 using namespace Wool;
 using namespace std;
 
@@ -27,21 +27,21 @@ TEST(BasicSHEEP, CircuitImport) {
 }
 
 void f_1(){
-    M a = encrypt(5);
-    M b = 20;
+    G a = encrypt(5);
+    G b = 20;
     output(a+b);
 }
 
 
 TEST(BasicWool, EvalEasy) {
-    Ast* ast = M::makeAST(f_1);
+    Ast* ast = G::makeAST(f_1);
     W w = W(*ast);
     long res = w.evaluateWith(Library::Plaintext);
     ASSERT_EQ(res, 25);
 }
 
 TEST(BasicWool, EvalSEALBFV){
-    Ast* ast = M::makeAST(f_1);
+    Ast* ast = G::makeAST(f_1);
     W w = W(*ast);
     long res = w.evaluateWith(Library::SEALBFV);
     ASSERT_EQ(res, 25);
@@ -49,7 +49,7 @@ TEST(BasicWool, EvalSEALBFV){
 
 /// maximum multiplicative depth should be 3
 void f_md(){
-    M a = 10;
+    G a = 10;
     a *= 10;
     a *= 10;
     a *= 10;
@@ -57,52 +57,52 @@ void f_md(){
 }
 
 TEST(BasicWool, MultDepthTest){
-    W w = W(*M::makeAST(f_md));
+    W w = W(*G::makeAST(f_md));
     ASSERT_EQ(w.getMultDepth(), 3);
 }
 
 void f_dec(){
-    M a = 10;
-    M b = encrypt(20);
+    G a = 10;
+    G b = encrypt(20);
     long c = decrypt(a*b);
     c += 10;
-    M x = encrypt(c);
-    M y = 1;
+    G x = encrypt(c);
+    G y = 1;
     output(x + y);
 }
 
 TEST(BasicWool, DecTest){
-    Ast* ast = M::makeAST(f_dec);
+    Ast* ast = G::makeAST(f_dec);
     W w = W(*ast);
     long res = w.evaluateWith(Library::SEALBFV);
     ASSERT_EQ(res, 211);
 }
 
 void f_dec_setlibBFV(){
-    M a = 10;
-    M b = encrypt(20);
+    G a = 10;
+    G b = encrypt(20);
     b.setLib(Library::SEALBFV);
     long c = decrypt(a*b);
     c += 10;
-    M x = encrypt(c);
-    M y = 1;
+    G x = encrypt(c);
+    G y = 1;
     output(x + y);
 }
 
 TEST(BasicWool, DecTestsetLibBFV){
-    Ast* ast = M::makeAST(f_dec_setlibBFV);
+    Ast* ast = G::makeAST(f_dec_setlibBFV);
     W w = W(*ast);
     long res = w.evaluateWith(Library::Plaintext);
     ASSERT_EQ(res, 211);
 }
 
 void f_batch(){
-    M a = batchEncrypt((std::vector <int>){1,2,3});
+    G a = batchEncrypt((std::vector <int>){1, 2, 3});
     output(a);
 }
 
 TEST(BatchingTest, VisitorTest){
-    Ast* ast = M::makeAST(f_batch);
+    Ast* ast = G::makeAST(f_batch);
     Function* f = (Function *) ast->getRootNode();
     Return* r = (Return *) f->getBodyStatements()[0];
     AbstractExpr * ae = r->getReturnExpressions()[0];
@@ -113,13 +113,13 @@ TEST(BatchingTest, VisitorTest){
 }
 
 void f_batch_add(){
-    M a = batchEncrypt(std::vector<int>{1,2,3});
-    M b = batchEncrypt(std::vector<int>{1,2,3});
+    G a = batchEncrypt(std::vector<int>{1, 2, 3});
+    G b = batchEncrypt(std::vector<int>{1, 2, 3});
     output(a+b);
 }
 
 TEST(BasicSlotSize, BatchingVisitorTest){
-    Ast* ast = M::makeAST(f_batch_add);
+    Ast* ast = G::makeAST(f_batch_add);
     Function* f = (Function *) ast->getRootNode();
     Return* r = (Return *) f->getBodyStatements()[0];
     AbstractExpr * ae = r->getReturnExpressions()[0];
