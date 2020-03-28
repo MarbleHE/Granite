@@ -13,7 +13,7 @@ target_include_directories(hd_batched PUBLIC
         ../../../Wool/include
         )
 target_link_libraries(hd_batched
-        marble
+        granite
         ast_lib
         wool
         )

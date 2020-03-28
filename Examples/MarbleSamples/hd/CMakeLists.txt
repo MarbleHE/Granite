@@ -13,7 +13,7 @@ target_include_directories(hd PUBLIC
         ../../../Wool/include
         )
 target_link_libraries(hd
-        marble
+        granite
         ast_lib
         wool
         )

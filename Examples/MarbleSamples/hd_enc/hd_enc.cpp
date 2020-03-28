@@ -28,7 +28,7 @@ int main() {
     // using the most appropriate settings
     double ms = G::evaluate(bind(hd_enc, v_enc, u_enc), Wool::Library::SEALBFV);
 
-    long res = G::result(bind(hd_enc, v_enc, u_enc));
+    long res = G::result(bind(hd_enc, v_enc, u_enc), Wool::Library ::SEALBFV);
     cout << res << endl;
     //cout << mult_depth << endl;
     cout << ms << endl;

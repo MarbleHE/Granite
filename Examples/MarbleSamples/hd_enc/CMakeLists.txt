@@ -13,7 +13,7 @@ target_include_directories(hd_enc PUBLIC
         ../../../Wool/include
         )
 target_link_libraries(hd_enc
-        marble
+        granite
         ast_lib
         wool
         )
