@@ -104,7 +104,7 @@ void CircuitCompositionVisitor::visit(LogicalExpr &elem) {
   auto r = cs.top();
   cs.pop();
 
-  Circuit gateCircuit = toGateCircuit(elem.getOp()->getOperatorSymbol());
+  Circuit gateCircuit = toGateCircuit(elem.getOperator()->getOperatorSymbol());
 
   cs.push(seq(par(l, r), gateCircuit));
 }
@@ -127,7 +127,7 @@ void CircuitCompositionVisitor::visit(ArithmeticExpr &elem) {
   auto r = cs.top();
   cs.pop();
 
-  Circuit gateCircuit = toGateCircuit(elem.getOp()->getOperatorSymbol());
+  Circuit gateCircuit = toGateCircuit(elem.getOperator()->getOperatorSymbol());
 
   cs.push(seq(par(l, r), gateCircuit));
 }
