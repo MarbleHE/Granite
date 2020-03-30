@@ -143,7 +143,22 @@ BaseContext<intType>* W::generateContext(Library l){
 #ifdef HAVE_HElib
         case Wool::HElib:
             cout << "Evaluating... with HElib" << endl;
-            return new SHEEP::ContextHElib<intType, intType>(); //TODO parameters
+            int slotIndex = 0;
+            for (auto x : slotsBGV){
+                if (x == maxSlots && sndMaxSlots * 3 < maxSlots){
+                    return slotIndex;
+                }
+                slotIndex++;
+            }
+            slotIndex = 0;
+            for (auto x : slotsBGV){
+                if (3 * maxSlots < x){
+                    return slotIndex;
+                }
+                slotIndex++;
+            }
+            return new SHEEP::ContextHElib<intType, intType>((int) pow(2.0, (estimatePlaintextSize()+1)), slotIndex , 1, 128);
+            //TODO: implement HElib with bools
 #endif
 #ifdef HAVE_SEAL_BFV
         case Wool::SEALBFV:
@@ -315,9 +330,7 @@ int W::estimateN(Library l){
             slots = slotsBFV;
             break;
         case HElib:
-            throw runtime_error("Parameter selection not implemented");
-            //slots = slotsBGV; TODO
-            break;
+            return 0; //No N for HElib
         case LP:
             return 0; //No N for LP
         case Palisade: //TODO find out how these schemes handle slots

@@ -78,8 +78,7 @@ private:
 
   const std::vector<int> slotsCKKS {512, 1024, 2048, 4096, 8192, 16384};
 
-  //TODO find out what slots go with which N (or Q).
-  const std::vector<int> slotsBGV {};
+  const std::vector<int> slotsBGV {4, 60, 96, 682, 1800};
 
     /// Composes Circuit of AbstractExpr and saves it in c
   /// \param ae AbstractExpr to compose circuit from
