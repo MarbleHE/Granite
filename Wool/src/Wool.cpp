@@ -146,14 +146,14 @@ BaseContext<intType>* W::generateContext(Library l){
             int slotIndex = 0;
             for (auto x : slotsBGV){
                 if (x == maxSlots && sndMaxSlots * 3 < maxSlots){
-                    return slotIndex;
+                    return new SHEEP::ContextHElib<intType, intType>((int) pow(2.0, (estimatePlaintextSize()+1)), slotIndex , 1, 128);
                 }
                 slotIndex++;
             }
             slotIndex = 0;
             for (auto x : slotsBGV){
                 if (3 * maxSlots < x){
-                    return slotIndex;
+                    return new SHEEP::ContextHElib<intType, intType>((int) pow(2.0, (estimatePlaintextSize()+1)), slotIndex , 1, 128);
                 }
                 slotIndex++;
             }
@@ -171,6 +171,7 @@ BaseContext<intType>* W::generateContext(Library l){
 #endif
 #ifdef HAVE_TFHE
         case Wool::TFHEInteger:
+             cout << "Evaluating... with TFHE" << endl;
              return new SHEEP::ContextTFHE<intType>(128);
 #endif
     }
@@ -199,6 +200,7 @@ BaseContext<bool>* W::generateContext(Library l){
             return new SHEEP::ContextTFHE<bool>();
         case Plaintext:
             return new SHEEP::ContextClear<bool>();
+            //TODO add HElib with bool...
     }
 
 }

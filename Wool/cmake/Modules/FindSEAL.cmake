@@ -1,5 +1,9 @@
-find_path(SEAL_INCLUDE_DIR NAMES seal)
-find_library(SEAL_LIBRARY NAMES libseal.a)
+find_path(SEAL_INCLUDE_DIR NAMES seal
+        PATHS /SEAL/native/src/
+        )
+find_library(SEAL_LIBRARY NAMES libseal-3.4.a
+        PATHS /SEAL/native/lib/
+        )
 
 #set(SEAL_FOUND TRUE)
 set(SEAL_INCLUDE_DIRS ${SEAL_INCLUDE_DIR})

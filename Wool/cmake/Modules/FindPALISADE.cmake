@@ -1,7 +1,15 @@
-find_path(PALISADE_INCLUDE_DIR NAMES palisade.h)
-find_library(PALISADE_CORE_LIBRARY NAMES PALISADEcore)
-find_library(PALISADE_PKE_LIBRARY NAMES PALISADEpke)
-find_library(PALISADE_NTL_LIBRARY NAMES libntl.so.35)
+find_path(PALISADE_INCLUDE_DIR NAMES palisade.h
+        PATHS /palisade-release/src/pke/include
+        )
+find_library(PALISADE_CORE_LIBRARY NAMES libPALISADEcore
+        PATHS /palisade-release/build/lib
+        )
+find_library(PALISADE_PKE_LIBRARY NAMES libPALISADEpke
+        PATHS /palisade-release/build/lib
+        )
+find_library(PALISADE_NTL_LIBRARY NAMES ntl.a
+        PATHS /ntl-11.1.0/src/
+        )
 
 #set(PALISADE_FOUND TRUE)
 set(PALISADE_INCLUDE_DIRS ${PALISADE_INCLUDE_DIR})

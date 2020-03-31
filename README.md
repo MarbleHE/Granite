@@ -17,7 +17,26 @@ SHEEP will then be used to evaluate those circuits on any of its supported libra
 
 ### SHEEP
 
-## Installation
+## Installation (Recommended)
+1. Install the latest version of CLion.
+2. Clone the repository, using:
+   ```
+   git clone --recurse-submodules -j8 https://github.com/MarbleHE/Granite.git
+   ```
+3. Install the latest version of Docker.
+4. Execute the following commands:
+    ```
+    docker build -t clion/remote-cpp-env:0.5 -f Dockerfile.remote-cpp-env .
+    docker run -d --cap-add sys_ptrace -p127.0.0.1:2222:22 --name clion_remote_env clion/remote-cpp-env:0.5
+    ssh-keygen -f "$HOME/.ssh/known_hosts" -R "[localhost]:2222"
+    ```
+5. Go to CLion > Preferences > Toolchains
+6. Add a new Remote Host with the Name: Docker_Granite, credentials are Host: localhost, Port: 2222, User name: user, Password: password
+7. Select the correct CMake in path: /cmake-3.15.0/bin/cmake
+8. Go to CLion > Preferences > CMake
+9. Change Debug-Docker's Toolchain to Docker
+10. Reload CMakeLists.txt in Granite root folder
+## Installation (Manual, not tested)
 Clone the repository, using:
 ```
 git clone --recurse-submodules -j8 https://github.com/MarbleHE/Granite.git

@@ -1,5 +1,9 @@
-find_path(HElib_INCLUDE_DIR NAMES FHE.h)
-find_library(HElib_LIBRARY NAMES fhe.a libfhe.a)
+find_path(HElib_INCLUDE_DIR NAMES FHE.h
+        PATHS /SHEEP/backend/lib/HElib/src
+        )
+find_library(HElib_LIBRARY NAMES fhe.a libfhe.a
+        PATHS /SHEEP/backend/lib/HElib/src/
+        )
 
 #set(HElib_FOUND TRUE)
 set(HElib_INCLUDE_DIRS ${HElib_INCLUDE_DIR})

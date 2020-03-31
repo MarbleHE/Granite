@@ -75,18 +75,6 @@ target_include_directories(wool PUBLIC
         ../Granite/lib/ast/include/ast
         ../Granite/lib/ast/include/visitor
         lib/SHEEP/backend/include
-        #TODO: is this even necessary?
-        lib/SHEEP/backend/lib/HElib/src
-        lib/SHEEP/backend/lib/HElib/src/misc
-        lib/SHEEP/backend/lib/HElib/src/aes
-        lib/SHEEP/backend/lib/palisade-release/src/abe/include
-        lib/SHEEP/backend/lib/palisade-release/src/binfhe/include
-        lib/SHEEP/backend/lib/palisade-release/src/core/include
-        lib/SHEEP/backend/lib/palisade-release/src/pke/include
-        lib/SHEEP/backend/lib/palisade-release/src/signature/include
-        lib/SHEEP/backend/lib/SEAL/native/src
-        lib/SHEEP/backend/lib/SEAL/native/src/seal/util
-        lib/SHEEP/backend/lib/tfhe/src/include
         )
 
 
@@ -105,7 +93,7 @@ if (TFHE_FOUND)
 endif(TFHE_FOUND)
 
 if (SEAL_FOUND)
-    target_link_libraries(wool SEAL::seal)
+    target_link_libraries(wool ${SEAL_LIBRARIES})
 endif(SEAL_FOUND)
 
 if (LP_FOUND)

@@ -2,11 +2,14 @@
 <project version="4">
   <component name="PublishConfigData">
     <serverData>
-      <paths name="WSL (86e9380b-a355-4e36-b052-cbacd970d3b8)">
+      <paths name="Docker (b128947f-40db-401e-b72d-64872e5b55a7)">
         <serverdata>
           <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/tmp/tmp.br69XCivS3" local="$PROJECT_DIR$" />
           </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug-docker" />
+          </excludedPaths>
         </serverdata>
       </paths>
     </serverData>
