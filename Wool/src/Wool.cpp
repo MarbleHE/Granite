@@ -125,6 +125,7 @@ template <typename intType>
 BaseContext<intType>* W::generateContext(Library l){
     //TODO: select parameters
     int N = estimateN(l);
+    int slotIndex = 0;
     switch (l) {
         case Wool::Plaintext:
             cout << "Evaluating... in Plaintext" << endl;
@@ -143,21 +144,21 @@ BaseContext<intType>* W::generateContext(Library l){
 #ifdef HAVE_HElib
         case Wool::HElib:
             cout << "Evaluating... with HElib" << endl;
-            int slotIndex = 0;
+            slotIndex = 0;
             for (auto x : slotsBGV){
                 if (x == maxSlots && sndMaxSlots * 3 < maxSlots){
-                    return new SHEEP::ContextHElib<intType, intType>((int) pow(2.0, (estimatePlaintextSize()+1)), slotIndex , 1, 128);
+                    return new SHEEP::ContextHElib_F2<intType>(slotIndex , 1, 128);
                 }
                 slotIndex++;
             }
             slotIndex = 0;
             for (auto x : slotsBGV){
                 if (3 * maxSlots < x){
-                    return new SHEEP::ContextHElib<intType, intType>((int) pow(2.0, (estimatePlaintextSize()+1)), slotIndex , 1, 128);
+                    return new SHEEP::ContextHElib_F2<intType>(slotIndex , 1, 128);
                 }
                 slotIndex++;
             }
-            return new SHEEP::ContextHElib<intType, intType>((int) pow(2.0, (estimatePlaintextSize()+1)), slotIndex , 1, 128);
+            return new SHEEP::ContextHElib_F2<intType>(slotIndex , 1, 128);
             //TODO: implement HElib with bools
 #endif
 #ifdef HAVE_SEAL_BFV
@@ -232,7 +233,7 @@ tuple<vector<long>, DurationContainer> W::eval(BaseContext<intType_t> *ctx){
 //#endif
     }
     catch (const GateNotImplemented &e) {
-        throw GateNotImplemented();
+        throw runtime_error(e.what());
     }
     vector<long> iptv;
     for (auto x: ptv) {

@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 ##############################
 # TARGET: testing
 ##############################
+include(GoogleTest)
 add_executable(testsG testsG.cpp)
 target_include_directories(testsG PUBLIC
         ../include

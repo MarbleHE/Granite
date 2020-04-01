@@ -25,13 +25,12 @@ int main() {
 
     // Benchmarks the application,
     // using the most appropriate settings
-    double ms = G::evaluate(bind(hd_batched, v_enc, u_enc), Wool::Library::SEALBFV);
+    double ms = G::evaluate(bind(hd_batched, v_enc, u_enc), Wool::Library::HElib);
 
     cout << md << endl;
     cout << ms << endl;
 
     cout << G::result(bind(hd_batched, v_enc, u_enc), Wool::Library::Plaintext) << endl;
-    cout << G::result(bind(hd_batched, v_enc, u_enc), Wool::Library::SEALBFV) << endl;
     cout << G::result(bind(hd_batched, v_enc, u_enc), Wool::Library::HElib) << endl;
     return 0;
 }

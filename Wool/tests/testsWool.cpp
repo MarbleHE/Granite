@@ -145,12 +145,10 @@ TEST(BasicGate, RotateTest){
 
 TEST(SHEEPconstIn, ParTest){
     Circuit c = par(single_unary_gate_circuit(Gate::Alias), constAliasCircuit());
-    std::cout << c;
 }
 
 TEST(SHEEPconstIn, SeqTest){
     Circuit c = seq(single_unary_gate_circuit(Gate::Alias), rotateCircuit());
-    std::cout << c;
 }
 
 

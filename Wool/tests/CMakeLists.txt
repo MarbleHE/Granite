@@ -1,6 +1,8 @@
+cmake_minimum_required(VERSION 3.14)
 ####################################################################################
 ## Wool testing
 ####################################################################################
+include(GoogleTest)
 add_executable(testsWool testsWool.cpp)
 target_include_directories(testsWool PUBLIC
         ../include

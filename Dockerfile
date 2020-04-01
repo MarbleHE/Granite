@@ -1,7 +1,7 @@
 # CLion remote docker environment (How to build docker container, run and stop it)
 #
 # Build and run:
-#   docker build -t clion/remote-cpp-env:0.5 -f Dockerfile.remote-cpp-env .
+#   docker build -t clion/remote-cpp-env:0.5 -f Dockerfile .
 #   docker run -d --cap-add sys_ptrace -p127.0.0.1:2222:22 --name clion_remote_env clion/remote-cpp-env:0.5
 #   ssh-keygen -f "$HOME/.ssh/known_hosts" -R "[localhost]:2222"
 #
@@ -41,13 +41,12 @@ RUN cd cmake-3.15.0; export CC=gcc-9; export CXX=g++-9; ./bootstrap; make -j8; m
 ####### install intel-tbb for parallelisation
 RUN apt-get -y install libtbb-dev
 
-
 ###### install PALISADE
 RUN apt-get -y install lzip
 RUN apt-get -y install flex
 RUN apt-get -y install bison
 RUN apt-get -y install autoconf
-RUN git clone --recursive -j8 https://gitlab.com/palisade/palisade-release.git
+RUN git clone --recursive https://gitlab.com/palisade/palisade-release.git
 RUN cd palisade-release; mkdir build; cd build; cmake ..; make -j8; make install
 
 # ###### get gmp (needed for HElib)

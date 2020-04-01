@@ -184,7 +184,7 @@ void f_batch(){
 TEST(BasicBatch, PadTest){
     Ast* ast = G::makeAST(f_batch);
     pad(ast, Wool::Library::SEALBFV);
-    std::cout << ast->getRootNode()->toJson().dump();
+    //std::cout << ast->getRootNode()->toJson().dump();
 }
 
 void f_batch_add(){
@@ -195,9 +195,9 @@ void f_batch_add(){
 
 TEST(BasicBatch, PadAddTest){
     Ast* ast = G::makeAST(f_batch_add);
-    std::cout << ast->getRootNode()->toJson().dump();
+    //std::cout << ast->getRootNode()->toJson().dump();
     pad(ast, Wool::Library::SEALBFV);
-    std::cout << ast->getRootNode()->toJson().dump();
+    //std::cout << ast->getRootNode()->toJson().dump();
 }
 
 TEST(BasicBatch, AddResultTest){
