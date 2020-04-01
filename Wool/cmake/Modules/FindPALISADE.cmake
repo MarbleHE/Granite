@@ -14,6 +14,7 @@ find_library(PALISADE_NTL_LIBRARY NAMES ntl.a
 #set(PALISADE_FOUND TRUE)
 set(PALISADE_INCLUDE_DIRS ${PALISADE_INCLUDE_DIR})
 set(PALISADE_LIBRARIES ${PALISADE_CORE_LIBRARY} ${PALISADE_PKE_LIBRARY} ${PALISADE_NTL_LIBRARY})
+list(APPEND PALISADE_INCLUDE_DIRS /palisade-release/src/core/include /palisade-release/third-party/cereal/include/)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(PALISADE DEFAULT_MSG
