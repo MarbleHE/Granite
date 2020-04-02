@@ -201,7 +201,7 @@ TEST(BasicBatch, PadAddTest){
 }
 
 TEST(BasicBatch, AddResultTest){
-    std::cout << G::result(f_batch_add, Wool::SEALBFV);
+    ASSERT_EQ(3, G::result(f_batch_add, Wool::SEALBFV));
 }
 
 void f_fold(){
@@ -211,9 +211,25 @@ void f_fold(){
 
 TEST(BasicBatch, RotateTest){
     Ast* ast = G::makeAST(f_fold);
-    Wool::W(*ast).printCircuit();
+    std::ifstream file(expected_output + "f_fold.json");
+    json expected_j = json::parse(file);
+    ASSERT_EQ(ast->getRootNode()->toJson().dump(),expected_j.dump());
 }
 
 TEST(BasicBatch, FoldTest){
     ASSERT_EQ(G::result(f_fold, Wool::Library::Plaintext), 10);
 }
+
+void f_fold2(){
+    G a = batchEncrypt(std::vector<int> {0,1,1,1,1,0});
+    output(a.fold(G::sum));
+}
+
+TEST(BasicBatch, Fold2){
+    ASSERT_EQ(G::result(f_fold2, Wool::Plaintext), 4);
+}
+
+TEST(SHEEPBasic, HElib){
+
+}
+

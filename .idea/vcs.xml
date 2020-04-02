@@ -33,6 +33,8 @@
     <mapping directory="$PROJECT_DIR$/Wool/lib/SHEEP/backend/lib/palisade-release/third-party/gperftools" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Wool/lib/SHEEP/backend/lib/tfhe" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Wool/lib/SHEEP/backend/lib/tfhe/src/test/googletest" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug-docker/Granite/lib/ast/nlohmann-json-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmake-build-debug-docker/Wool/lib/SHEEP/backend/applications/googletest-src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug/Granite/lib/ast/nlohmann-json-src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug/Marble/lib/ast/googletest-src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug/Marble/lib/ast/nlohmann-json-src" vcs="Git" />

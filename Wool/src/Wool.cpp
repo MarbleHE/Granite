@@ -129,7 +129,7 @@ BaseContext<intType>* W::generateContext(Library l){
     switch (l) {
         case Wool::Plaintext:
             cout << "Evaluating... in Plaintext" << endl;
-            return new SHEEP::ContextClear<intType>();
+            return new SHEEP::ContextClear<intType>(getSlotSize(Plaintext));
     //TODO: implement all libraries
 #ifdef HAVE_LP
             case Wool::LP:
@@ -237,6 +237,10 @@ tuple<vector<long>, DurationContainer> W::eval(BaseContext<intType_t> *ctx){
     }
     vector<long> iptv;
     for (auto x: ptv) {
+        for (auto y: x){
+            cout << (long) y;
+        }
+        cout << endl;
         iptv.push_back((long) x[0]);
     }
     return make_tuple(iptv, dc);
@@ -377,6 +381,7 @@ int W::estimateNViaQ(Library l){
 
 int W::getSlotSize(Library l){
     if (maxSlots == 1) return 1;
+    int i = 0;
     switch (l){
         case HElib:
             throw runtime_error("not implemented"); //TODO
@@ -384,8 +389,20 @@ int W::getSlotSize(Library l){
             return estimateN(l)/2;
         case SEALCKKS:
             return estimateN(l)/2;
+        case Plaintext:
+            while (pow(2, i) <= maxSlots){
+                if (pow(2, i) == maxSlots && sndMaxSlots * 3 < maxSlots){
+                    return pow(2, i);
+                }
+                i++;
+            }
+            i = 0;
+            while (pow(2, i) < 3 * maxSlots ){
+                i++;
+            }
+            return pow(2,i);
         default:
-            if (maxSlots > 1) throw std::runtime_error("Library selected, which does not support batching"); //TODO: move this throw to proper place
+            if (maxSlots > 1) throw std::runtime_error("Library has maxSLots > 1, but does not support batching"); //TODO: move this throw to proper place
             return 1; //TODO: other libraries with slots?
     }
 

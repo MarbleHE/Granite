@@ -418,8 +418,9 @@ G &G::fold(std::function<G(G, G)> f) {
     // rotate down by half, then apply f to combine values
     while(this->getExprSize() > 1) {
         G t = *this;
-        t.rotate(t.getExprSize() / 2);
-        t.exprSize = ceil((float) t.exprSize / (float) 2);
+        int rotationF = floor((float) t.getExprSize() / (float) 2);
+        t.rotate(rotationF);
+        t.exprSize = t.exprSize - rotationF;
         this->exprSize = t.getExprSize();
         *this = f(*this,t);
     }
