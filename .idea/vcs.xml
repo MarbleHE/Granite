@@ -3,26 +3,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Granite/lib/ast" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/Marble/cmake-build-debug/googletest-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/Marble/cmake-build-debug/lib/ast/googletest-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/Marble/cmake-build-debug/lib/ast/nlohmann-json-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/Marble/lib/ast" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/Marble/lib/ast/cmake-build-debug/googletest-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/Marble/lib/ast/cmake-build-debug/nlohmann-json-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/SHEEP" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/SHEEP/backend/cmake-build-debug/applications/googletest-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/HElib" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/SEAL" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/SEAL/native/tests/thirdparty/googletest" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/palisade-release" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/palisade-release/third-party/cereal" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/palisade-release/third-party/google-benchmark" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/palisade-release/third-party/google-test" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/palisade-release/third-party/gperftools" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/tfhe" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/SHEEP/backend/lib/tfhe/src/test/googletest" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Wool/lib/SHEEP" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/Wool/lib/SHEEP/backend/cmake-build-debug/applications/googletest-src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Wool/lib/SHEEP/backend/lib/HElib" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Wool/lib/SHEEP/backend/lib/SEAL" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Wool/lib/SHEEP/backend/lib/SEAL/native/tests/thirdparty/googletest" vcs="Git" />
@@ -36,10 +17,6 @@
     <mapping directory="$PROJECT_DIR$/cmake-build-debug-docker/Granite/lib/ast/nlohmann-json-src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug-docker/Wool/lib/SHEEP/backend/applications/googletest-src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug/Granite/lib/ast/nlohmann-json-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/Marble/lib/ast/googletest-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/Marble/lib/ast/nlohmann-json-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/SHEEP/backend/applications/googletest-src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug/Wool/lib/SHEEP/backend/applications/googletest-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/_deps/googletest-src" vcs="Git" />
   </component>
 </project>

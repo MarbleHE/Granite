@@ -9,6 +9,7 @@
 #include "Function.h"
 #include "MultDepthVisitor.h"
 #include "BatchingVisitor.hpp"
+#include "OpCountVisitor.h"
 #include "context.hpp"
 #include "context-clear.hpp"
 #ifdef HAVE_LP
@@ -54,6 +55,9 @@ W::W(AbstractExpr *ae) {
   MultDepthVisitor mdv = MultDepthVisitor();
   mdv.visit(ast);
   this->multDepth = mdv.getMaxDepth();
+  OpCountVisitor opv = OpCountVisitor();
+  opv.visit(*ae);
+  this->opcount = opv.getOpCount();
   BatchingVisitor bv = BatchingVisitor();
   bv.visit(*ae);
   this->maxSlots = bv.getMaxSlots();
@@ -69,6 +73,9 @@ W::W(Ast a) {
   MultDepthVisitor mdv = MultDepthVisitor();
   mdv.visit(a);
   this->multDepth = mdv.getMaxDepth();
+  OpCountVisitor opv = OpCountVisitor();
+  opv.visit(*ae);
+  this->opcount = opv.getOpCount();
   BatchingVisitor bv = BatchingVisitor();
   bv.visit(*ae);
   this->maxSlots = bv.getMaxSlots();
@@ -91,7 +98,7 @@ long W::evaluateWith(Library l) {
         r =  get<0>(eval<int32_t >(ctx))[0];
     }
     else {
-        cout << "Warning: Result might not fit into plaintext modulus.";
+        cout << "Warning: Result might not fit into plaintext modulus. ";
         auto ctx = generateContext<int64_t> (l);
         r =  get<0>(eval<int64_t >(ctx))[0];
     }
@@ -114,7 +121,7 @@ double W::benchmarkWith(Library l) {
         dc =  get<1>(eval<int32_t >(ctx));
     }
     else {
-        cout << "Warning: Result might not fit into plaintext modulus.";
+        cout << "Warning: Result might not fit into plaintext modulus. ";
         auto ctx = generateContext<int64_t> (l);
         dc =  get<1>(eval<int64_t >(ctx));
     }
@@ -177,8 +184,7 @@ BaseContext<intType>* W::generateContext(Library l){
 #endif
     }
 
-    cout << "Warning. No valid library at evaluation. Clear context selected." << endl;
-    return new SHEEP::ContextClear<intType >();
+    throw std::runtime_error("Selected Library not correctly installed.");
 }
 
 #ifdef HAVE_SEAL_CKKS
@@ -237,10 +243,6 @@ tuple<vector<long>, DurationContainer> W::eval(BaseContext<intType_t> *ctx){
     }
     vector<long> iptv;
     for (auto x: ptv) {
-        for (auto y: x){
-            cout << (long) y;
-        }
-        cout << endl;
         iptv.push_back((long) x[0]);
     }
     return make_tuple(iptv, dc);
@@ -322,8 +324,11 @@ int W::estimatePlaintextSize() {
     if (*ptmax == 0 == *cptmax){
         *ptmax = 1; // handle 0 vectors... no log problems.
     }
-    //TODO count additions/subtractions and take maximum of both..
-    return (multDepth + 1) * ceil(log2(max(*ptmax,*cptmax))) + 1;
+    int max_val = max(*ptmax,*cptmax);
+    int other_ops = opcount - multDepth; //any other operations can at most multiply the result. (e.g. with +)
+    max_val = other_ops*max_val;
+    int max_pt_sz = (multDepth + 1) * ceil(log2(max_val)) + 1;
+    return max_pt_sz;
 }
 
 int W::estimateN(Library l){

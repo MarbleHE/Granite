@@ -26,8 +26,8 @@ SHEEP will then be used to evaluate those circuits on any of its supported libra
 3. Install the latest version of Docker.
 4. Execute the following commands:
     ```
-    docker build -t clion/remote-cpp-env:0.5 -f Dockerfile .
-    docker run -d --cap-add sys_ptrace -p127.0.0.1:2222:22 --name clion_remote_env clion/remote-cpp-env:0.5
+    docker build -t granite_ssh -f Dockerfile .
+    docker run -d --cap-add sys_ptrace -p127.0.0.1:2222:22 --name granite_ssh granite_ssh
     ssh-keygen -f "$HOME/.ssh/known_hosts" -R "[localhost]:2222"
     ```
 5. Go to CLion > Preferences > Toolchains

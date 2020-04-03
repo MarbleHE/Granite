@@ -70,7 +70,6 @@ void G::output(const G &m) {
 
 G::G() {
   this->plaintext = true;
-  this->expr = new Variable("_var_");
   this->library = Wool::Library::Plaintext;
 }
 

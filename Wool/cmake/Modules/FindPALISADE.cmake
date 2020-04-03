@@ -1,10 +1,10 @@
 find_path(PALISADE_INCLUDE_DIR NAMES palisade.h
         PATHS /palisade-release/src/pke/include
         )
-find_library(PALISADE_CORE_LIBRARY NAMES libPALISADEcore
+find_library(PALISADE_CORE_LIBRARY NAMES PALISADEcore
         PATHS /palisade-release/build/lib
         )
-find_library(PALISADE_PKE_LIBRARY NAMES libPALISADEpke
+find_library(PALISADE_PKE_LIBRARY NAMES PALISADEpke
         PATHS /palisade-release/build/lib
         )
 find_library(PALISADE_NTL_LIBRARY NAMES ntl.a

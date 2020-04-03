@@ -3,9 +3,9 @@
 //
 #include <fstream>
 #include <string>
+#include <functional>
 #include "gtest/gtest.h"
 #include "Ast.h"
-#include "AbstractBinaryExpr.h"
 #include "G.hpp"
 #include "nlohmann/json.hpp"
 #include "Function.h"
@@ -226,10 +226,124 @@ void f_fold2(){
 }
 
 TEST(BasicBatch, Fold2){
+    Ast * ast = G::makeAST(f_fold2);
+    std::cout << ast->getRootNode()->toJson().dump();
+    Wool::W(*ast).printCircuit();
     ASSERT_EQ(G::result(f_fold2, Wool::Plaintext), 4);
 }
 
-TEST(SHEEPBasic, HElib){
-
+void fold_param(G a){
+    output(a.fold(G::sum));
 }
 
+class FoldTest : public ::testing::Test {
+protected:
+    std::vector<std::vector<int>> tests;
+    void SetUp() override {
+        for (size_t i = 2; i <= 1024; i*=2){ // fold has undefined behaviour for sizes not being a power of 2.
+            std::vector<int> v;
+            for (size_t j = 0; j < i; j++){
+                v.push_back(j);
+            }
+            tests.push_back(v);
+        }
+    }
+};
+
+TEST_F(FoldTest, ExtensivePlaintext){
+    for (const auto& x : tests){
+        EXPECT_EQ(G::result(std::bind(fold_param,batchEncrypt(x)), Wool::Library::Plaintext),((x.size()-1)*(x.size()-1)+x.size()-1)/2);
+    }
+}
+
+TEST_F(FoldTest, ExtensiveHElib){
+    for (const auto& x : tests){
+        EXPECT_EQ(G::result(std::bind(fold_param,batchEncrypt(x)), Wool::Library::HElib),((x.size()-1)*(x.size()-1)+x.size()-1)/2);
+    }
+}
+
+TEST_F(FoldTest, ExtensiveSEAL){
+    for (const auto& x : tests){
+        EXPECT_EQ(G::result(std::bind(fold_param,batchEncrypt(x)), Wool::Library::SEALBFV),((x.size()-1)*(x.size()-1)+x.size()-1)/2);
+    }
+}
+
+TEST_F(FoldTest, ExtensivePalisade){
+    for (const auto& x : tests){
+        EXPECT_EQ(G::result(std::bind(fold_param,batchEncrypt(x)), Wool::Library::Palisade),((x.size()-1)*(x.size()-1)+x.size()-1)/2);
+    }
+}
+
+void big_math(G a){
+    G b = 2 * a + 2;
+    b++;
+    G c = b * b ;
+    G d = c - a;
+    output(d*5 - 20);
+}
+
+class MathTest : public ::testing::Test {
+protected:
+    std::vector<int> tests;
+    void SetUp() override {
+        for (size_t i = 1; i <= 128; i*=2){
+            tests.push_back(i);
+        }
+    }
+};
+
+
+TEST_F(MathTest, ExtensivePlaintext){
+    for (auto x: tests){
+        int b = 2 * x + 2;
+        b++;
+        int c = b * b ;
+        int d = c - x;
+        int expected_res = d*5 - 20;
+        EXPECT_EQ(G::result(std::bind(big_math,encrypt(x)), Wool::Library::Plaintext),expected_res);
+    }
+}
+
+TEST_F(MathTest, ExtensiveSEALBFV){
+    for (auto x: tests){
+        int b = 2 * x + 2;
+        b++;
+        int c = b * b ;
+        int d = c - x;
+        int expected_res = d*5 - 20;
+        EXPECT_EQ(G::result(std::bind(big_math,encrypt(x)), Wool::Library::SEALBFV),expected_res);
+    }
+}
+
+TEST_F(MathTest, ExtensiveHELib){
+    for (auto x: tests){
+        int b = 2 * x + 2;
+        b++;
+        int c = b * b ;
+        int d = c - x;
+        int expected_res = d*5 - 20;
+        EXPECT_EQ(G::result(std::bind(big_math,encrypt(x)), Wool::Library::HElib),expected_res);
+    }
+}
+
+TEST_F(MathTest, ExtensiveTFHEInteger){
+    for (auto x: tests){
+        int b = 2 * x + 2;
+        b++;
+        int c = b * b ;
+        int d = c - x;
+        int expected_res = d*5 - 20;
+        EXPECT_EQ(G::result(std::bind(big_math,encrypt(x)), Wool::Library::TFHEInteger),expected_res);
+    }
+}
+
+TEST_F(MathTest, ExtensivePalisade){
+    for (auto x: tests){
+        int b = 2 * x + 2;
+        b++;
+        int c = b * b ;
+        int d = c - x;
+        int expected_res = d*5 - 20;
+        EXPECT_EQ(G::result(std::bind(big_math,encrypt(x)), Wool::Library::Palisade),expected_res);
+    }
+}

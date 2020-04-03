@@ -69,6 +69,9 @@ private:
   /// Second biggest amount of slots required by some batched gate within the circuit (!=maxSlots, default: 0)
   int sndMaxSlots;
 
+  /// Number of total operations in circuit
+  int opcount;
+
   /// Possible Qs for 128bit security. (HE standard v1.1 March 16, 2018, smallest q of all tables)
   const std::vector<int> N =     {1024, 2048, 4096, 8192, 16384, 32768};
   const std::vector<int> Q128bit {25,    51,   101,  202,   411, 827};
@@ -120,6 +123,8 @@ private:
   /// \param l
   /// \return N
   int estimateN(Library l);
+
+
 };
 
 };
