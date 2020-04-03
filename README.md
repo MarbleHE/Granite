@@ -30,6 +30,7 @@ SHEEP will then be used to evaluate those circuits on any of its supported libra
     docker run -d --cap-add sys_ptrace -p127.0.0.1:2222:22 --name granite_ssh granite_ssh
     ssh-keygen -f "$HOME/.ssh/known_hosts" -R "[localhost]:2222"
     ```
+    The last command is expected to fail, if the host is not already known. So error messages can be ignored there.
 5. Go to CLion > Preferences > Toolchains
 6. Add a new Remote Host with the Name: Docker_Granite, credentials are Host: localhost, Port: 2222, User name: user, Password: password
 7. Select the correct CMake in path: /cmake-3.15.0/bin/cmake

@@ -10,7 +10,7 @@
 #
 # ssh credentials (test user):
 #   user@password
-FROM stmario/sheep_base AS stmario/granite_ssh
+FROM stmario/sheep_base AS granite_ssh
 
 RUN apt-get update \
   && apt-get install -y ssh \

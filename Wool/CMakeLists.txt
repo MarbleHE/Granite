@@ -6,10 +6,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/Modules")
 ####################################################################################
 ## Build sheep library
 ####################################################################################
-find_package(PALISADE) # Palisade includes and exposes google test to the build
-if (NOT PALISADE_FOUND)
-    set(APP_TESTING TRUE) # This flag decides if RPN/SHEEP's own googletest download is executed
-endif()
+set(APP_TESTING TRUE)
 add_subdirectory(lib/SHEEP/backend)
 
 ####################################################################################
