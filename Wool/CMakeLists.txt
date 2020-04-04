@@ -62,7 +62,9 @@ set(SOURCE_FILES
         src/Wool.cpp
         src/CircuitCompositionVisitor.cpp
         src/BatchingVisitor.cpp
-        src/CircuitHelpers.cpp src/OpCountVisitor.cpp include/OpCountVisitor.h)
+        src/CircuitHelpers.cpp
+        src/OpCountVisitor.cpp
+        src/MultCountVisitor.cpp)
 
 add_library(wool ${SOURCE_FILES})
 target_include_directories(wool PUBLIC

@@ -9,7 +9,8 @@
 #include "Function.h"
 #include "MultDepthVisitor.h"
 #include "BatchingVisitor.hpp"
-#include "OpCountVisitor.h"
+#include "OpCountVisitor.hpp"
+#include "MultCountVisitor.hpp"
 #include "context.hpp"
 #include "context-clear.hpp"
 #ifdef HAVE_LP
@@ -48,20 +49,11 @@ string toString(Wool::Library l) {
 }
 
 W::W(AbstractExpr *ae) {
-  composeCircuit(ae);
   Ast ast = Ast();
   Function *func = dynamic_cast<Function *>(ast.setRootNode(new Function("f")));
   func->addStatement(new Return(ae));
-  MultDepthVisitor mdv = MultDepthVisitor();
-  mdv.visit(ast);
-  this->multDepth = mdv.getMaxDepth();
-  OpCountVisitor opv = OpCountVisitor();
-  opv.visit(*ae);
-  this->opcount = opv.getOpCount();
-  BatchingVisitor bv = BatchingVisitor();
-  bv.visit(*ae);
-  this->maxSlots = bv.getMaxSlots();
-  this->sndMaxSlots = bv.getSndMaxSlots();
+  calculateParams(ast);
+  composeCircuit(ae);
 }
 
 //TODO: make less vulnerable to any changes
@@ -69,17 +61,8 @@ W::W(Ast a) {
   Function* f = (Function *) a.getRootNode();
   Return* r = (Return *) f->getBodyStatements()[0];
   AbstractExpr * ae = r->getReturnExpressions()[0];
+  calculateParams(a);
   composeCircuit(ae);
-  MultDepthVisitor mdv = MultDepthVisitor();
-  mdv.visit(a);
-  this->multDepth = mdv.getMaxDepth();
-  OpCountVisitor opv = OpCountVisitor();
-  opv.visit(*ae);
-  this->opcount = opv.getOpCount();
-  BatchingVisitor bv = BatchingVisitor();
-  bv.visit(*ae);
-  this->maxSlots = bv.getMaxSlots();
-  this->sndMaxSlots = bv.getSndMaxSlots();
 }
 
 long W::evaluateWith(Library l) {
@@ -146,7 +129,7 @@ BaseContext<intType>* W::generateContext(Library l){
 #ifdef HAVE_PALISADE
             case Wool::Palisade:
                 cout << "Evaluating... with Palisade" << endl;
-            return new SHEEP::ContextPalisade<intType>();
+            return new SHEEP::ContextPalisade<intType>(estimatePlaintextSize(),maxSlots,nMults,multDepth);
 #endif
 #ifdef HAVE_HElib
         case Wool::HElib:
@@ -411,6 +394,25 @@ int W::getSlotSize(Library l){
             return 1; //TODO: other libraries with slots?
     }
 
+}
+
+void W::calculateParams(Ast ast) {
+    Function* f = (Function *) ast.getRootNode();
+    Return* r = (Return *) f->getBodyStatements()[0];
+    AbstractExpr * ae = r->getReturnExpressions()[0];
+    MultDepthVisitor mdv = MultDepthVisitor();
+    mdv.visit(ast);
+    this->multDepth = mdv.getMaxDepth();
+    OpCountVisitor opv = OpCountVisitor();
+    opv.visit(*ae);
+    this->opcount = opv.getOpCount();
+    BatchingVisitor bv = BatchingVisitor();
+    bv.visit(*ae);
+    this->maxSlots = bv.getMaxSlots();
+    this->sndMaxSlots = bv.getSndMaxSlots();
+    MultCountVisitor mcv = MultCountVisitor();
+    mcv.visit(*ae);
+    this->nMults = mcv.getMultCount();
 }
 
 

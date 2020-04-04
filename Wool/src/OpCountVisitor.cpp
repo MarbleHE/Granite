@@ -2,7 +2,7 @@
 // Created by Mario Stöckli on 03.04.20.
 //
 
-#include "OpCountVisitor.h"
+#include "OpCountVisitor.hpp"
 
 #include "LogicalExpr.h"
 #include "UnaryExpr.h"

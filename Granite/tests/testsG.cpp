@@ -282,6 +282,14 @@ void big_math(G a){
     output(d*5 - 20);
 }
 
+int big_math_res(int x){
+    int b = 2 * x + 2;
+    b++;
+    int c = b * b ;
+    int d = c - x;
+    return d*5 - 20;
+}
+
 class MathTest : public ::testing::Test {
 protected:
     std::vector<int> tests;
@@ -295,55 +303,35 @@ protected:
 
 TEST_F(MathTest, ExtensivePlaintext){
     for (auto x: tests){
-        int b = 2 * x + 2;
-        b++;
-        int c = b * b ;
-        int d = c - x;
-        int expected_res = d*5 - 20;
+        int expected_res = big_math_res(x);
         EXPECT_EQ(G::result(std::bind(big_math,encrypt(x)), Wool::Library::Plaintext),expected_res);
     }
 }
 
 TEST_F(MathTest, ExtensiveSEALBFV){
     for (auto x: tests){
-        int b = 2 * x + 2;
-        b++;
-        int c = b * b ;
-        int d = c - x;
-        int expected_res = d*5 - 20;
+        int expected_res = big_math_res(x);
         EXPECT_EQ(G::result(std::bind(big_math,encrypt(x)), Wool::Library::SEALBFV),expected_res);
     }
 }
 
 TEST_F(MathTest, ExtensiveHELib){
     for (auto x: tests){
-        int b = 2 * x + 2;
-        b++;
-        int c = b * b ;
-        int d = c - x;
-        int expected_res = d*5 - 20;
+        int expected_res = big_math_res(x);
         EXPECT_EQ(G::result(std::bind(big_math,encrypt(x)), Wool::Library::HElib),expected_res);
     }
 }
 
 TEST_F(MathTest, ExtensiveTFHEInteger){
     for (auto x: tests){
-        int b = 2 * x + 2;
-        b++;
-        int c = b * b ;
-        int d = c - x;
-        int expected_res = d*5 - 20;
+        int expected_res = big_math_res(x);
         EXPECT_EQ(G::result(std::bind(big_math,encrypt(x)), Wool::Library::TFHEInteger),expected_res);
     }
 }
 
 TEST_F(MathTest, ExtensivePalisade){
     for (auto x: tests){
-        int b = 2 * x + 2;
-        b++;
-        int c = b * b ;
-        int d = c - x;
-        int expected_res = d*5 - 20;
+        int expected_res = big_math_res(x);
         EXPECT_EQ(G::result(std::bind(big_math,encrypt(x)), Wool::Library::Palisade),expected_res);
     }
 }

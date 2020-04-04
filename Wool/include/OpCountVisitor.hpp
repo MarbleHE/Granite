@@ -2,8 +2,8 @@
 // Created by Mario Stöckli on 03.04.20.
 //
 
-#ifndef GRANITE_OPCOUNTVISITOR_H
-#define GRANITE_OPCOUNTVISITOR_H
+#ifndef GRANITE_OPCOUNTVISITOR_HPP
+#define GRANITE_OPCOUNTVISITOR_HPP
 
 #include "Visitor.h"
 
@@ -30,4 +30,4 @@ public:
 };
 
 
-#endif //GRANITE_OPCOUNTVISITOR_H
+#endif //GRANITE_OPCOUNTVISITOR_HPP

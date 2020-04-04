@@ -54,23 +54,26 @@ private:
   /// Circuit which was derived from AbstractExpr or AST
   Circuit c;
 
-  /// input to feed into Circuit
+  /// inputs to feed into Circuit
   std::vector<std::vector<long>> ptvec;
 
-  /// const input to feed into Circuit
+  /// constants input vector to feed into Circuit
   std::vector<long> cptvec;
 
-  /// Multiplicative depth of circuit c
+  /// Multiplicative depth of the AST
   int multDepth;
 
-  /// Maximum number of slots required by some batched gate within the circuit
+  /// Maximum number of slots required by some batched gate within the AST
   int maxSlots;
 
-  /// Second biggest amount of slots required by some batched gate within the circuit (!=maxSlots, default: 0)
+  /// Second biggest amount of slots required by some batched gate within the AST (!=maxSlots, default: 0)
   int sndMaxSlots;
 
-  /// Number of total operations in circuit
+  /// Number of total operations in the AST
   int opcount;
+
+  /// Number of multiplications in the AST
+  int nMults;
 
   /// Possible Qs for 128bit security. (HE standard v1.1 March 16, 2018, smallest q of all tables)
   const std::vector<int> N =     {1024, 2048, 4096, 8192, 16384, 32768};
@@ -124,6 +127,9 @@ private:
   /// \return N
   int estimateN(Library l);
 
+  /// initializes all parameters later needed for cryptographic parameter selection
+  /// \param ast
+  void calculateParams(Ast ast);
 
 };
 
