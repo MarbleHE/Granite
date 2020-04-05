@@ -37,6 +37,16 @@ SHEEP will then be used to evaluate those circuits on any of its supported libra
 8. Go to CLion > Preferences > CMake
 9. Change Debug-Docker's Toolchain to Docker
 10. Reload CMakeLists.txt in Granite root folder
+
+## Benchmark
+Look at the examples in folder Benchmark.
+In the results folder, there is a convenient script for plotting.
+
+To get the results from the Docker container, use Tools > Deployment > Browse Remote Host and connect to the container via ssh again.
+
+The results from the example are stored in the folder tmp/tmp.lyA63QWUHt/Benchmark/results
+
+They are not synced automatically.
 ## Installation (Manual, not tested)
 Clone the repository, using:
 ```

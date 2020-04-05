@@ -38,8 +38,6 @@ double G::evaluate(std::function<void ()> f, Wool::Library l) {
 
     duration<double, std::milli> time_span = t2 - t1;
     double self_eval_time =  time_span.count();
-    //TODO: with visitor: find maxSlots and pad all to next slot size (replicate 3 times), except it fits perfectly && sndMaxSlots == 1. If sndMaxSlots > 1, pad to 3 * maxSlots.
-
     //pad(ast,l); Not necessary. SHEEP pads itself.
     double time = Wool::W(*ast).benchmarkWith(l);
     return self_eval_time + time;
@@ -441,10 +439,13 @@ G::G(AbstractExpr *ae, bool plaintext, Wool::Library library, int expressionSize
 
 G batchEncrypt(vector<bool> v){
     Matrix<bool>* mat = new Matrix<bool>(vector<vector<bool>> {v});
-    return G(new LiteralBool (mat), false, Wool::Library::HElib, v.size()); //TODO or is TFHE Bool better?
+    return G(new LiteralBool (mat), false, Wool::Library::HElib, v.size());
 }
 
 G batchEncrypt(vector<int> v){
+    if (v.size() == 1){
+        return G(new LiteralInt(v[0]), false, Wool::Library::SEALBFV, 1);
+    }
     Matrix<int>* mat = new Matrix<int>(vector<vector<int>> {v});
     return G(new LiteralInt (mat), false, Wool::Library::SEALBFV, v.size());
 }
@@ -527,6 +528,39 @@ void pad(AbstractExpr* ae, Wool::Library l){
     int nslots = Wool::W(ae).getSlotSize(l);
     PadVisitor pv = PadVisitor(nslots);
     pv.visit(*ae);
+}
+
+G fold(vector<G> v, function<G(G, G)> f){
+    // rotate down by half, then apply f to combine values
+    vector<G> t = v;
+    while(t.size() > 1) {
+        if (t.size() % 2 == 1) { // just put last element on top to make equal again.
+            t[0] = f(t[0], t.back());
+            t.pop_back();
+        }
+        else {
+            int rotationF = t.size() / 2;
+            vector<G> tv;
+            for (size_t i = 0; i < rotationF; i++){
+                int ri = i + rotationF;
+                tv.push_back(f(t[i],t[ri]));
+            }
+            t = tv;
+        }
+    }
+
+    return t[0];
+}
+
+std::vector<G> operator*(std::vector<G> lhs, std::vector<G> rhs) {
+    if (lhs.size() != rhs.size()){
+        throw std::runtime_error("Vector sizes in component-wise multiplication mismatch. lhs.size() is " + to_string(lhs.size()) + " rhs.size() is " + to_string(rhs.size()) + ".");
+    }
+    vector<G> r;
+    for (size_t i = 0; i < lhs.size(); i++){
+        r.push_back(lhs[i]*rhs[i]);
+    }
+    return r;
 }
 
 }

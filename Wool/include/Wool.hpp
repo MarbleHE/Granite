@@ -16,6 +16,11 @@ class W;
 /// Libraries supported by SHEEP
 enum Library { Plaintext, HElib, LP, Palisade, SEALBFV, SEALCKKS, TFHEBool, TFHEInteger };
 
+/// Libraries which support batching return true
+/// \param l
+/// \return
+bool batchingSupport(Library l);
+
 /// computes string from library enum
 /// \param l
 /// \return string to corresponding library enum

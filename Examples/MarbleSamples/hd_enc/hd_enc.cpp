@@ -26,7 +26,7 @@ int main() {
 
     // Benchmarks the application,
     // using the most appropriate settings
-    double ms = G::evaluate(bind(hd_enc, v_enc, u_enc), Wool::Library::SEALBFV);
+    double ms = G::evaluate(bind(hd_enc, v_enc, u_enc), Wool::Library::SEALBFV); //TODO: change to HElib
 
     long res = G::result(bind(hd_enc, v_enc, u_enc), Wool::Library ::SEALBFV);
     cout << res << endl;

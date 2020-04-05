@@ -39,6 +39,18 @@ std::vector<long> decrypt(std::vector<G> mv);
 /// Output imitates the return statement in HE functions.
 void output(G value);
 
+/// folds vector v with function f
+/// \param v
+/// \param f
+/// \return
+G fold(std::vector<G> v, std::function<G(G, G)> f);
+
+/// Component-wise Multiplication for vectors of G (Can be folded later)
+/// \param lhs
+/// \param rhs
+/// \return
+std::vector<G> operator*(std::vector<G> lhs, std::vector<G> rhs);
+
 /// Pads an AST to the correct slot size.
 /// \param ast
 void pad(Ast* ast, Wool::Library l);

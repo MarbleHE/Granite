@@ -13,8 +13,8 @@ void and_batched(G v, G u) {
 }
 
 int main() {
-    vector<int> v = {0, 1, 1, 0, 0/*...*/};
-    vector<int> u = {1, 0, 1, 0, 1/*...*/};
+    vector<int> v = {0, 1, 1, 0/*...*/};
+    vector<int> u = {1, 0, 1, 0/*...*/};
 
     G v_enc = batchEncrypt(v);
     G u_enc = batchEncrypt(u);

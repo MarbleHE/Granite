@@ -1,18 +1,18 @@
 cmake_minimum_required(VERSION 3.8)
-project(And_batched_sample)
+project(And_benchmark)
 
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(and_batched_sample and_batched.cpp)
-target_include_directories(and_batched_sample PUBLIC
+add_executable(and_benchmark and_benchmark.cpp)
+target_include_directories(and_benchmark PUBLIC
         ../../../Granite/include
         ../../../Granite/lib/SHEEP/backend/include
         ../../../Granite/lib/ast/include/ast
         ../../../Wool/include
         )
-target_link_libraries(and_batched_sample
+target_link_libraries(and_benchmark
         granite
         ast_lib
         wool

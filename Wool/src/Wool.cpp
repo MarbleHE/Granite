@@ -309,13 +309,12 @@ int W::estimatePlaintextSize() {
     }
     int max_val = max(*ptmax,*cptmax);
     int other_ops = opcount - multDepth; //any other operations can at most multiply the result. (e.g. with +)
-    max_val = other_ops*max_val;
+    max_val = max_val + other_ops*max_val;
     int max_pt_sz = (multDepth + 1) * ceil(log2(max_val)) + 1;
     return max_pt_sz;
 }
 
 int W::estimateN(Library l){
-    int qN = estimateNViaQ(l);
     vector<int> slots;
     switch (l){
         case SEALCKKS:
@@ -324,17 +323,11 @@ int W::estimateN(Library l){
         case SEALBFV:
             slots = slotsBFV;
             break;
-        case HElib:
-            return 0; //No N for HElib
-        case LP:
-            return 0; //No N for LP
-        case Palisade: //TODO find out how these schemes handle slots
-        case TFHEBool:
-        case TFHEInteger:
-            return 0;
-        case Plaintext:
-            return 0;  //No N for Plaintext
+        case Palisade: //TODO find out how Palisade works
+        default:
+            return 0;  //No N for the other libraries
     }
+    int qN = estimateNViaQ(l);
     int i = 0;
     for (auto x : slots){
         if (x == maxSlots && sndMaxSlots * 3 < maxSlots){
@@ -415,5 +408,15 @@ void W::calculateParams(Ast ast) {
     this->nMults = mcv.getMultCount();
 }
 
+
+bool batchingSupport(Library l){
+    switch (l){
+        case SEALBFV:
+        case HElib:
+        case Plaintext :
+            return true;
+    }
+    return false;
+}
 
 }

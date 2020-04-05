@@ -232,11 +232,11 @@ TEST(BasicBatch, Fold2){
     ASSERT_EQ(G::result(f_fold2, Wool::Plaintext), 4);
 }
 
-void fold_param(G a){
-    output(a.fold(G::sum));
+void fold_param_enc(std::vector<G> a){
+    output(fold(a, G::sum));
 }
 
-class FoldTest : public ::testing::Test {
+class FoldTest_Enc : public ::testing::Test {
 protected:
     std::vector<std::vector<int>> tests;
     void SetUp() override {
@@ -250,27 +250,57 @@ protected:
     }
 };
 
-TEST_F(FoldTest, ExtensivePlaintext){
-    for (const auto& x : tests){
-        EXPECT_EQ(G::result(std::bind(fold_param,batchEncrypt(x)), Wool::Library::Plaintext),((x.size()-1)*(x.size()-1)+x.size()-1)/2);
+TEST_F(FoldTest_Enc, ExtensivePlaintext){
+    for (auto x: tests){
+        EXPECT_EQ(G::result(std::bind(fold_param_enc, encrypt(x)), Wool::Library::Plaintext), ((x.size() - 1) * (x.size() - 1) + x.size() - 1) / 2);
     }
 }
 
-TEST_F(FoldTest, ExtensiveHElib){
-    for (const auto& x : tests){
-        EXPECT_EQ(G::result(std::bind(fold_param,batchEncrypt(x)), Wool::Library::HElib),((x.size()-1)*(x.size()-1)+x.size()-1)/2);
+TEST_F(FoldTest_Enc, ExtensiveSEALBFV){
+    for (auto x: tests){
+        EXPECT_EQ(G::result(std::bind(fold_param_enc, encrypt(x)), Wool::Library::SEALBFV), ((x.size() - 1) * (x.size() - 1) + x.size() - 1) / 2);
     }
 }
 
-TEST_F(FoldTest, ExtensiveSEAL){
+void fold_param_batched(G a){
+    output(a.fold(G::sum));
+}
+
+class FoldTest_Batched : public ::testing::Test {
+protected:
+    std::vector<std::vector<int>> tests;
+    void SetUp() override {
+        for (size_t i = 2; i <= 1024; i*=2){ // fold has undefined behaviour for sizes not being a power of 2.
+            std::vector<int> v;
+            for (size_t j = 0; j < i; j++){
+                v.push_back(j);
+            }
+            tests.push_back(v);
+        }
+    }
+};
+
+TEST_F(FoldTest_Batched, ExtensivePlaintext){
     for (const auto& x : tests){
-        EXPECT_EQ(G::result(std::bind(fold_param,batchEncrypt(x)), Wool::Library::SEALBFV),((x.size()-1)*(x.size()-1)+x.size()-1)/2);
+        EXPECT_EQ(G::result(std::bind(fold_param_batched, batchEncrypt(x)), Wool::Library::Plaintext), ((x.size() - 1) * (x.size() - 1) + x.size() - 1) / 2);
     }
 }
 
-TEST_F(FoldTest, ExtensivePalisade){
+TEST_F(FoldTest_Batched, ExtensiveHElib){
     for (const auto& x : tests){
-        EXPECT_EQ(G::result(std::bind(fold_param,batchEncrypt(x)), Wool::Library::Palisade),((x.size()-1)*(x.size()-1)+x.size()-1)/2);
+        EXPECT_EQ(G::result(std::bind(fold_param_batched, batchEncrypt(x)), Wool::Library::HElib), ((x.size() - 1) * (x.size() - 1) + x.size() - 1) / 2);
+    }
+}
+
+TEST_F(FoldTest_Batched, ExtensiveSEAL){
+    for (const auto& x : tests){
+        EXPECT_EQ(G::result(std::bind(fold_param_batched, batchEncrypt(x)), Wool::Library::SEALBFV), ((x.size() - 1) * (x.size() - 1) + x.size() - 1) / 2);
+    }
+}
+
+TEST_F(FoldTest_Batched, ExtensivePalisade){
+    for (const auto& x : tests){
+        EXPECT_EQ(G::result(std::bind(fold_param_batched, batchEncrypt(x)), Wool::Library::Palisade), ((x.size() - 1) * (x.size() - 1) + x.size() - 1) / 2);
     }
 }
 

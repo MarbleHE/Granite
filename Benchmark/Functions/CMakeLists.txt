@@ -1,0 +1,2 @@
+add_subdirectory(hd_benchmark)
+add_subdirectory(and_benchmark)
