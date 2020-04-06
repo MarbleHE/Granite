@@ -16,7 +16,5 @@
     <mapping directory="$PROJECT_DIR$/Wool/lib/SHEEP/backend/lib/tfhe/src/test/googletest" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug-docker/Granite/lib/ast/nlohmann-json-src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/cmake-build-debug-docker/Wool/lib/SHEEP/backend/applications/googletest-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/Granite/lib/ast/nlohmann-json-src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/cmake-build-debug/Wool/lib/SHEEP/backend/applications/googletest-src" vcs="Git" />
   </component>
 </project>
