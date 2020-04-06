@@ -63,6 +63,13 @@ std::vector<G> operator-(std::vector<G> lhs, std::vector<G> rhs);
 /// \return
 std::vector<G> operator-(long i, std::vector<G> rhs);
 
+/// Returns two the padded versions of lhs and rhs for batching.
+/// (Constants in the expressions of lhs or rhs get padded to a vector)
+/// \param lhs
+/// \param rhs
+/// \return <lhsPadded, rhsPadded>
+std::tuple<G,G> pad(const G &lhs, const G &rhs);
+
 /// Pads an AST to the correct slot size.
 /// \param ast
 void pad(Ast* ast, Wool::Library l);
@@ -281,6 +288,7 @@ private:
 
   friend Ast make_AST(std::function<void()> f);
 
+  friend std::tuple<G,G> pad(const G &lhs, const G &rhs);
 };
 
 };

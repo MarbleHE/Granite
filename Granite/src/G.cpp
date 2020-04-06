@@ -276,107 +276,71 @@ G &G::operator!() {
 }
 
 G operator==(const G &lhs, const G &rhs) {
-    if (lhs.exprSize != rhs.exprSize){
-        throw std::runtime_error("Expression size mismatch.");
-    }
-    auto exp = new LogicalExpr(lhs.expr, LogCompOp::EQUAL, rhs.expr);
-    bool pt = lhs.isPlaintext() && rhs.isPlaintext();
-    Wool::Library l = G::resolveLibraries(lhs.library, rhs.library);
-    return G(exp, pt, l, lhs.exprSize);
+    G lhsPadded = std::get<0>(pad(lhs, rhs));
+    G rhsPadded = std::get<1>(pad(lhs, rhs));
+    auto exp = new LogicalExpr(lhsPadded.expr, LogCompOp::EQUAL, rhsPadded.expr);
+    bool pt = lhsPadded.isPlaintext() && rhsPadded.isPlaintext();
+    Wool::Library l = G::resolveLibraries(lhsPadded.library, rhsPadded.library);
+    return G(exp, pt, l, lhsPadded.exprSize);
 }
 
 G operator!=(const G &lhs, const G &rhs) {
-    if (lhs.exprSize != rhs.exprSize){
-        throw std::runtime_error("Expression size mismatch.");
-    }
-    auto exp = new LogicalExpr(lhs.expr, LogCompOp::UNEQUAL, rhs.expr);
-    bool pt = lhs.isPlaintext() && rhs.isPlaintext();
-    Wool::Library l = G::resolveLibraries(lhs.library, rhs.library);
-    return G(exp, pt, l, rhs.exprSize);
+    G lhsPadded = std::get<0>(pad(lhs, rhs));
+    G rhsPadded = std::get<1>(pad(lhs, rhs));
+    auto exp = new LogicalExpr(lhsPadded.expr, LogCompOp::UNEQUAL, rhsPadded.expr);
+    bool pt = lhsPadded.isPlaintext() && rhsPadded.isPlaintext();
+    Wool::Library l = G::resolveLibraries(lhsPadded.library, rhsPadded.library);
+    return G(exp, pt, l, rhsPadded.exprSize);
 }
 
 G operator>=(const G &lhs, const G &rhs) {
-    if (lhs.exprSize != rhs.exprSize){
-        throw std::runtime_error("Expression size mismatch.");
-    }
-    auto exp = new LogicalExpr(lhs.expr, LogCompOp::GREATER_EQUAL, rhs.expr);
-    bool pt = lhs.isPlaintext() && rhs.isPlaintext();
-    Wool::Library l = G::resolveLibraries(lhs.library, rhs.library);
-    return G(exp, pt, l, rhs.exprSize);
+    G lhsPadded = std::get<0>(pad(lhs, rhs));
+    G rhsPadded = std::get<1>(pad(lhs, rhs));
+    auto exp = new LogicalExpr(lhsPadded.expr, LogCompOp::GREATER_EQUAL, rhsPadded.expr);
+    bool pt = lhsPadded.isPlaintext() && rhsPadded.isPlaintext();
+    Wool::Library l = G::resolveLibraries(lhsPadded.library, rhsPadded.library);
+    return G(exp, pt, l, rhsPadded.exprSize);
 }
 
 G operator>(const G &lhs, const G &rhs) {
-    if (lhs.exprSize != rhs.exprSize){
-        throw std::runtime_error("Expression size mismatch.");
-    }
-    auto exp = new LogicalExpr(lhs.expr, LogCompOp::GREATER, rhs.expr);
-    bool pt = lhs.isPlaintext() && rhs.isPlaintext();
-    Wool::Library l = G::resolveLibraries(lhs.library, rhs.library);
-    return G(exp, pt, l, rhs.exprSize);
+    G lhsPadded = std::get<0>(pad(lhs, rhs));
+    G rhsPadded = std::get<1>(pad(lhs, rhs));
+    auto exp = new LogicalExpr(lhsPadded.expr, LogCompOp::GREATER, rhsPadded.expr);
+    bool pt = lhsPadded.isPlaintext() && rhsPadded.isPlaintext();
+    Wool::Library l = G::resolveLibraries(lhsPadded.library, rhsPadded.library);
+    return G(exp, pt, l, rhsPadded.exprSize);
 }
 
 G operator<=(const G &lhs, const G &rhs) {
-    if (lhs.exprSize != rhs.exprSize){
-        throw std::runtime_error("Expression size mismatch.");
-    }
-    auto exp = new LogicalExpr(lhs.expr, LogCompOp::SMALLER_EQUAL, rhs.expr);
-    bool pt = lhs.isPlaintext() && rhs.isPlaintext();
-    Wool::Library l = G::resolveLibraries(lhs.library, rhs.library);
-    return G(exp, pt, l, rhs.exprSize);
+    G lhsPadded = std::get<0>(pad(lhs, rhs));
+    G rhsPadded = std::get<1>(pad(lhs, rhs));
+    auto exp = new LogicalExpr(lhsPadded.expr, LogCompOp::SMALLER_EQUAL, rhsPadded.expr);
+    bool pt = lhsPadded.isPlaintext() && rhsPadded.isPlaintext();
+    Wool::Library l = G::resolveLibraries(lhsPadded.library, rhsPadded.library);
+    return G(exp, pt, l, rhsPadded.exprSize);
 }
 
 G operator<(const G &lhs, const G &rhs) {
-    if (lhs.exprSize != rhs.exprSize){
-        throw std::runtime_error("Expression size mismatch.");
-    }
-    auto exp = new LogicalExpr(lhs.expr, LogCompOp::SMALLER, rhs.expr);
-    bool pt = lhs.isPlaintext() && rhs.isPlaintext();
-    Wool::Library l = G::resolveLibraries(lhs.library, rhs.library);
-    return G(exp, pt, l, rhs.exprSize);
+    G lhsPadded = std::get<0>(pad(lhs, rhs));
+    G rhsPadded = std::get<1>(pad(lhs, rhs));
+    auto exp = new LogicalExpr(lhsPadded.expr, LogCompOp::SMALLER, rhsPadded.expr);
+    bool pt = lhsPadded.isPlaintext() && rhsPadded.isPlaintext();
+    Wool::Library l = G::resolveLibraries(lhsPadded.library, rhsPadded.library);
+    return G(exp, pt, l, rhsPadded.exprSize);
 }
 
 G operator+(const G &lhs, const G &rhs) {
-    if (lhs.exprSize != rhs.exprSize){
-        throw std::runtime_error("Expression size mismatch.");
-    }
-    auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::ADDITION, rhs.expr);
-    bool pt = lhs.isPlaintext() && rhs.isPlaintext();
-    Wool::Library l = G::resolveLibraries(lhs.library, rhs.library);
-    return G(exp, pt, l, rhs.exprSize);
+    G lhsPadded = std::get<0>(pad(lhs, rhs));
+    G rhsPadded = std::get<1>(pad(lhs, rhs));
+    auto exp = new ArithmeticExpr(lhsPadded.expr, ArithmeticOp::ADDITION, rhsPadded.expr);
+    bool pt = lhsPadded.isPlaintext() && rhsPadded.isPlaintext();
+    Wool::Library l = G::resolveLibraries(lhsPadded.library, rhsPadded.library);
+    return G(exp, pt, l, rhsPadded.exprSize);
 }
 
 G operator-(const G &lhs, const G &rhs) {
-    G lhsPadded = lhs;
-    G rhsPadded = rhs;
-    if (lhsPadded.exprSize != rhsPadded.exprSize){
-        if (lhsPadded.exprSize == 1){
-            if (auto li = dynamic_cast<LiteralInt*>(lhsPadded.expr)){
-                vector<LiteralInt*> v;
-                for (size_t i = 0; i < rhsPadded.exprSize; i++){
-                    v.push_back(li);
-                }
-                lhsPadded.expr = new LiteralInt (new Matrix<LiteralInt*> ({v}));
-                lhsPadded.exprSize = rhsPadded.exprSize;
-            } else {
-                throw std::runtime_error("Padding for batched vectors other than int not implemented.");
-            }
-        }
-        else if (rhsPadded.exprSize == 1){
-            if (auto li = dynamic_cast<LiteralInt*>(rhsPadded.expr)) {
-                vector<LiteralInt *> v;
-                for (size_t i = 0; i < lhsPadded.exprSize; i++) {
-                    v.push_back(li);
-                }
-                rhsPadded.expr = new LiteralInt(new Matrix<LiteralInt *>({v}));
-                rhsPadded.exprSize = rhsPadded.exprSize;
-            } else {
-                throw std::runtime_error("Padding for batched vectors other than int not implemented.");
-            }
-        }
-        else {
-            throw std::runtime_error("Expression size mismatch.");
-        }
-    }
+    G lhsPadded = std::get<0>(pad(lhs, rhs));
+    G rhsPadded = std::get<1>(pad(lhs, rhs));
     auto exp = new ArithmeticExpr(lhsPadded.expr, ArithmeticOp::SUBTRACTION, rhsPadded.expr);
     bool pt = lhsPadded.isPlaintext() && rhsPadded.isPlaintext();
     Wool::Library l = G::resolveLibraries(lhsPadded.library, rhsPadded.library);
@@ -384,13 +348,12 @@ G operator-(const G &lhs, const G &rhs) {
 }
 
 G operator*(const G &lhs, const G &rhs) {
-    if (lhs.exprSize != rhs.exprSize){
-        throw std::runtime_error("Expression size mismatch.");
-    }
-    auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::MULTIPLICATION, rhs.expr);
-    bool pt = lhs.isPlaintext() && rhs.isPlaintext();
-    Wool::Library l = G::resolveLibraries(lhs.library, rhs.library);
-    return G(exp, pt, l, rhs.exprSize);
+    G lhsPadded = std::get<0>(pad(lhs, rhs));
+    G rhsPadded = std::get<1>(pad(lhs, rhs));
+    auto exp = new ArithmeticExpr(lhsPadded.expr, ArithmeticOp::MULTIPLICATION, rhsPadded.expr);
+    bool pt = lhsPadded.isPlaintext() && rhsPadded.isPlaintext();
+    Wool::Library l = G::resolveLibraries(lhsPadded.library, rhsPadded.library);
+    return G(exp, pt, l, rhsPadded.exprSize);
 }
 
 void G::rotate(int k){
@@ -555,6 +518,41 @@ void pad(AbstractExpr* ae, Wool::Library l){
     int nslots = Wool::W(ae).getSlotSize(l);
     PadVisitor pv = PadVisitor(nslots);
     pv.visit(*ae);
+}
+
+std::tuple<G,G> pad(const G &lhs, const G &rhs){
+    G lhsPadded = lhs;
+    G rhsPadded = rhs;
+    if (lhsPadded.exprSize != rhsPadded.exprSize){
+        if (lhsPadded.exprSize == 1){
+            if (auto li = dynamic_cast<LiteralInt*>(lhsPadded.expr)){
+            vector<int> v;
+            for (size_t i = 0; i < rhsPadded.exprSize; i++){
+                v.push_back(li->getValue());
+            }
+            lhsPadded.expr = new LiteralInt (new Matrix<int> ({v}));
+            lhsPadded.exprSize = rhsPadded.exprSize;
+        } else {
+            throw std::runtime_error("Padding for batched vectors other than int not implemented.");
+            }
+        }
+    else if (rhsPadded.exprSize == 1){
+        if (auto li = dynamic_cast<LiteralInt*>(rhsPadded.expr)) {
+            vector<int> v;
+            for (size_t i = 0; i < lhsPadded.exprSize; i++) {
+                v.push_back(li->getValue());
+            }
+            rhsPadded.expr = new LiteralInt(new Matrix<int>({v}));
+            rhsPadded.exprSize = rhsPadded.exprSize;
+        } else {
+        throw std::runtime_error("Padding for batched vectors other than int not implemented.");
+        }
+    }
+        else {
+            throw std::runtime_error("Expression size mismatch.");
+        }
+    }
+    return std::make_tuple(lhsPadded,rhsPadded);
 }
 
 G fold(vector<G> v, function<G(G, G)> f){
