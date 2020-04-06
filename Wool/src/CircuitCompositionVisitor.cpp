@@ -182,5 +182,7 @@ CircuitCompositionVisitor::toGateCircuit(
       switch (std::get<UnaryOp>(variant)) {
         case UnaryOp::NEGATION:return single_unary_gate_circuit(Gate::Negate);
       }
+      default:
+          throw std::runtime_error("Opsymbol variant is not any of ArtihmeticOp, LogCompOp, or UnaryOp. Did the interface change?");
   }
 }

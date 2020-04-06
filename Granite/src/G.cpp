@@ -1,8 +1,6 @@
 #include <chrono>
 #include "G.hpp"
-#include "BitHelpers.h"
 #include "Ast.h"
-#include "Variable.h"
 #include "LiteralInt.h"
 #include "LiteralBool.h"
 #include "Function.h"
@@ -16,6 +14,7 @@
 #include "AbstractMatrix.h"
 #include "Rotate.h"
 #include "PadVisitor.hpp"
+#include "Matrix.h"
 
 using namespace std;
 
@@ -277,7 +276,7 @@ G &G::operator!() {
 }
 
 G operator==(const G &lhs, const G &rhs) {
-    if (lhs.exprSize < rhs.exprSize){
+    if (lhs.exprSize != rhs.exprSize){
         throw std::runtime_error("Expression size mismatch.");
     }
     auto exp = new LogicalExpr(lhs.expr, LogCompOp::EQUAL, rhs.expr);
@@ -287,7 +286,7 @@ G operator==(const G &lhs, const G &rhs) {
 }
 
 G operator!=(const G &lhs, const G &rhs) {
-    if (lhs.exprSize < rhs.exprSize){
+    if (lhs.exprSize != rhs.exprSize){
         throw std::runtime_error("Expression size mismatch.");
     }
     auto exp = new LogicalExpr(lhs.expr, LogCompOp::UNEQUAL, rhs.expr);
@@ -297,7 +296,7 @@ G operator!=(const G &lhs, const G &rhs) {
 }
 
 G operator>=(const G &lhs, const G &rhs) {
-    if (lhs.exprSize < rhs.exprSize){
+    if (lhs.exprSize != rhs.exprSize){
         throw std::runtime_error("Expression size mismatch.");
     }
     auto exp = new LogicalExpr(lhs.expr, LogCompOp::GREATER_EQUAL, rhs.expr);
@@ -307,7 +306,7 @@ G operator>=(const G &lhs, const G &rhs) {
 }
 
 G operator>(const G &lhs, const G &rhs) {
-    if (lhs.exprSize < rhs.exprSize){
+    if (lhs.exprSize != rhs.exprSize){
         throw std::runtime_error("Expression size mismatch.");
     }
     auto exp = new LogicalExpr(lhs.expr, LogCompOp::GREATER, rhs.expr);
@@ -317,7 +316,7 @@ G operator>(const G &lhs, const G &rhs) {
 }
 
 G operator<=(const G &lhs, const G &rhs) {
-    if (lhs.exprSize < rhs.exprSize){
+    if (lhs.exprSize != rhs.exprSize){
         throw std::runtime_error("Expression size mismatch.");
     }
     auto exp = new LogicalExpr(lhs.expr, LogCompOp::SMALLER_EQUAL, rhs.expr);
@@ -327,7 +326,7 @@ G operator<=(const G &lhs, const G &rhs) {
 }
 
 G operator<(const G &lhs, const G &rhs) {
-    if (lhs.exprSize < rhs.exprSize){
+    if (lhs.exprSize != rhs.exprSize){
         throw std::runtime_error("Expression size mismatch.");
     }
     auto exp = new LogicalExpr(lhs.expr, LogCompOp::SMALLER, rhs.expr);
@@ -337,7 +336,7 @@ G operator<(const G &lhs, const G &rhs) {
 }
 
 G operator+(const G &lhs, const G &rhs) {
-    if (lhs.exprSize < rhs.exprSize){
+    if (lhs.exprSize != rhs.exprSize){
         throw std::runtime_error("Expression size mismatch.");
     }
     auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::ADDITION, rhs.expr);
@@ -347,17 +346,45 @@ G operator+(const G &lhs, const G &rhs) {
 }
 
 G operator-(const G &lhs, const G &rhs) {
-    if (lhs.exprSize < rhs.exprSize){
-        throw std::runtime_error("Expression size mismatch.");
+    G lhsPadded = lhs;
+    G rhsPadded = rhs;
+    if (lhsPadded.exprSize != rhsPadded.exprSize){
+        if (lhsPadded.exprSize == 1){
+            if (auto li = dynamic_cast<LiteralInt*>(lhsPadded.expr)){
+                vector<LiteralInt*> v;
+                for (size_t i = 0; i < rhsPadded.exprSize; i++){
+                    v.push_back(li);
+                }
+                lhsPadded.expr = new LiteralInt (new Matrix<LiteralInt*> ({v}));
+                lhsPadded.exprSize = rhsPadded.exprSize;
+            } else {
+                throw std::runtime_error("Padding for batched vectors other than int not implemented.");
+            }
+        }
+        else if (rhsPadded.exprSize == 1){
+            if (auto li = dynamic_cast<LiteralInt*>(rhsPadded.expr)) {
+                vector<LiteralInt *> v;
+                for (size_t i = 0; i < lhsPadded.exprSize; i++) {
+                    v.push_back(li);
+                }
+                rhsPadded.expr = new LiteralInt(new Matrix<LiteralInt *>({v}));
+                rhsPadded.exprSize = rhsPadded.exprSize;
+            } else {
+                throw std::runtime_error("Padding for batched vectors other than int not implemented.");
+            }
+        }
+        else {
+            throw std::runtime_error("Expression size mismatch.");
+        }
     }
-    auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::SUBTRACTION, rhs.expr);
-    bool pt = lhs.isPlaintext() && rhs.isPlaintext();
-    Wool::Library l = G::resolveLibraries(lhs.library, rhs.library);
-    return G(exp, pt, l, rhs.exprSize);
+    auto exp = new ArithmeticExpr(lhsPadded.expr, ArithmeticOp::SUBTRACTION, rhsPadded.expr);
+    bool pt = lhsPadded.isPlaintext() && rhsPadded.isPlaintext();
+    Wool::Library l = G::resolveLibraries(lhsPadded.library, rhsPadded.library);
+    return G(exp, pt, l, lhsPadded.exprSize);
 }
 
 G operator*(const G &lhs, const G &rhs) {
-    if (lhs.exprSize < rhs.exprSize){
+    if (lhs.exprSize != rhs.exprSize){
         throw std::runtime_error("Expression size mismatch.");
     }
     auto exp = new ArithmeticExpr(lhs.expr, ArithmeticOp::MULTIPLICATION, rhs.expr);
@@ -559,6 +586,29 @@ std::vector<G> operator*(std::vector<G> lhs, std::vector<G> rhs) {
     vector<G> r;
     for (size_t i = 0; i < lhs.size(); i++){
         r.push_back(lhs[i]*rhs[i]);
+    }
+    return r;
+}
+
+std::vector<G> operator-(std::vector<G> lhs, std::vector<G> rhs) {
+    if (lhs.size() != rhs.size()){
+        throw std::runtime_error("Vector sizes in component-wise subtraction mismatch. lhs.size() is " + to_string(lhs.size()) + " rhs.size() is " + to_string(rhs.size()) + ".");
+    }
+    vector<G> r;
+    for (size_t i = 0; i < lhs.size(); i++){
+        r.push_back(lhs[i]-rhs[i]);
+    }
+    return r;
+}
+
+std::vector<G> operator-(long i, std::vector<G> rhs) {
+    vector<G> lhs;
+    for (auto x: rhs){
+        lhs.push_back(i);
+    }
+    vector<G> r;
+    for (size_t i = 0; i < rhs.size(); i++){
+        r.push_back(lhs[i]-rhs[i]);
     }
     return r;
 }

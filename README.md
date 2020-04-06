@@ -38,6 +38,8 @@ SHEEP will then be used to evaluate those circuits on any of its supported libra
 9. Change Debug-Docker's Toolchain to Docker
 10. Reload CMakeLists.txt in Granite root folder
 
+## Troubleshooting
+If you encounter strange errors of targets being missing or not recompiling, try Build > Clean, or delete cmake-build-debug-docker in the root folder and reload the root CMakeLists.txt, or delete the .idea file in the root folder and restart CLion. (This means, you will have to change the CMake toolchain from default to Docker again. Also you will loose any other setting for the local project.)
 ## Benchmark
 Look at the examples in folder Benchmark.
 In the results folder, there is a convenient script for plotting.

@@ -80,6 +80,9 @@ private:
   /// Number of multiplications in the AST
   int nMults;
 
+  /// The biggest number in the AST
+  int maxInput;
+
   /// Possible Qs for 128bit security. (HE standard v1.1 March 16, 2018, smallest q of all tables)
   const std::vector<int> N =     {1024, 2048, 4096, 8192, 16384, 32768};
   const std::vector<int> Q128bit {25,    51,   101,  202,   411, 827};
@@ -135,6 +138,10 @@ private:
   /// initializes all parameters later needed for cryptographic parameter selection
   /// \param ast
   void calculateParams(Ast ast);
+
+  /// Calculates the biggest int in the AST
+  /// \return
+  int calcMaxInput();
 
 };
 

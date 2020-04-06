@@ -4,26 +4,24 @@
 
 using namespace std;
 using namespace Granite;
-
+using namespace Wool;
 
 void hd_batched(G v, G u) {
-    G diff = (v != u);
+    G diff = (1 - (v - u)*(v - u)); //TODO instead of this workaround, use a library supporting !=
     diff.fold(G::sum);
     output(diff);
 }
 
 void hd_enc(vector<G> v, vector<G> u) {
-    G sum = 0;
-    for (int i = 0; i < v.size(); ++i) {
-        sum += (v[i] != u[i]);
-    }
+    vector<G> diff = (1 - (v - u)*(v - u));
+    G sum = fold(diff,G::sum);
     output(sum);
 }
 
 int main() {
     vector<Library> libraries = {Library::SEALBFV}; //TODO: Add HELib and Palisade once they are working
 
-    int start_size = 0;
+    int start_size = 1;
     int end_size = 60;
     for (auto l: libraries){
         std::ofstream resfile;
@@ -50,6 +48,7 @@ int main() {
             }
             catch (const runtime_error &e){
                 // skip here, because no batching support
+                cout << e.what();
                 resfile << "NaN,";
             }
             vector<G> v_enc = encrypt(v);
@@ -62,8 +61,10 @@ int main() {
             }
             catch (const runtime_error &e){
                 // skip here, because no suitable Q was found (multDepth too high for standard parameters)
+                cout << e.what();
                 resfile << "NaN\n";
             }
+            resfile.flush();
         }
         resfile.close();
     }

@@ -23,7 +23,7 @@ void and_enc(vector<G> v, vector<G> u) {
 int main() {
     vector<Library> libraries = {Library::SEALBFV}; //TODO: Add HELib and Palisade once they are working
 
-    int start_size = 0;
+    int start_size = 1;
     int end_size = 60;
     for (auto l: libraries){
         std::ofstream resfile;
@@ -64,6 +64,7 @@ int main() {
                 // skip here, because no suitable Q was found (multDepth too high for standard parameters)
                 resfile << "NaN\n";
             }
+            resfile.flush();
         }
         resfile.close();
     }

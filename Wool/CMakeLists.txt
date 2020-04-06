@@ -70,9 +70,10 @@ add_library(wool ${SOURCE_FILES})
 target_include_directories(wool PUBLIC
         include
         lib/SHEEP/backend/include
-        ../Granite/include
         ../Granite/lib/ast/include/ast
         ../Granite/lib/ast/include/visitor
+        ../Granite/lib/ast/include/optimizer
+        ../Granite/lib/ast/include/utilities
         lib/SHEEP/backend/include
         )
 

@@ -51,6 +51,18 @@ G fold(std::vector<G> v, std::function<G(G, G)> f);
 /// \return
 std::vector<G> operator*(std::vector<G> lhs, std::vector<G> rhs);
 
+/// Component-wise Subtraction for vectors of G (Can be folded later)
+/// \param lhs
+/// \param rhs
+/// \return
+std::vector<G> operator-(std::vector<G> lhs, std::vector<G> rhs);
+
+/// Component-wise Subtraction for vectors of G from a Vector initialized with the same value (Can be folded later)
+/// \param i The value of which the left vector should consist of
+/// \param rhs
+/// \return
+std::vector<G> operator-(long i, std::vector<G> rhs);
+
 /// Pads an AST to the correct slot size.
 /// \param ast
 void pad(Ast* ast, Wool::Library l);

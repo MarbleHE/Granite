@@ -45,6 +45,8 @@ string toString(Wool::Library l) {
     case Wool::SEALCKKS:return "SEALCKKS";
     case Wool::TFHEBool:return "TFHEBool";
     case Wool::TFHEInteger:return "TFHEInteger";
+      default:
+          throw std::runtime_error("Library not implemented");
   }
 }
 
@@ -52,17 +54,17 @@ W::W(AbstractExpr *ae) {
   Ast ast = Ast();
   Function *func = dynamic_cast<Function *>(ast.setRootNode(new Function("f")));
   func->addStatement(new Return(ae));
-  calculateParams(ast);
   composeCircuit(ae);
+  calculateParams(ast);
 }
 
-//TODO: make less vulnerable to any changes
+//TODO: make less vulnerable to any changes, add support for function parameters
 W::W(Ast a) {
   Function* f = (Function *) a.getRootNode();
   Return* r = (Return *) f->getBodyStatements()[0];
   AbstractExpr * ae = r->getReturnExpressions()[0];
-  calculateParams(a);
   composeCircuit(ae);
+  calculateParams(a);
 }
 
 long W::evaluateWith(Library l) {
@@ -192,7 +194,7 @@ BaseContext<bool>* W::generateContext(Library l){
             return new SHEEP::ContextClear<bool>();
             //TODO add HElib with bool...
     }
-
+    throw std::runtime_error("Library not implemented");
 }
 #endif
 
@@ -287,29 +289,9 @@ void W::printCircuit(){
 
 int W::estimatePlaintextSize() {
     // The maximum possible number to achieve in a circuit is by multiplying the largest number multDepth times itself
-    auto ptv = ptvec;
-    auto cptv = cptvec;
-    if (ptv.empty()){
-        ptv.emplace_back(1);
-    }
-    if (cptv.empty()){
-        cptv.emplace_back(1);
-    }
-    vector<long> ptmaxv;
-    for (auto x : ptvec){
-        if (!x.empty()){
-            auto me = max_element(x.begin(),x.end());
-            ptmaxv.push_back(*me);
-        }
-    }
-    auto cptmax = max_element(cptv.begin(),cptv.end());
-    auto ptmax = max_element(ptmaxv.begin(),ptmaxv.end());
-    if (*ptmax == 0 == *cptmax){
-        *ptmax = 1; // handle 0 vectors... no log problems.
-    }
-    int max_val = max(*ptmax,*cptmax);
+    if (maxInput == 1) return 8; //Small hack for extensive boolean support with integer SEALBFV
     int other_ops = opcount - multDepth; //any other operations can at most multiply the result. (e.g. with +)
-    max_val = max_val + other_ops*max_val;
+    int max_val = maxInput + other_ops*maxInput;
     int max_pt_sz = (multDepth + 1) * ceil(log2(max_val)) + 1;
     return max_pt_sz;
 }
@@ -346,7 +328,9 @@ int W::estimateN(Library l){
 }
 
 int W::estimateNViaQ(Library l){
-    int Q = (multDepth + 1) * 60; // 60 bits each q_i
+    int qBits = 60; // 60 bits each q_i
+    if (maxInput == 1) qBits = 30; // Small hack for extensive boolean usage with integer SEALBFV
+    int Q = (multDepth + 1) * qBits;
     int j = 0;
     for (size_t i = 0; i < Q128bit.size(); i++){
         if (Q128bit[i] > Q){
@@ -406,6 +390,31 @@ void W::calculateParams(Ast ast) {
     MultCountVisitor mcv = MultCountVisitor();
     mcv.visit(*ae);
     this->nMults = mcv.getMultCount();
+    this->maxInput = calcMaxInput();
+}
+
+int W::calcMaxInput() {
+    auto ptv = ptvec;
+    auto cptv = cptvec;
+    if (ptv.empty()){
+        ptv.emplace_back(1);
+    }
+    if (cptv.empty()){
+        cptv.emplace_back(1);
+    }
+    vector<long> ptmaxv;
+    for (auto x : ptvec){
+        if (!x.empty()){
+            auto me = max_element(x.begin(),x.end());
+            ptmaxv.push_back(*me);
+        }
+    }
+    auto cptmax = max_element(cptv.begin(),cptv.end());
+    auto ptmax = max_element(ptmaxv.begin(),ptmaxv.end());
+    if (*ptmax == 0 == *cptmax){
+        *ptmax = 1; // handle 0 vectors... no log problems.
+    }
+    return max(*ptmax,*cptmax);
 }
 
 

@@ -16,7 +16,6 @@ add_subdirectory(lib/ast)
 ####################################################################################
 #Linking against libraries gtest, ast, wool, sheep
 set(SOURCE_FILES
-        src/BitHelpers.cpp
         src/G.cpp
         src/PadVisitor.cpp)
 
