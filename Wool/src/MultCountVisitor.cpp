@@ -16,7 +16,7 @@ void MultCountVisitor::visit(AbstractExpr &elem) {
 }
 
 void MultCountVisitor::visit(ArithmeticExpr &elem) {
-    if (std::get<ArithmeticOp>(elem.getOperator()->getOperatorSymbol()) == ArithmeticOp::ADDITION){
+    if (std::get<ArithmeticOp>(elem.getOperator()->getOperatorSymbol()) == ArithmeticOp::MULTIPLICATION){
         multCount++;
     }
     elem.getLeft()->accept(*this);

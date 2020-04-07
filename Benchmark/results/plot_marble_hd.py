@@ -6,7 +6,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 
 
-def plot_figs(library):
+def plot_figs(library, function):
     # figure settings
     fig_width_pt = 300                    # Get this from LaTeX using \showthe\columnwidth
     inches_per_pt = 1.0/72.27*2                 # Convert pt to inches
@@ -30,13 +30,13 @@ def plot_figs(library):
 
 
     import matplotlib.pyplot as plt
-    data = np.genfromtxt('granite_and_' + library + '.csv', delimiter=',', names=True)
+    data = np.genfromtxt('granite_' + function + '_' + library + '.csv', delimiter=',', names=True)
     #plt.plot([1,2,3,4])
 
     begin = 0
     end = 60
 
-    plt.plot(data['n'][begin:end], data['batched'][begin:end], color='0.2', label='And Count',linestyle='-',marker='o',markersize=5, linewidth=2)
+    plt.plot(data['n'][begin:end], data['batched'][begin:end], color='0.2', label='Hamming Distance',linestyle='-',marker='o',markersize=5, linewidth=2)
     #plt.plot(data['max_levels'], data['time_add'], color='c', label='Addition',linestyle='-',marker='o',markersize=4)
     #plt.title("Comparison of Adder Performance")
     plt.xlabel('Elements in vector')
@@ -46,7 +46,7 @@ def plot_figs(library):
     plt.legend(loc=2)
     plt.grid(True, linestyle=':', color='0.8', zorder=0)
     plt.xlim(0,60)
-    plt.ylim(-1.5,2)#36
+    plt.ylim(-0.1,2)#36
 
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
@@ -54,8 +54,8 @@ def plot_figs(library):
     F = plt.gcf()
     F.set_size_inches(fig_size)
     #plt.show()
-    #plt.savefig('granite_and_' + library + '_batched.png')
-    pdf_pages = PdfPages('granite_and_' + library + '_batched.pdf')
+    #plt.savefig('granite_' + function + '_' + library + '_batched.png')
+    pdf_pages = PdfPages('granite_' + function + '_' + library + '_batched.pdf')
     pdf_pages.savefig(F,bbox_inches='tight')
     plt.clf()
     pdf_pages.close()
@@ -63,8 +63,7 @@ def plot_figs(library):
     begin = 0
     end = 30
 
-    data['slow'] = list(map((lambda x : x*60), data['slow'])) #del
-    plt.plot(data['n'][begin:end], data['slow'][begin:end], color='0.2', label='And Count',linestyle='-',marker='o',markersize=5, linewidth=2)
+    plt.plot(data['n'][begin:end], data['slow'][begin:end], color='0.2', label='Hamming Distance',linestyle='-',marker='o',markersize=5, linewidth=2)
     #plt.plot(data['max_levels'], data['time_add'], color='c', label='Addition',linestyle='-',marker='o',markersize=4)
     #plt.title("Comparison of Adder Performance")
     plt.xlabel('Elements in vector')
@@ -75,7 +74,7 @@ def plot_figs(library):
     plt.grid(True, linestyle=':', color='0.8', zorder=0)
     #plt.yticks(range(0,35001,5000), range(0,36,5))
     plt.xlim(0,30)
-    plt.ylim(-0.1,5) #4.2
+    plt.ylim(-0.1,6) #4.2
 
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
@@ -83,13 +82,13 @@ def plot_figs(library):
     F = plt.gcf()
     F.set_size_inches(fig_size)
     #plt.show()
-    #plt.savefig('granite_and_' + library + '.png')
-    pdf_pages = PdfPages('granite_and_' + library + '.pdf')
+    #plt.savefig('granite_' + function + '_' + library + '.png')
+    pdf_pages = PdfPages('granite_' + function + '_' + library + '.pdf')
     pdf_pages.savefig(F,bbox_inches='tight')
     plt.clf()
     pdf_pages.close()
 
 
-plot_figs('SEALBFV')
+plot_figs('SEALBFV','hd')
 
 

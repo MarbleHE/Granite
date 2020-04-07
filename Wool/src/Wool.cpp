@@ -8,9 +8,7 @@
 #include "Return.h"
 #include "Function.h"
 #include "MultDepthVisitor.h"
-#include "BatchingVisitor.hpp"
-#include "OpCountVisitor.hpp"
-#include "MultCountVisitor.hpp"
+#include "ParameterVisitor.hpp"
 #include "context.hpp"
 #include "context-clear.hpp"
 #ifdef HAVE_LP
@@ -380,16 +378,12 @@ void W::calculateParams(Ast ast) {
     MultDepthVisitor mdv = MultDepthVisitor();
     mdv.visit(ast);
     this->multDepth = mdv.getMaxDepth();
-    OpCountVisitor opv = OpCountVisitor();
-    opv.visit(*ae);
-    this->opcount = opv.getOpCount();
-    BatchingVisitor bv = BatchingVisitor();
-    bv.visit(*ae);
-    this->maxSlots = bv.getMaxSlots();
-    this->sndMaxSlots = bv.getSndMaxSlots();
-    MultCountVisitor mcv = MultCountVisitor();
-    mcv.visit(*ae);
-    this->nMults = mcv.getMultCount();
+    ParameterVisitor pv = ParameterVisitor();
+    pv.visit(*ae);
+    this->opcount = pv.getOpCount();
+    this->maxSlots = pv.getMaxSlots();
+    this->sndMaxSlots = pv.getSndMaxSlots();
+    this->nMults = pv.getMultCount();
     this->maxInput = calcMaxInput();
 }
 

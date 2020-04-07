@@ -7,7 +7,7 @@ using namespace Granite;
 
 
 void hd_batched(G v, G u) {
-    G diff = (v != u);
+    G diff = (1 - (v - u)*(v - u)); //TODO instead of this workaround, use a library supporting !=
     diff.fold(G::sum);
     output(diff);
 }

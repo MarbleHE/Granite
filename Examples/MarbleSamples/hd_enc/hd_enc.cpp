@@ -6,10 +6,8 @@ using namespace std;
 using namespace Granite;
 
 void hd_enc(vector<G> v, vector<G> u) {
-    G sum = 0;
-    for (int i = 0; i < v.size(); ++i) {
-        sum += (v[i] != u[i]);
-    }
+    vector<G> diff = (1 - (v - u)*(v - u)); //TODO instead of this workaround, use a library supporting !=
+    G sum = fold(diff,G::sum);
     output(sum);
 }
 

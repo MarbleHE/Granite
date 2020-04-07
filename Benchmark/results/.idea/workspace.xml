@@ -2,28 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7dc9cc0c-79bb-43e9-8eb2-98d2a94cea93" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/results.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Examples/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Examples/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Examples/MarbleSamples/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Examples/MarbleSamples/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Examples/MarbleSamples/ads/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Examples/MarbleSamples/ads/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Examples/MarbleSamples/and_batched/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Examples/MarbleSamples/and_batched/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Examples/MarbleSamples/and_batched/and_batched.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../Examples/MarbleSamples/and_batched/and_batched.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Examples/MarbleSamples/faces/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Examples/MarbleSamples/faces/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Examples/MarbleSamples/hd/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Examples/MarbleSamples/hd/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Examples/MarbleSamples/hd_batched/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Examples/MarbleSamples/hd_batched/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Examples/MarbleSamples/hd_enc/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Examples/MarbleSamples/hd_enc/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Examples/MarbleSamples/hd_enc/hd_enc.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../Examples/MarbleSamples/hd_enc/hd_enc.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Examples/example.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Granite/include/G.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../Granite/include/G.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Granite/src/G.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../Granite/src/G.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Functions/hd_benchmark/hd_benchmark.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Functions/hd_benchmark/hd_benchmark.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/granite_and_SEALBFV.csv" beforeDir="false" afterPath="$PROJECT_DIR$/granite_and_SEALBFV.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/granite_hd_SEALBFV.csv" beforeDir="false" afterPath="$PROJECT_DIR$/granite_hd_SEALBFV.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plot_marble_hd.py" beforeDir="false" afterPath="$PROJECT_DIR$/plot_marble_hd.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../Granite/tests/testsG.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../Granite/tests/testsG.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Wool/include/Wool.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../Wool/include/Wool.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Wool/src/Wool.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../Wool/src/Wool.cpp" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -32,24 +16,33 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/plot_marble_hd.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="515">
-              <caret line="77" column="19" selection-start-line="77" selection-start-column="19" selection-end-line="77" selection-end-column="19" />
-              <folding>
-                <element signature="e#0#24#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="900">
+              <caret line="64" lean-forward="true" selection-start-line="64" selection-end-line="64" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/granite_and_SEALBFV.csv">
+        <entry file="file://$PROJECT_DIR$/granite_hd_SEALBFV.csv">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="405">
-              <caret line="27" column="15" lean-forward="true" selection-start-line="27" selection-start-column="15" selection-end-line="27" selection-end-column="15" />
+            <state relative-caret-position="15">
+              <caret line="1" column="19" lean-forward="true" selection-start-line="1" selection-start-column="19" selection-end-line="1" selection-end-column="19" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/plot_marble_hd_both.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="570">
+              <caret line="38" selection-start-line="38" selection-end-line="38" />
+              <folding>
+                <element signature="e#0#24#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -60,6 +53,8 @@
     <findStrings>
       <find>granite_and</find>
       <find>Plaintext</find>
+      <find>and</find>
+      <find>marble</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -70,6 +65,7 @@
       <list>
         <option value="$PROJECT_DIR$/granite_and_Plaintext.csv" />
         <option value="$PROJECT_DIR$/granite_and_SEALBFV.csv" />
+        <option value="$PROJECT_DIR$/plot_marble_hd_both.py" />
         <option value="$PROJECT_DIR$/plot_marble_hd.py" />
       </list>
     </option>
@@ -115,7 +111,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.plot_marble_hd">
     <configuration name="plot_marble_hd" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="results" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -137,9 +133,31 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="plot_marble_hd_both" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="results" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/plot_marble_hd_both.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Python.plot_marble_hd" />
+        <item itemvalue="Python.plot_marble_hd_both" />
       </list>
     </recent_temporary>
   </component>
@@ -147,26 +165,29 @@
     <configuration />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1920" height="1007" extended-state="0" />
+    <frame x="0" y="23" width="1920" height="1006" extended-state="6" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24960506" />
       <window_info id="Structure" order="1" weight="0.25" />
-      <window_info anchor="bottom" id="Educational.CheckDetails" />
-      <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Terminal" />
-      <window_info anchor="bottom" id="Event Log" side_tool="true" />
-      <window_info anchor="bottom" id="Python Console" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32896176" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32822758" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Educational.CheckDetails" order="8" />
+      <window_info anchor="bottom" id="Terminal" order="9" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
+      <window_info anchor="bottom" id="Python Console" order="11" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$USER_HOME$/Library/Python/3.7/lib/python/site-packages/numpy/lib/npyio.py">
@@ -185,18 +206,32 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/granite_and_SEALBFV.csv">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="405">
-          <caret line="27" column="15" lean-forward="true" selection-start-line="27" selection-start-column="15" selection-end-line="27" selection-end-column="15" />
+        <state relative-caret-position="30">
+          <caret line="2" column="20" lean-forward="true" selection-start-line="2" selection-start-column="20" selection-end-line="2" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/granite_hd_SEALBFV.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="19" lean-forward="true" selection-start-line="1" selection-start-column="19" selection-end-line="1" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/plot_marble_hd_both.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="570">
+          <caret line="38" selection-start-line="38" selection-end-line="38" />
+          <folding>
+            <element signature="e#0#24#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/plot_marble_hd.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="515">
-          <caret line="77" column="19" selection-start-line="77" selection-start-column="19" selection-end-line="77" selection-end-column="19" />
-          <folding>
-            <element signature="e#0#24#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="900">
+          <caret line="64" lean-forward="true" selection-start-line="64" selection-end-line="64" />
         </state>
       </provider>
     </entry>

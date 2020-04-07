@@ -365,3 +365,47 @@ TEST_F(MathTest, ExtensivePalisade){
         EXPECT_EQ(G::result(std::bind(big_math,encrypt(x)), Wool::Library::Palisade),expected_res);
     }
 }
+
+void hd_batched(G v, G u) {
+    G diff = (1 - (v - u)*(v - u)); //TODO instead of this workaround, use a library supporting !=
+    diff.fold(G::sum);
+    output(diff);
+}
+
+void hd_enc(std::vector<G> v, std::vector<G> u) {
+    std::vector<G> diff = (1 - (v - u)*(v - u));
+    G sum = fold(diff,G::sum);
+    output(sum);
+}
+
+class HDTest : public ::testing::Test {
+protected:
+    std::vector<std::vector<int>> testsA;
+    std::vector<std::vector<int>> testsB;
+    void SetUp() override {
+        for (size_t i = 1; i <= 60; i++){
+            std::vector<int> a;
+            std::vector<int> b;
+            for (size_t j = 0; j < i; j++){
+                a.push_back(1);
+                b.push_back(j % 2);
+            }
+            testsA.push_back(a);
+            testsB.push_back(b);
+        }
+    }
+};
+
+TEST_F(HDTest, PlotVerification){
+    for (size_t i = 0; i < testsA.size(); i ++){
+        auto a = testsA[i];
+        auto b = testsB[i];
+        std::vector<G> a_enc = encrypt(a);
+        std::vector<G> b_enc = encrypt(b);
+        G a_batched = batchEncrypt(a);
+        G b_batched = batchEncrypt(b);
+        EXPECT_EQ(G::result(std::bind(hd_enc,a_enc, b_enc),Wool::SEALBFV), a.size() / 2);
+        // A few of these batched tests are expected to fail due to undefined behaviour of folding on batched vectors whose size is not a power of 2
+        EXPECT_EQ(G::result(std::bind(hd_batched,a_batched, b_batched),Wool::SEALBFV), a.size() / 2);
+    }
+}
