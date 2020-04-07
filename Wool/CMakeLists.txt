@@ -64,7 +64,8 @@ set(SOURCE_FILES
         src/BatchingVisitor.cpp
         src/CircuitHelpers.cpp
         src/OpCountVisitor.cpp
-        src/MultCountVisitor.cpp src/ParameterVisitor.cpp)
+        src/MultCountVisitor.cpp
+        src/ParameterVisitor.cpp)
 
 add_library(wool ${SOURCE_FILES})
 target_include_directories(wool PUBLIC
