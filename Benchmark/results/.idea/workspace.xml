@@ -4,10 +4,10 @@
     <list default="true" id="7dc9cc0c-79bb-43e9-8eb2-98d2a94cea93" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/../Functions/hd_benchmark/hd_benchmark.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Functions/hd_benchmark/hd_benchmark.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/granite_and_SEALBFV.csv" beforeDir="false" afterPath="$PROJECT_DIR$/granite_and_SEALBFV.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/granite_hd_SEALBFV.csv" beforeDir="false" afterPath="$PROJECT_DIR$/granite_hd_SEALBFV.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/granite_and_Plaintext.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/granite_and_SEALBFV.csv" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/plot_marble_hd.py" beforeDir="false" afterPath="$PROJECT_DIR$/plot_marble_hd.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Granite/tests/testsG.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../../Granite/tests/testsG.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plot_marble_hd_both.py" beforeDir="false" afterPath="$PROJECT_DIR$/plot_marble_hd_both.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,31 +17,31 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/plot_marble_hd.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="900">
-              <caret line="64" lean-forward="true" selection-start-line="64" selection-end-line="64" />
+            <state relative-caret-position="235">
+              <caret line="65" column="13" selection-start-line="65" selection-start-column="13" selection-end-line="65" selection-end-column="13" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/granite_hd_SEALBFV.csv">
+        <entry file="file://$PROJECT_DIR$/granite_hd_Plaintext.csv">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="1" column="19" lean-forward="true" selection-start-line="1" selection-start-column="19" selection-end-line="1" selection-end-column="19" />
+            <state relative-caret-position="484">
+              <caret line="194" column="9" selection-start-line="194" selection-start-column="9" selection-end-line="194" selection-end-column="9" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/plot_marble_hd_both.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="570">
-              <caret line="38" selection-start-line="38" selection-end-line="38" />
+            <state relative-caret-position="540">
+              <caret line="36" lean-forward="true" selection-start-line="36" selection-end-line="36" />
               <folding>
-                <element signature="e#0#24#0" expanded="true" />
+                <element signature="e#36#60#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -65,15 +65,15 @@
       <list>
         <option value="$PROJECT_DIR$/granite_and_Plaintext.csv" />
         <option value="$PROJECT_DIR$/granite_and_SEALBFV.csv" />
-        <option value="$PROJECT_DIR$/plot_marble_hd_both.py" />
         <option value="$PROJECT_DIR$/plot_marble_hd.py" />
+        <option value="$PROJECT_DIR$/plot_marble_hd_both.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="y" value="23" />
+    <option name="y" value="45" />
     <option name="width" value="1920" />
-    <option name="height" value="1007" />
+    <option name="height" value="1006" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -111,7 +111,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.plot_marble_hd">
+  <component name="RunManager" selected="Python.plot_marble_hd_both">
     <configuration name="plot_marble_hd" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="results" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -156,8 +156,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.plot_marble_hd" />
         <item itemvalue="Python.plot_marble_hd_both" />
+        <item itemvalue="Python.plot_marble_hd" />
       </list>
     </recent_temporary>
   </component>
@@ -214,24 +214,31 @@
     <entry file="file://$PROJECT_DIR$/granite_hd_SEALBFV.csv">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
-          <caret line="1" column="19" lean-forward="true" selection-start-line="1" selection-start-column="19" selection-end-line="1" selection-end-column="19" />
+          <caret line="1" column="19" selection-start-line="1" selection-start-column="19" selection-end-line="1" selection-end-column="19" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/plot_marble_hd_both.py">
+    <entry file="file://$PROJECT_DIR$/granite_hd_Plaintext.csv">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="570">
-          <caret line="38" selection-start-line="38" selection-end-line="38" />
-          <folding>
-            <element signature="e#0#24#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="484">
+          <caret line="194" column="9" selection-start-line="194" selection-start-column="9" selection-end-line="194" selection-end-column="9" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/plot_marble_hd.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="900">
-          <caret line="64" lean-forward="true" selection-start-line="64" selection-end-line="64" />
+        <state relative-caret-position="235">
+          <caret line="65" column="13" selection-start-line="65" selection-start-column="13" selection-end-line="65" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/plot_marble_hd_both.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="540">
+          <caret line="36" lean-forward="true" selection-start-line="36" selection-end-line="36" />
+          <folding>
+            <element signature="e#36#60#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
