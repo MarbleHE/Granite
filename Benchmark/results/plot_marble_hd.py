@@ -34,7 +34,7 @@ def plot_figs(library, function):
     #plt.plot([1,2,3,4])
 
     begin = 0
-    end = 60
+    end = 180
 
     plt.plot(data['n'][begin:end], data['batched'][begin:end], color='0.2', label='Hamming Distance',linestyle='-',marker='o',markersize=5, linewidth=2)
     #plt.plot(data['max_levels'], data['time_add'], color='c', label='Addition',linestyle='-',marker='o',markersize=4)
@@ -61,19 +61,19 @@ def plot_figs(library, function):
     pdf_pages.close()
 
     begin = 0
-    end = 30
+    end = 180
 
     plt.plot(data['n'][begin:end], data['slow'][begin:end], color='0.2', label='Hamming Distance',linestyle='-',marker='o',markersize=5, linewidth=2)
     #plt.plot(data['max_levels'], data['time_add'], color='c', label='Addition',linestyle='-',marker='o',markersize=4)
     #plt.title("Comparison of Adder Performance")
     plt.xlabel('Elements in vector')
-    plt.ylabel('Time [s]') #min
+    plt.ylabel('Time [ms]') #min
     plt.gca().xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
     plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
     plt.legend(loc=2)
     plt.grid(True, linestyle=':', color='0.8', zorder=0)
     #plt.yticks(range(0,35001,5000), range(0,36,5))
-    plt.xlim(0,30)
+    plt.xlim(0,180)
     plt.ylim(-0.1,6) #4.2
 
     plt.rc('text', usetex=True)
@@ -89,6 +89,6 @@ def plot_figs(library, function):
     pdf_pages.close()
 
 
-plot_figs('SEALBFV','hd')
+plot_figs('plainC++','hd')
 
 

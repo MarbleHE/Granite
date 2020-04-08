@@ -33,7 +33,7 @@ def plot_fig(library):
     #plt.plot([1,2,3,4])
 
     begin = 0
-    end = 30
+    end = 180
 
     plt.plot(data['n'][begin:end], data['batched'][begin:end], color='0.2', label='Batched',linestyle='-',marker='o',markersize=5, linewidth=2)
     plt.plot(data['n'][begin:end], data['slow'][begin:end], color='0.2', label='Naive',linestyle='-',marker='+',markersize=5, linewidth=2)
@@ -41,13 +41,13 @@ def plot_fig(library):
     #plt.plot(data['max_levels'], data['time_add'], color='c', label='Addition',linestyle='-',marker='o',markersize=4)
     #plt.title("Comparison of Adder Performance")
     plt.xlabel('Elements in vector')
-    plt.ylabel('Time [s]')
+    plt.ylabel('Time [ms]')
     plt.gca().xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
     plt.gca().yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
     plt.legend(loc=2)
     plt.grid(True, linestyle=':', color='0.8', zorder=0)
-    plt.xlim(1,30)
-    plt.ylim(-0.1,6)
+    plt.xlim(1,180)
+    plt.ylim(-0.1,3)
 
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
@@ -62,4 +62,4 @@ def plot_fig(library):
     pdf_pages.close()
 
 
-plot_fig('SEALBFV')
+plot_fig('plainC++')

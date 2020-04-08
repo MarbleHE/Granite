@@ -17,3 +17,17 @@ target_link_libraries(hd_benchmark
         ast_lib
         wool
         )
+
+add_executable(hd_plain_benchmark hd.cpp)
+set_target_properties(hd_plain_benchmark PROPERTIES COMPILE_FLAGS "-O3 -march=native -fopenmp-simd")
+target_include_directories(hd_plain_benchmark PUBLIC
+        ../../../Granite/include
+        ../../../Granite/lib/SHEEP/backend/include
+        ../../../Granite/lib/ast/include/ast
+        ../../../Wool/include
+        )
+target_link_libraries(hd_plain_benchmark
+        granite
+        ast_lib
+        wool
+        )
