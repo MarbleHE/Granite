@@ -1,16 +1,9 @@
-find_path(HElib_INCLUDE_DIR NAMES FHE.h
-        PATHS /SHEEP/backend/lib/HElib/src
-        )
-find_library(HElib_LIBRARY NAMES fhe.a libfhe.a
-        PATHS /SHEEP/backend/lib/HElib/src/
-        )
-
-#set(HElib_FOUND TRUE)
-set(HElib_INCLUDE_DIRS ${HElib_INCLUDE_DIR})
-set(HElib_LIBRARIES ${HElib_LIBRARY})
+find_path(HElib_INCLUDE_DIRS NAMES FHE.h PATH_SUFFIXES helib)
+find_library(HElib_LIBRARIES NAMES libhelib.a)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(HElib DEFAULT_MSG
-                                  HElib_LIBRARY HElib_INCLUDE_DIR)
+        HElib_LIBRARIES HElib_INCLUDE_DIRS)
 
-mark_as_advanced(HElib_LIBRARY HElib_INCLUDE_DIR)
+mark_as_advanced(HElib_LIBRARIES HElib_INCLUDE_DIRS)
+
