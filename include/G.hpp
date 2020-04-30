@@ -7,10 +7,10 @@
 #include <vector>
 #include <string>
 #include <functional>
-#include <OpSymbEnum.h>
 
-#include "AbstractExpr.h"
 #include "Wool.hpp"
+#include "ast_opt/ast/AbstractExpr.h"
+#include "ast_opt/ast/OpSymbEnum.h"
 
 namespace Granite {
 class G;

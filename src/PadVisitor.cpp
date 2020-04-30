@@ -3,8 +3,8 @@
 //
 #include <vector>
 #include "PadVisitor.hpp"
-#include "LiteralInt.h"
-#include "Matrix.h"
+#include "ast_opt/ast/LiteralInt.h"
+#include "ast_opt/ast/Matrix.h"
 
 PadVisitor::PadVisitor(int targetSlotSize) {
     this->targetSlotSize = targetSlotSize;

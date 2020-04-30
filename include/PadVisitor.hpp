@@ -5,9 +5,9 @@
 #ifndef GRANITE_PADVISITOR_HPP
 #define GRANITE_PADVISITOR_HPP
 
-#include "Visitor.h"
-#include "AbstractExpr.h"
-#include "LiteralInt.h"
+#include "ast_opt/visitor/Visitor.h"
+#include "ast_opt/ast/AbstractExpr.h"
+#include "ast_opt/ast/LiteralInt.h"
 
 class PadVisitor: Visitor {
 private:

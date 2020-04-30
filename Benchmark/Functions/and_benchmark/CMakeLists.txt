@@ -1,19 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
 project(And_benchmark)
 
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 add_executable(and_benchmark and_benchmark.cpp)
-target_include_directories(and_benchmark PUBLIC
-        ../../../include
-        ../../../Granite/lib/SHEEP/backend/include
-        ../../../lib/ast/include/ast
-        ../../../Wool/include
-        )
-target_link_libraries(and_benchmark
-        granite
-        ast_lib
-        wool
-        )
+target_link_libraries(and_benchmark PRIVATE Granite::granite)

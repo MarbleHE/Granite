@@ -4,14 +4,14 @@
 #include <fstream>
 #include <string>
 #include <functional>
-#include "gtest/gtest.h"
-#include "Ast.h"
 #include "G.hpp"
-#include "nlohmann/json.hpp"
-#include "Function.h"
-#include "Return.h"
-#include "Wool.hpp"
 #include "PadVisitor.hpp"
+#include "Wool.hpp"
+#include "nlohmann/json.hpp"
+#include "gtest/gtest.h"
+#include "ast_opt/ast/Ast.h"
+#include "ast_opt/ast/Function.h"
+#include "ast_opt/ast/Return.h"
 
 using json = nlohmann::json;
 using namespace Granite;

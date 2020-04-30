@@ -1,38 +1,34 @@
 cmake_minimum_required(VERSION 3.14)
+include(FetchContent) # Introduced in CMake 3.11
+include(GoogleTest) # Introduced in CMake 3.10
+
+##############################
+# Download GoogleTest framework
+##############################
+FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG release-1.10.0
+)
+FetchContent_MakeAvailable(googletest)
+
 ##############################
 # TARGET: testing
 ##############################
-add_subdirectory("../extern/googletest" "extern/googletest")
+add_executable(testsGranite testsG.cpp)
 
-# To keep CACHE cleaner
-mark_as_advanced(
-        BUILD_GMOCK BUILD_GTEST BUILD_SHARED_LIBS
-        gmock_build_tests gtest_build_samples gtest_build_tests
-        gtest_disable_pthreads gtest_force_shared_crt gtest_hide_internal_symbols
-)
+# this is important to have code coverage in CLion
+if (CMAKE_COMPILER_IS_GNUCXX)
+    set(CMAKE_CXX_FLAGS "--coverage")
+elseif ("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
+    set(CMAKE_CXX_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
+endif ()
 
-# These help some IDE's to realize that gtest isn't a real part of the project
-set_target_properties(gtest PROPERTIES FOLDER extern)
-set_target_properties(gtest_main PROPERTIES FOLDER extern)
-set_target_properties(gmock PROPERTIES FOLDER extern)
-set_target_properties(gmock_main PROPERTIES FOLDER extern)
+target_link_libraries(testsGranite PRIVATE granite gtest gtest_main)
+target_include_directories(testsGranite PRIVATE ../include/)
 
+# create ctest targets
+gtest_discover_tests(testsGranite TEST_PREFIX gtest:)
 
-
-macro(package_add_test TESTNAME)
-    # create an exectuable in which the tests will be stored
-    add_executable(${TESTNAME} ${ARGN})
-    # link the Google test infrastructure, mocking library, and a default main fuction to
-    # the test executable.  Remove g_test_main if writing your own main function.
-    target_link_libraries(${TESTNAME} gtest gmock gtest_main)
-    # gtest_discover_tests replaces gtest_add_tests,
-    # see https://cmake.org/cmake/help/v3.10/module/GoogleTest.html for more options to pass to it
-    gtest_discover_tests(${TESTNAME}
-            # set a working directory so your project root so that you can find test data via paths relative to the project root
-            WORKING_DIRECTORY ${PROJECT_DIR}
-            PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}"
-            )
-    set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
-endmacro()
-
-package_add_test(testsG testsG.cpp)
+# make sure that wool is built before the testing-all target
+add_dependencies(testsGranite granite)
