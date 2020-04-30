@@ -7,9 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(faces_sample faces.cpp)
 target_include_directories(faces_sample PUBLIC
-        ../../../Granite/include
+        ../../../include
         ../../../Granite/lib/SHEEP/backend/include
-        ../../../Granite/lib/ast/include/ast
+        ../../../lib/ast/include/ast
         ../../../Wool/include
         )
 target_link_libraries(faces_sample

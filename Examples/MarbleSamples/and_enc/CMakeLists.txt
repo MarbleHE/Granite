@@ -7,9 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(and_enc_sample and_enc.cpp)
 target_include_directories(and_enc_sample PUBLIC
-        ../../../Granite/include
+        ../../../include
         ../../../Granite/lib/SHEEP/backend/include
-        ../../../Granite/lib/ast/include/ast
+        ../../../lib/ast/include/ast
         ../../../Wool/include
         )
 target_link_libraries(and_enc_sample

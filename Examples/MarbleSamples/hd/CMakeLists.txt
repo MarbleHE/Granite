@@ -7,9 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(hd_sample hd.cpp)
 target_include_directories(hd_sample PUBLIC
-        ../../../Granite/include
+        ../../../include
         ../../../Granite/lib/SHEEP/backend/include
-        ../../../Granite/lib/ast/include/ast
+        ../../../lib/ast/include/ast
         ../../../Wool/include
         )
 target_link_libraries(hd_sample
