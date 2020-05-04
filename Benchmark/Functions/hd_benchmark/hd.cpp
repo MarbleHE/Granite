@@ -58,7 +58,7 @@ int hd_plaintext_batched(vector<int> v, vector<int> u) {
 
 int main() {
     ofstream resfile;
-    resfile.open ("../../../../Benchmark/results/granite_hd_plainC++.csv");
+    resfile.open ("../../../../benchmark/results/granite_hd_plainC++.csv");
     resfile << "#n,#batched,#slow\n";
 
     int n_runs = 10;

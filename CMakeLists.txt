@@ -4,7 +4,7 @@ project(Granite
         DESCRIPTION "Granite is a compiler for FHE"
         LANGUAGES CXX)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/Modules")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules")
 
 ####################################################################################
 ## Dependencies
@@ -63,7 +63,7 @@ install(EXPORT GraniteTargets
         DESTINATION lib/cmake/Granite)
 
 ####################################################################################
-## Granite Examples
+## Granite examples
 ####################################################################################
 add_subdirectory(examples)
 

@@ -1,6 +1,17 @@
 //
 // Created by mario on 08.01.20.
 //
+/// The namespace Granite and class G provide a simple interface for the evaluation and analysis of a FHE function
+/// A user can provide a function, written with the type G. This has the effect, that using the overloaded operators,
+/// the instances can pass an AST, as the function is being executed.
+/// This then results in a bottom-up construction of the unrolled AST of the function, which can be used by the library Wool for further use.
+/// An example can be found in the examples folder, e.g. the hd_enc example.
+///
+/// The namespace mainly consists of convenience functions, which exist to provide a functional interface for G.
+/// The class implements the public interface of overloaded operators.
+/// It also contains the methods serving as a wrapper for the Wool methods, which are responsible for actual execution and benchmarking of the code.
+
+
 #ifndef M_HPP
 #define M_HPP
 
@@ -15,34 +26,64 @@
 namespace Granite {
 class G;
 
-/// Encrypt does not actually encrypt at runtime, but sets the variables with a constructor
+/// Initializes an instance of G with a LiteralInt AST and marks it as encrypted with the given library.
+/// \param value The value to be encrypted.
+/// \param library The library to be used for a later decrypt(G) call
+/// \return The initialized instance..
 G encrypt(long value, Wool::Library library);
 
+/// Initializes an instance of G with a LiteralInt AST and marks it as encrypted with a library to be specified at a later time.
+/// \param value The value to be encrypted.
+/// \return The initialized instance.
 G encrypt(long value);
 
+/// Initializes a whole vector of instances of G with an AST consisting of a Literal and marks it as encrypted with a library to be specified at a later time.
+/// \param v The vector of values to be encrypted separately. (This is NOT batching)
+/// \return A vector of the instances of G.
 std::vector<G> encrypt(std::vector<bool> v);
 
+/// Initializes a whole vector of instances of G with an AST consisting of a Literal and marks it as encrypted with a library to be specified at a later time.
+/// \param v The vector of values to be encrypted separately. (This is NOT batching)
+/// \return A vector of the instances of G.
 std::vector<G> encrypt(std::vector<int> v);
 
+/// Initializes a whole vector of instances of G with an AST consisting of a Literal and marks it as encrypted with a library to be specified at a later time.
+/// \param v The vector of values to be encrypted separately. (This is NOT batching)
+/// \return A vector of the instances of G.
 std::vector<G> encrypt(std::vector<long> v);
 
+/// Initializes an instance of G with an AST consisting of a Literal containing a one-dimensional matrix.
+/// This can be used by Wool to support batching.
+/// The instance is marked as encrypted with a library to be specified at a later time.
+/// \param v The vector of values to be encrypted.
+/// \return An instance of G
 G batchEncrypt(std::vector<bool> v);
 
+/// Initializes an instance of G with an AST consisting of a Literal containing a one-dimensional matrix.
+/// This can be used by Wool to support batching.
+/// The instance is marked as encrypted with a library to be specified at a later time.
+/// \param v The vector of values to be encrypted.
+/// \return An instance of G
 G batchEncrypt(std::vector<int> v);
 
-/// Evaluates the expression in m according to the selected library (Plaintext default) and returns its result.
+/// Triggers the encryption, computation and decryption of the expression stored in m.
+/// The context to be used is determined by the library stored in m. (Plaintext default)
+/// Use this only to support mixed computations within a function. Use output otherwise.
 long decrypt(G m);
 
-/// Vector decrypt
+/// Triggers the encryption, computation and decryption of the expression stored in m.
+/// The context to be used is determined by the library stored in m. (Plaintext default)
+/// Use this only to support mixed computations within a function. Use output otherwise.
 std::vector<long> decrypt(std::vector<G> mv);
 
-/// Output imitates the return statement in HE functions.
+/// Output imitates the return statement in HE functions. HE functions without output are undefined.
+/// Legacy interface support.
 void output(G value);
 
-/// folds vector v with function f
+/// Folds vector v with function f using batching
 /// \param v
 /// \param f
-/// \return
+/// \return An instance of G containing the AST produced by the fold.
 G fold(std::vector<G> v, std::function<G(G, G)> f);
 
 /// Component-wise Multiplication for vectors of G (Can be folded later)

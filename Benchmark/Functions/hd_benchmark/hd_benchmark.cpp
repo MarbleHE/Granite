@@ -28,8 +28,8 @@ int main() {
     for (auto l: libraries){
         std::ofstream resfile;
 
-        // Find files on the remote host under path: tmp/tmp.lyA63QWUHt/Benchmark/results
-        resfile.open ("../../../../Benchmark/results/granite_hd_" + toString(l) + ".csv");
+        // Find files on the remote host under path: tmp/tmp.lyA63QWUHt/benchmark/results
+        resfile.open ("../../../../benchmark/results/granite_hd_" + toString(l) + ".csv");
         resfile << "#n,#batched,#slow\n";
 
         for (size_t i = start_size; i < end_size ; i++) {

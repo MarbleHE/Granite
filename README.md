@@ -19,18 +19,20 @@ SHEEP will then be used to evaluate those circuits on any of its supported libra
 
 ## Installation (Recommended)
 1. Install the latest version of CLion.
-2. Clone the repository, using:
+2. Clone the repository and its dependency Wool, using:
    ```
-   git clone --recurse-submodules https://github.com/MarbleHE/Granite.git
+   git clone https://github.com/MarbleHE/Granite.git
+   git clone https://github.com/MarbleHE/Wool
    ```
 3. Install the latest version of Docker.
 4. Execute the following commands:
     ```
-    docker build -t granite_ssh -f Dockerfile .
-    docker run -d --cap-add sys_ptrace -p127.0.0.1:2222:22 --name granite_ssh granite_ssh
-    ssh-keygen -f "$HOME/.ssh/known_hosts" -R "[localhost]:2222"
-    ```
-    The last command is expected to fail, if the host is not already known. So error messages can be ignored there.
+   cd Wool
+   docker pull marblehe/wool_library
+   docker tag marblehe/wool_library wool_library
+   docker build -t wool_library_ssh -f Dockerfile_wool_library_ssh .
+   docker run -d --cap-add sys_ptrace -p 127.0.0.1:2222:22 wool_library_ssh
+   ```
 5. Go to CLion > Preferences > Toolchains
 6. Add a new Remote Host with the Name: Docker_Granite, credentials are Host: localhost, Port: 2222, User name: user, Password: password
 7. Select the correct CMake in path: /cmake-3.15.0/bin/cmake
@@ -49,50 +51,3 @@ To get the results from the Docker container, use Tools > Deployment > Browse Re
 The results from the example are stored in the folder tmp/tmp.lyA63QWUHt/Benchmark/results
 
 They are not synced automatically.
-## Installation (Manual, not tested)
-Clone the repository, using:
-```
-git clone --recurse-submodules -j8 https://github.com/MarbleHE/Granite.git
-```
-Then install the following dependencies.
-### SHEEP
-```
-brew install tbb
-```
-
-or for apt-based Linux installations:
-```
-apt-get -y install libtbb-dev
-```
-#### TFHE
-To build TFHE, first install the fftw library (download source from http://www.fftw.org/download.html then follow the instructions on that page)
-
-Then build TFHE as follows:
-```
-cd Wool/lib/SHEEP/backend/lib/tfhe
-mkdir build
-cd build
-cmake ../src -DENABLE_TESTS=on -DENABLE_FFTW=on -DCMAKE_BUILD_TYPE=optim -DENABLE_NAYUKI_PORTABLE=off -DENABLE_SPQLIOS_AVX=off -DENABLE_SPQLIOS_FMA=off -DENABLE_NAYUKI_AVX=off
-make
-sudo make install
-```
-
-#### HElib
-HElib depends on the GMP and NTL libraries. To install gmp on OSX do:
-```
-brew install gmp
-```
-
-this will install into /usr/local/Cellar/gmp - this location is needed when building ntl.)
-
-For ntl, use `brew install ntl`??? or download and install from official resources, where at the ./configure step, add the argument GMP_PREFIX=/usr/local/Cellar/gmp if you installed gmp using homebrew, or the relevant location if you used another method.
-
-Then build HElib as follows:
-```
-cd ../../HElib/src
-make
-mkdir build
-cd build
-cmake ..
-make all
-```
