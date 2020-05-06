@@ -89,21 +89,22 @@ G fold(std::vector<G> v, std::function<G(G, G)> f);
 /// Component-wise Multiplication for vectors of G (Can be folded later)
 /// \param lhs
 /// \param rhs
-/// \return
+/// \return Vector of instances containing the AST of lhs[i]*rhs[i]
 std::vector<G> operator*(std::vector<G> lhs, std::vector<G> rhs);
 
 /// Component-wise Subtraction for vectors of G (Can be folded later)
 /// \param lhs
 /// \param rhs
-/// \return
+/// \return Vector of instances containing the AST of lhs[i]-rhs[i]
 std::vector<G> operator-(std::vector<G> lhs, std::vector<G> rhs);
 
 /// Component-wise Subtraction for vectors of G from a Vector initialized with the same value (Can be folded later)
 /// \param i The value of which the left vector should consist of
 /// \param rhs
-/// \return
+/// \return Vector of instances containing the AST of i-rhs[k]
 std::vector<G> operator-(long i, std::vector<G> rhs);
 
+/// DEPRECATED
 /// Returns two the padded versions of lhs and rhs for batching.
 /// (Constants in the expressions of lhs or rhs get padded to a vector)
 /// \param lhs
@@ -111,19 +112,20 @@ std::vector<G> operator-(long i, std::vector<G> rhs);
 /// \return <lhsPadded, rhsPadded>
 std::tuple<G,G> pad(const G &lhs, const G &rhs);
 
+/// DEPRECATED
 /// Pads an AST to the correct slot size.
 /// \param ast
 void pad(Ast* ast, Wool::Library l);
 
+/// DEPRECATED
 void pad(AbstractExpr* ae, Wool::Library l);
 
 class G {
  public:
-  /// The method generating an AST from some function written with G classes.
+  /// The method generating an AST from some function f written with G classes.
   static Ast *makeAST(std::function<void()> f);
 
   /// Method for multDepth analysis will (Wrapper for Wool).
-  /// The multDepth returned  is ignoring anything previous all decrypt statements and only measure statements on which output depends on directly.
   /// \return Maximum multiplicative depth of circuit composed from AST.
   static int analyse(std::function<void()> f);
 
@@ -276,8 +278,12 @@ class G {
   /// \return Size of the current expression (batched vector)
   int getExprSize();
 
+  /// Fold function to use after batching
+  /// \param f The function to combine values
+  /// \return An instance of G containing the AST after folding this with f
   G &fold(std::function<G(G, G)> f);
 
+  /// Convenience wrapper for + to use in folds.
   static G sum(G, G);
 
 private:
@@ -321,14 +327,30 @@ private:
   /// \return
   friend G rotate(G m, int k);
 
+    /// Initializes an instance of G with a LiteralInt AST and marks it as encrypted with the given library.
+    /// \param value The value to be encrypted.
+    /// \param library The library to be used for a later decrypt(G) call
+    /// \return The initialized instance..
   friend G encrypt(long value, Wool::Library library);
 
+  /// Initializes an instance of G with an AST consisting of a Literal containing a one-dimensional matrix.
+  /// This can be used by Wool to support batching.
+  /// The instance is marked as encrypted with a library to be specified at a later time.
+  /// \param v The vector of values to be encrypted.
+  /// \return An instance of G
   friend  G batchEncrypt(std::vector<bool> v);
 
+    /// Initializes an instance of G with an AST consisting of a Literal containing a one-dimensional matrix.
+    /// This can be used by Wool to support batching.
+    /// The instance is marked as encrypted with a library to be specified at a later time.
+    /// \param v The vector of values to be encrypted.
+    /// \return An instance of G
   friend  G batchEncrypt(std::vector<int> v);
 
-  friend Ast make_AST(std::function<void()> f);
+    /// The method generating an AST from some function f written with G classes.
+    friend Ast make_AST(std::function<void()> f);
 
+    ///DEPRECATED
   friend std::tuple<G,G> pad(const G &lhs, const G &rhs);
 };
 
